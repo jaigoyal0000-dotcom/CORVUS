@@ -77,13 +77,12 @@ export default function DashboardPage() {
         if (Array.isArray(data) && data.length > 0) {
           setProjectsList(data);
         } else {
-          // Pre-populate with official-grade national initiatives
           setProjectsList([
             {
               id: 'proj_0001',
               name: 'Delhi NCR Urban Expansion & Forest Canopy Audit',
               description: 'Bi-temporal high-resolution satellite surveillance for unauthorized construction and green buffer monitoring across 1,484 km².',
-              location_name: 'Delhi NCR, Survey Division North',
+              location_name: 'Delhi NCR (North Survey Division)',
               created_at: '2026-09-10T10:00:00Z',
               queries_count: 34,
               status: 'Approved & Verified',
@@ -94,7 +93,7 @@ export default function DashboardPage() {
               id: 'proj_0002',
               name: 'Brahmaputra River Basin Flood Inundation & Embankment Surveillance',
               description: 'Sentinel-1 SAR radar bi-weekly penetration through monsoon cloud cover to track breach hotspots and shelter connectivity.',
-              location_name: 'Assam & Arunachal Pradesh Riverine Zones',
+              location_name: 'Assam & Riverine Basins',
               created_at: '2026-09-08T06:30:00Z',
               queries_count: 52,
               status: 'Active Disaster Alert',
@@ -136,33 +135,34 @@ export default function DashboardPage() {
 
   if (!mounted) return null;
 
-  // Bilingual content dictionary
+  // Sensible Bilingual Government Dictionary
   const t = {
     govIndia: language === 'hi' ? 'भारत सरकार' : 'GOVERNMENT OF INDIA',
     ministry: language === 'hi' ? 'अंतरिक्ष विभाग एवं पृथ्वी विज्ञान मंत्रालय' : 'Department of Space & Ministry of Earth Sciences',
     portalName: language === 'hi' ? 'राष्ट्रीय सुदूर संवेदन एवं भू-स्थानिक अवलोकन पोर्टल' : 'National Remote Sensing & Earth Observation Geospatial Portal',
     portalSub: language === 'hi'
-      ? 'नागरिकों, किसानों, नगर निकायों एवं शोधकर्ताओं हेतु उपग्रह आधारित कृत्रिम बुद्धिमत्ता निगरानी मंच'
-      : 'Open AI-Powered Satellite Surveillance for Citizens, Farmers, Municipal Authorities & Disaster Responders',
-    bulletinTitle: language === 'hi' ? 'ताज़ा राष्ट्रीय बुलेटिन' : 'LIVE NATIONAL BULLETIN',
+      ? 'नागरिकों, किसानों, नगर निकायों एवं आपदा प्रबंधन हेतु उपग्रह आधारित आधिकारिक भू-स्थानिक मंच'
+      : 'Approved under National Geospatial Policy 2022 • Open Public & Inter-Departmental Satellite Intelligence',
+    bulletinTitle: language === 'hi' ? 'ताज़ा बुलेटिन' : 'LIVE BULLETIN',
     bulletinText: language === 'hi'
-      ? '📢 इसरो एवं सेंटिनल उपग्रह रडार लाइव: असम एवं गंगा बेसिन में बाढ़ निगरानी सक्रिय • खरीफ फसल स्वास्थ्य रिपोर्ट जारी • अनाधिकृत शहरी अतिक्रमण जांच उपलब्ध • नागरिक सहायता 1800-11-2026 24x7 चालू।'
-      : '📢 SATELLITE RADAR LIVE: High-Resolution Monsoon Inundation Watch active for Brahmaputra & Ganga Basins • Kharif Crop Health Indexes Calibrated across 18 States • Municipal Encroachment Audits Open for Panchayats & ULBs • Citizen Helpline 1800-11-2026 Active 24x7.',
+      ? 'इसरो एवं सेंटिनल उपग्रह रडार लाइव: असम एवं गंगा बेसिन में बाढ़ निगरानी सक्रिय • खरीफ फसल स्वास्थ्य रिपोर्ट जारी • अनाधिकृत शहरी अतिक्रमण जांच उपलब्ध • नागरिक सहायता 1800-11-2026 (निःशुल्क) चालू।'
+      : 'SATELLITE RADAR LIVE: High-Resolution Monsoon Inundation Watch active for Brahmaputra & Ganga Basins • Kharif Crop Health Indexes Calibrated across 18 States • Municipal Encroachment Audits Open for Panchayats & ULBs • Citizen Helpline 1800-11-2026 Active 24x7.',
     searchPlaceholder: language === 'hi'
-      ? 'राज्य, जिला, नदी घाटी या पिन कोड खोजें (उदा. दिल्ली, वाराणसी, पटना, मुंबई, जयपुर)...'
+      ? 'राज्य, जिला, पंचायत या निर्देशांक खोजें (उदा. दिल्ली, वाराणसी, पटना, मुंबई, जयपुर)...'
       : 'Search any State, District, Panchayat, River Basin or Coordinates (e.g., Delhi, Patna, Brahmaputra, Mumbai)...',
-    searchBtn: language === 'hi' ? 'खोजें' : 'Locate Area',
+    searchBtn: language === 'hi' ? 'खोजें' : 'Search Area',
     quickServices: language === 'hi' ? 'प्रमुख सार्वजनिक एवं प्रशासनिक सेवाएँ' : 'Key Citizen & Department Services',
     quickServicesSub: language === 'hi'
-      ? 'प्रत्येक नागरिक और अधिकारी द्वारा आसानी से उपयोग किए जाने वाले सरल उपग्रह मॉड्यूल'
-      : 'Plain-language, single-click geospatial services designed for instant public and administrative access',
-    kpiArea: language === 'hi' ? 'कुल निगरानी क्षेत्र' : 'Monitored National Landmass',
+      ? 'प्रत्येक नागरिक और अधिकारी द्वारा आसानी से उपयोग किए जाने वाले आधिकारिक उपग्रह मॉड्यूल'
+      : 'Direct, single-click geospatial services for public transparency and departmental operations',
+    kpiSection: language === 'hi' ? 'राष्ट्रीय भू-स्थानिक आंकड़े' : 'National Geospatial Statistics Overview',
+    kpiArea: language === 'hi' ? 'कुल निगरानी क्षेत्र' : 'Total Territory Monitored',
     kpiSat: language === 'hi' ? 'सक्रिय उपग्रह बेड़ा' : 'Operational Satellite Feeds',
-    kpiAudits: language === 'hi' ? 'प्रमाणित जिला सर्वेक्षण' : 'Verified District Audits',
-    kpiDisaster: language === 'hi' ? 'सक्रिय आपदा चेतावनी' : 'Emergency Disaster Alerts',
-    howItWorksTitle: language === 'hi' ? 'यह पोर्टल कैसे काम करता है? (3 सरल चरण)' : 'How Citizens and Officers Use This Portal (3 Simple Steps)',
-    recentProjectsTitle: language === 'hi' ? 'हालिया राष्ट्रीय एवं राज्य स्तरीय भू-स्थानिक परियोजनाएं' : 'Official Geospatial Initiatives & Verified Audits',
-    systemIntegrations: language === 'hi' ? 'राष्ट्रीय संस्थान एवं डेटा एकीकरण' : 'National Agency & Satellite Feeds Integration',
+    kpiAudits: language === 'hi' ? 'सत्यापित सर्वेक्षण' : 'Verified District Audits',
+    kpiDisaster: language === 'hi' ? 'सतत निगरानी' : '24x7 Disaster Surveillance',
+    howItWorksTitle: language === 'hi' ? 'नागरिक एवं अधिकारी इस पोर्टल का उपयोग कैसे करें?' : 'How Citizens and Officials Use This Portal (3 Simple Steps)',
+    recentProjectsTitle: language === 'hi' ? 'सत्यापित राष्ट्रीय एवं राज्य स्तरीय भू-स्थानिक सर्वेक्षण' : 'Official Geospatial Initiatives & Verified Audits',
+    systemIntegrations: language === 'hi' ? 'राष्ट्रीय संस्थान एवं उपग्रह डेटा एकीकरण' : 'National Agency & Satellite Feeds Integration',
   };
 
   // Filter projects based on search
@@ -177,102 +177,89 @@ export default function DashboardPage() {
   return (
     <div
       className={`min-h-screen ${
-        highContrast ? 'bg-black text-amber-300' : 'bg-white text-slate-800'
+        highContrast ? 'bg-black text-amber-300' : 'bg-[#FAFCFF] text-slate-800'
       } ${
         fontScale === 'large' ? 'text-base' : fontScale === 'larger' ? 'text-lg' : 'text-sm'
       }`}
     >
-      {/* 🇮🇳 1. VIBRANT NATIONAL TRICOLOR TOP STRIP (Saffron • White • Green) */}
-      <div className="h-2 w-full flex shrink-0 shadow-md">
-        <div className="flex-1 bg-gradient-to-r from-amber-600 to-orange-500" />
-        <div className="flex-1 bg-white relative flex items-center justify-center border-y border-slate-200">
-          <div className="w-1.5 h-1.5 rounded-full bg-blue-900" />
+      {/* 🇮🇳 1. ELEGANT NATIONAL TRICOLOR TOP STRIP */}
+      <div className="h-1.5 w-full flex shrink-0">
+        <div className="flex-1 bg-[#E65100]" />
+        <div className="flex-1 bg-white border-y border-slate-200 relative flex items-center justify-center">
+          <div className="w-1.5 h-1.5 rounded-full bg-[#000080]" />
         </div>
-        <div className="flex-1 bg-gradient-to-r from-emerald-600 to-green-600" />
+        <div className="flex-1 bg-[#138808]" />
       </div>
       
-      {/* Official Government of India Top Banner on Clean White */}
-      <div className="bg-white border-b border-slate-200 text-xs py-2 px-4 sm:px-8 flex flex-wrap items-center justify-between gap-3 text-slate-700 shadow-sm">
+      {/* Top Official Government Masthead Bar */}
+      <div className="bg-white border-b border-slate-200 text-xs py-2 px-4 sm:px-8 flex flex-wrap items-center justify-between gap-3 text-slate-700 shadow-xs">
         <div className="flex items-center gap-3">
-          {/* National Ashoka Emblem / National Seal Graphic */}
-          <div className="flex items-center gap-2.5">
-            <div className="w-6 h-6 rounded-full bg-amber-100 border border-amber-400 flex items-center justify-center text-xs shadow-sm">
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-full bg-amber-50 border border-amber-400 flex items-center justify-center text-sm shadow-xs">
               🏛️
             </div>
             <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2">
-              <span className="font-extrabold tracking-wider text-amber-700 uppercase">
+              <span className="font-extrabold tracking-wider text-[#9A3412] uppercase text-xs">
                 {t.govIndia}
               </span>
-              <span className="text-slate-400 hidden sm:inline">•</span>
-              <span className="text-slate-600 text-[11px] font-semibold">
+              <span className="text-slate-300 hidden sm:inline">|</span>
+              <span className="text-slate-600 text-[11px] font-medium">
                 {t.ministry}
               </span>
             </div>
           </div>
         </div>
 
-        {/* Accessibility & Language Controls with National Palette */}
-        <div className="flex items-center gap-3 font-mono text-[11px]">
-          {/* Live IST Clock with Navy & Cyan Hue */}
-          <div className="hidden lg:flex items-center gap-1.5 text-blue-900 bg-blue-50 px-2.5 py-1 rounded-md border border-blue-200 shadow-sm">
+        {/* Accessibility & Language Controls */}
+        <div className="flex items-center gap-3 text-[11px]">
+          {/* Live IST Clock */}
+          <div className="hidden lg:flex items-center gap-1.5 text-[#0A2540] bg-slate-50 px-2.5 py-1 rounded border border-slate-200 font-mono">
             <Activity className="w-3.5 h-3.5 text-emerald-600 animate-pulse" />
-            <span className="font-bold">{currentTime || '19:40:00 IST'}</span>
+            <span className="font-bold">{currentTime || '19:50:00 IST'}</span>
           </div>
 
-          {/* Citizen Helpline in India Green */}
-          <div className="hidden sm:flex items-center gap-1.5 text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-300 shadow-sm">
+          {/* Citizen Helpline */}
+          <div className="hidden sm:flex items-center gap-1.5 text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded border border-emerald-300">
             <Phone className="w-3.5 h-3.5 text-emerald-600" />
-            <span className="font-sans font-extrabold">Toll-Free: 1800-11-2026</span>
+            <span className="font-bold">Toll-Free: 1800-11-2026</span>
           </div>
 
-          {/* Font Scaler (A- | A | A+) */}
-          <div className="flex items-center bg-slate-100 rounded-md border border-slate-300 overflow-hidden">
+          {/* Font Scaler */}
+          <div className="flex items-center bg-slate-100 rounded border border-slate-300 overflow-hidden font-mono">
             <button
               onClick={() => setFontScale('normal')}
-              className={`px-2 py-0.5 font-bold transition ${fontScale === 'normal' ? 'bg-amber-500 text-white' : 'text-slate-700 hover:bg-slate-200'}`}
+              className={`px-2 py-0.5 font-bold transition ${fontScale === 'normal' ? 'bg-[#0B3558] text-white' : 'text-slate-700 hover:bg-slate-200'}`}
               title="Standard Font Size"
             >
               A-
             </button>
             <button
               onClick={() => setFontScale('large')}
-              className={`px-2 py-0.5 font-bold transition ${fontScale === 'large' ? 'bg-amber-500 text-white' : 'text-slate-700 hover:bg-slate-200'}`}
+              className={`px-2 py-0.5 font-bold transition ${fontScale === 'large' ? 'bg-[#0B3558] text-white' : 'text-slate-700 hover:bg-slate-200'}`}
               title="Large Font Size"
             >
               A
             </button>
             <button
               onClick={() => setFontScale('larger')}
-              className={`px-2 py-0.5 font-bold transition ${fontScale === 'larger' ? 'bg-amber-500 text-white' : 'text-slate-700 hover:bg-slate-200'}`}
+              className={`px-2 py-0.5 font-bold transition ${fontScale === 'larger' ? 'bg-[#0B3558] text-white' : 'text-slate-700 hover:bg-slate-200'}`}
               title="Extra Large Font Size"
             >
               A+
             </button>
           </div>
 
-          {/* High Contrast Toggle */}
-          <button
-            onClick={() => setHighContrast(!highContrast)}
-            className={`px-2.5 py-1 rounded-md border text-[10px] font-sans font-bold transition ${
-              highContrast
-                ? 'bg-amber-400 text-black border-amber-300'
-                : 'bg-slate-100 border-slate-300 text-slate-700 hover:bg-slate-200'
-            }`}
-          >
-            {highContrast ? 'Standard' : 'Contrast'}
-          </button>
-
-          {/* Language Selector in Tricolor (Saffron Active / Slate Border) */}
-          <div className="flex items-center bg-slate-100 rounded-md border border-slate-300 overflow-hidden font-sans">
+          {/* Language Selector */}
+          <div className="flex items-center bg-slate-100 rounded border border-slate-300 overflow-hidden">
             <button
               onClick={() => setLanguage('en')}
-              className={`px-2.5 py-1 font-bold transition ${language === 'en' ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
+              className={`px-2.5 py-1 font-bold transition ${language === 'en' ? 'bg-[#E65100] text-white shadow-xs' : 'text-slate-700 hover:text-slate-900'}`}
             >
               English
             </button>
             <button
               onClick={() => setLanguage('hi')}
-              className={`px-2.5 py-1 font-bold transition ${language === 'hi' ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
+              className={`px-2.5 py-1 font-bold transition ${language === 'hi' ? 'bg-[#E65100] text-white shadow-xs' : 'text-slate-700 hover:text-slate-900'}`}
             >
               हिंदी
             </button>
@@ -280,85 +267,74 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Main Standard Nav */}
+      {/* Official Sensible Government Navigation Bar */}
       <Navbar />
 
-      {/* 📢 2. LIVE EMERGENCY BULLETIN (Clean Saffron Tint on White) */}
-      <div className="bg-amber-50 border-b border-amber-200 px-4 sm:px-8 py-2.5 flex items-center gap-3 shadow-inner">
-        <div className="flex items-center gap-1.5 px-3 py-1 rounded-md bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 text-white font-extrabold text-[10px] uppercase tracking-wider shrink-0 shadow-md shadow-amber-600/30 animate-pulse">
-          <AlertTriangle className="w-3.5 h-3.5" />
+      {/* 📢 2. OFFICIAL BULLETIN TICKER */}
+      <div className="bg-[#FFF8E7] border-b border-amber-200/80 px-4 sm:px-8 py-2 flex items-center gap-3">
+        <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-[#E65100] text-white font-extrabold text-[10px] uppercase tracking-wider shrink-0 shadow-xs">
+          <AlertTriangle className="w-3 h-3" />
           <span>{t.bulletinTitle}</span>
         </div>
-        <div className="overflow-hidden whitespace-nowrap text-xs text-amber-950 font-semibold">
+        <div className="overflow-hidden whitespace-nowrap text-xs text-amber-950 font-medium">
           <p className="inline-block">{t.bulletinText}</p>
         </div>
       </div>
 
-      {/* 🏛️ 3. OFFICIAL NATIONAL PORTAL MASTHEAD ON WHITE BACKDROP */}
-      <header className="relative overflow-hidden bg-gradient-to-b from-slate-50 via-white to-slate-50/80 border-b border-slate-200 px-4 sm:px-8 py-9">
-        {/* Subtle Ambient Flag Color Glow Orbs */}
-        <div className="absolute -top-12 left-10 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-12 right-10 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative z-10">
-          <div className="space-y-2.5 max-w-3xl">
-            <div className="flex items-center gap-3.5">
-              {/* Emblem Box with Tricolor Gradient Border */}
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 via-white to-emerald-500 p-0.5 shadow-xl shadow-slate-300/40 shrink-0">
-                <div className="w-full h-full bg-white rounded-[14px] flex items-center justify-center text-amber-600 shadow-inner">
-                  <Satellite className="w-6 h-6" />
-                </div>
+      {/* 🏛️ 3. SENSIBLE OFFICIAL PORTAL HEADER */}
+      <header className="bg-white border-b border-slate-200 px-4 sm:px-8 py-7 shadow-xs">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div className="space-y-1.5 max-w-3xl">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-300 flex items-center justify-center text-[#0B3558] shrink-0 shadow-xs">
+                <Satellite className="w-6 h-6 text-[#0B3558]" />
               </div>
               <div>
-                <div className="flex items-center flex-wrap gap-2">
-                  <span className="text-xs font-mono font-extrabold text-amber-700 tracking-wider uppercase">
-                    CORVUS — NATIONAL EARTH OBSERVATION MISSION
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] font-bold text-[#E65100] tracking-wider uppercase">
+                    CORVUS — राष्ट्रीय सुदूर संवेदन मिशन
                   </span>
-                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-300 text-emerald-800 text-[10px] font-bold font-mono shadow-sm">
-                    ✓ Survey of India Calibrated
+                  <span className="px-2 py-0.5 rounded bg-emerald-50 border border-emerald-300 text-emerald-800 text-[10px] font-bold">
+                    ✓ Survey of India Verified
                   </span>
                 </div>
-                <h1 className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-amber-600 via-blue-950 to-emerald-700">
+                <h1 className="text-xl sm:text-2xl font-black text-[#0B2545] tracking-tight">
                   {t.portalName}
                 </h1>
               </div>
             </div>
-            <p className="text-xs sm:text-sm text-slate-600 font-normal leading-relaxed pl-1">
+            <p className="text-xs sm:text-sm text-slate-600 font-normal pl-0.5 leading-relaxed">
               {t.portalSub}
             </p>
           </div>
 
-          {/* Official Officer Badge & Primary Saffron CTA Button */}
+          {/* Right: Clean Action Button & User Info */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full md:w-auto shrink-0">
-            <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-3 text-xs w-full sm:w-auto">
-              <div className="text-[10px] font-mono text-slate-500 uppercase tracking-wider">
-                Logged in Official / Citizen
+            <div className="bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs w-full sm:w-auto">
+              <div className="text-[10px] text-slate-500 font-medium">
+                Authorized Official / Citizen
               </div>
-              <div className="font-bold text-slate-900 flex items-center gap-1.5 mt-0.5">
+              <div className="font-bold text-[#0B2545] flex items-center gap-1 mt-0.5">
                 <UserCheck className="w-3.5 h-3.5 text-emerald-600" />
                 <span>{user?.full_name || 'Corvus Mission Director'}</span>
-                <span className="text-[10px] font-mono text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded border border-emerald-300 font-bold">
-                  Authorized
-                </span>
               </div>
             </div>
 
-            {/* Launch Workspace CTA in Bold Saffron / Tiranga Accent */}
             <Link
               href="/workspace/proj_0001"
-              className="px-5 py-3.5 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black rounded-xl text-xs flex items-center justify-center gap-2 shadow-xl shadow-amber-500/20 transition shrink-0 w-full sm:w-auto"
+              className="px-5 py-3 bg-[#E65100] hover:bg-[#D84315] text-white font-bold rounded-lg text-xs flex items-center justify-center gap-2 shadow-sm transition shrink-0 w-full sm:w-auto"
             >
-              <Globe className="w-4 h-4 text-slate-950" />
-              <span>Launch GIS Satellite Map ➔</span>
+              <Globe className="w-4 h-4 text-white" />
+              <span>उपग्रह नक्शा खोलें (Launch GIS Map) ➔</span>
             </Link>
           </div>
         </div>
 
-        {/* Universal District / Village / Coordinates Locator Bar */}
+        {/* Universal Search Bar */}
         <div className="max-w-7xl mx-auto mt-6">
-          <div className="bg-white border-2 border-amber-400/60 hover:border-amber-500 focus-within:border-amber-500 rounded-2xl p-2.5 flex flex-col sm:flex-row items-center gap-2.5 shadow-lg transition">
+          <div className="bg-white border-2 border-slate-300 hover:border-[#0B3558] focus-within:border-[#0B3558] rounded-xl p-2 flex flex-col sm:flex-row items-center gap-2 shadow-xs transition">
             <div className="flex items-center gap-2.5 px-3 w-full flex-1">
-              <Search className="w-4 h-4 text-amber-600 shrink-0" />
+              <Search className="w-4 h-4 text-slate-500 shrink-0" />
               <input
                 type="text"
                 value={searchDistrict}
@@ -376,26 +352,25 @@ export default function DashboardPage() {
               )}
             </div>
             
-            {/* Quick jump presets in Tricolor badges */}
             <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0 px-2 sm:px-0">
-              <span className="text-[10px] text-slate-500 font-mono hidden lg:inline">Popular:</span>
+              <span className="text-[10px] text-slate-500 font-medium hidden lg:inline">Quick Search:</span>
               {[
-                { name: 'Delhi NCR', border: 'border-amber-300 text-amber-800 bg-amber-50' },
-                { name: 'Patna (Ganga)', border: 'border-blue-300 text-blue-800 bg-blue-50' },
-                { name: 'Assam (Flood)', border: 'border-orange-300 text-orange-800 bg-orange-50' },
-                { name: 'Mumbai Coast', border: 'border-emerald-300 text-emerald-800 bg-emerald-50' },
+                { name: 'Delhi NCR' },
+                { name: 'Patna (Ganga)' },
+                { name: 'Assam (Flood)' },
+                { name: 'Mumbai Coast' },
               ].map((loc) => (
                 <button
                   key={loc.name}
                   onClick={() => setSearchDistrict(loc.name)}
-                  className={`px-2.5 py-1 hover:brightness-95 ${loc.border} rounded-lg text-[11px] font-semibold whitespace-nowrap transition border shadow-xs`}
+                  className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[11px] font-medium transition border border-slate-200 whitespace-nowrap"
                 >
                   {loc.name}
                 </button>
               ))}
               <Link
                 href="/workspace/proj_0001"
-                className="px-4 py-2 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shrink-0 ml-1 shadow-md shadow-emerald-600/20"
+                className="px-4 py-2 bg-[#0B3558] hover:bg-[#07243D] text-white rounded-lg text-xs font-bold transition flex items-center gap-1.5 shrink-0 ml-1 shadow-xs"
               >
                 <span>{t.searchBtn}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -405,99 +380,77 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      {/* 📊 4. NATIONAL GEOSPATIAL KEY INDICATORS ON WHITE (Saffron • White • Green • Emergency) */}
+      {/* 📊 4. NATIONAL GEOSPATIAL STATISTICS (Sensible Numbers Panel) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-8 py-6">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-xs font-extrabold text-[#0B2545] uppercase tracking-wider flex items-center gap-2">
+            <BarChart3 className="w-4 h-4 text-[#E65100]" />
+            <span>{t.kpiSection}</span>
+          </h2>
+          <span className="text-[10px] text-slate-500 font-medium">
+            National Remote Sensing Centre &amp; Survey of India Standard
+          </span>
+        </div>
+
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {/* KPI 1: Saffron / Kesari */}
-          <div className="bg-gradient-to-br from-white via-white to-amber-50/50 border border-amber-300 hover:border-amber-400 rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-sm hover:shadow-md transition group">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-[11px] font-bold text-amber-700 uppercase tracking-wider">
-                {t.kpiArea}
-              </span>
-              <div className="p-2 rounded-xl bg-amber-100 border border-amber-300 text-amber-700 group-hover:scale-105 transition">
-                <Globe className="w-4 h-4" />
-              </div>
+          <div className="bg-white border-t-3 border-t-[#E65100] border border-slate-200 rounded-xl p-4 shadow-xs">
+            <div className="text-[11px] font-bold text-slate-600 uppercase">
+              {t.kpiArea}
             </div>
-            <div>
-              <div className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-                3.287M km²
-              </div>
-              <div className="text-[11px] text-amber-800/80 mt-1 font-mono">
-                Pan-India Territory Tracked
-              </div>
+            <div className="text-2xl font-black text-[#0B2545] tracking-tight mt-1">
+              3,287,263 km²
+            </div>
+            <div className="text-[11px] text-[#E65100] font-medium mt-1">
+              अखिल भारतीय कवरेज (All-India)
             </div>
           </div>
 
-          {/* KPI 2: Ashoka Navy / White */}
-          <div className="bg-gradient-to-br from-white via-white to-blue-50/50 border border-blue-300 hover:border-blue-400 rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-sm hover:shadow-md transition group">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-[11px] font-bold text-blue-700 uppercase tracking-wider">
-                {t.kpiSat}
-              </span>
-              <div className="p-2 rounded-xl bg-blue-100 border border-blue-300 text-blue-700 group-hover:scale-105 transition">
-                <Satellite className="w-4 h-4" />
-              </div>
+          <div className="bg-white border-t-3 border-t-[#0B3558] border border-slate-200 rounded-xl p-4 shadow-xs">
+            <div className="text-[11px] font-bold text-slate-600 uppercase">
+              {t.kpiSat}
             </div>
-            <div>
-              <div className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-                14 Active Satellites
-              </div>
-              <div className="text-[11px] text-blue-800/80 mt-1 font-mono">
-                Sentinel, Landsat &amp; Radar SAR
-              </div>
+            <div className="text-2xl font-black text-[#0B2545] tracking-tight mt-1">
+              14 Satellites
+            </div>
+            <div className="text-[11px] text-[#0B3558] font-medium mt-1">
+              सक्रिय उपग्रह बेड़ा (Sentinel/RISAT)
             </div>
           </div>
 
-          {/* KPI 3: India Green / Harita */}
-          <div className="bg-gradient-to-br from-white via-white to-emerald-50/50 border border-emerald-300 hover:border-emerald-400 rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-sm hover:shadow-md transition group">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-[11px] font-bold text-emerald-700 uppercase tracking-wider">
-                {t.kpiAudits}
-              </span>
-              <div className="p-2 rounded-xl bg-emerald-100 border border-emerald-300 text-emerald-700 group-hover:scale-105 transition">
-                <FileCheck2 className="w-4 h-4" />
-              </div>
+          <div className="bg-white border-t-3 border-t-[#138808] border border-slate-200 rounded-xl p-4 shadow-xs">
+            <div className="text-[11px] font-bold text-slate-600 uppercase">
+              {t.kpiAudits}
             </div>
-            <div>
-              <div className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-                1,280+ Panchayats
-              </div>
-              <div className="text-[11px] text-emerald-800/80 mt-1 font-mono">
-                Urban &amp; Agricultural Surveys
-              </div>
+            <div className="text-2xl font-black text-[#0B2545] tracking-tight mt-1">
+              1,280+ Surveys
+            </div>
+            <div className="text-[11px] text-[#138808] font-medium mt-1">
+              सत्यापित सर्वेक्षण (Panchayat/ULBs)
             </div>
           </div>
 
-          {/* KPI 4: 24x7 Surveillance / Saffron-Orange Emergency */}
-          <div className="bg-gradient-to-br from-white via-white to-orange-50/50 border border-orange-300 hover:border-orange-400 rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-sm hover:shadow-md transition group">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-[11px] font-bold text-orange-700 uppercase tracking-wider">
-                {t.kpiDisaster}
-              </span>
-              <div className="p-2 rounded-xl bg-orange-100 border border-orange-300 text-orange-700 group-hover:scale-105 transition">
-                <ShieldAlert className="w-4 h-4" />
-              </div>
+          <div className="bg-white border-t-3 border-t-red-600 border border-slate-200 rounded-xl p-4 shadow-xs">
+            <div className="text-[11px] font-bold text-slate-600 uppercase">
+              {t.kpiDisaster}
             </div>
-            <div>
-              <div className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-                24x7 Surveillance
-              </div>
-              <div className="text-[11px] text-orange-800/80 mt-1 font-mono">
-                Flood, Cyclone &amp; Fire Alerts
-              </div>
+            <div className="text-2xl font-black text-[#0B2545] tracking-tight mt-1">
+              24×7 Active
+            </div>
+            <div className="text-[11px] text-red-600 font-medium mt-1">
+              सतत निगरानी (Disaster Watch)
             </div>
           </div>
         </div>
       </section>
 
-      {/* 🚀 5. KEY CITIZEN & DEPARTMENT SERVICES (Clean White Cards with Tricolor Accents) */}
+      {/* 🚀 5. KEY CITIZEN & DEPARTMENT SERVICES (Clean, Sensible Writing) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-8 py-4 space-y-4">
         <div>
-          <div className="flex items-center gap-2.5">
-            <span className="p-1.5 rounded-lg bg-amber-100 text-amber-700 border border-amber-300">
+          <div className="flex items-center gap-2">
+            <span className="p-1 rounded bg-amber-100 text-[#E65100]">
               <Landmark className="w-4 h-4" />
             </span>
-            <h2 className="text-base sm:text-lg font-extrabold text-slate-900">
+            <h2 className="text-base font-extrabold text-[#0B2545]">
               {t.quickServices}
             </h2>
           </div>
@@ -506,224 +459,194 @@ export default function DashboardPage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {/* Card 1: Interactive GIS Satellite Map (Ashoka Navy / Blue) */}
-          <div className="bg-white border border-blue-200 hover:border-blue-400 rounded-2xl p-5 shadow-sm hover:shadow-md flex flex-col justify-between group transition">
-            <div className="space-y-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* Service 1 */}
+          <div className="bg-white border border-slate-200 hover:border-[#0B3558] rounded-xl p-5 shadow-xs hover:shadow-sm flex flex-col justify-between transition">
+            <div className="space-y-2.5">
               <div className="flex items-center justify-between">
-                <div className="p-3 rounded-xl bg-blue-50 border border-blue-200 text-blue-700 group-hover:scale-105 transition">
-                  <Globe className="w-6 h-6" />
+                <div className="p-2.5 rounded-lg bg-blue-50 text-[#0B3558] border border-blue-200">
+                  <Globe className="w-5 h-5" />
                 </div>
-                <span className="text-[10px] font-mono bg-blue-50 text-blue-800 px-2.5 py-0.5 rounded-full border border-blue-200 font-bold">
-                  Public Service 01
+                <span className="text-[10px] font-bold text-[#0B3558] bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                  नक्शा सेवा
                 </span>
               </div>
               <div>
-                <h3 className="text-sm font-bold text-slate-900 group-hover:text-blue-700 transition">
-                  Interactive GIS Satellite Map (नक्शा पोर्टल)
+                <h3 className="text-sm font-bold text-[#0B2545]">
+                  भू-स्थानिक नक्शा पोर्टल (GIS Satellite Map Explorer)
                 </h3>
                 <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-                  View high-resolution satellite imagery across any Indian village or town. Toggle road networks, tree canopies, and water boundaries.
+                  देश भर के गांवों, शहरों और औद्योगिक क्षेत्रों के उच्च-रिज़ॉल्यूशन उपग्रह चित्र, सड़क नेटवर्क एवं भूमि आवरण देखें।
                 </p>
-              </div>
-              <div className="pt-2 flex flex-wrap gap-1.5">
-                <span className="text-[10px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">Real-Time OpenLayers</span>
-                <span className="text-[10px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">Multi-Spectral</span>
-                <span className="text-[10px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">GPS Anchored</span>
               </div>
             </div>
 
-            <div className="mt-5 pt-4 border-t border-slate-100">
+            <div className="mt-4 pt-3 border-t border-slate-100">
               <Link
                 href="/workspace/proj_0001"
-                className="w-full py-2.5 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition shadow-md"
+                className="w-full py-2 bg-[#0B3558] hover:bg-[#07243D] text-white rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition shadow-xs"
               >
-                <span>Launch Interactive Map</span>
+                <span>नक्शा पोर्टल खोलें (Launch Map)</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
           </div>
 
-          {/* Card 2: Disaster & Emergency AI Portal (Saffron / Orange) */}
-          <div className="bg-white border border-amber-200 hover:border-amber-400 rounded-2xl p-5 shadow-sm hover:shadow-md flex flex-col justify-between group transition">
-            <div className="space-y-3">
+          {/* Service 2 */}
+          <div className="bg-white border border-slate-200 hover:border-[#E65100] rounded-xl p-5 shadow-xs hover:shadow-sm flex flex-col justify-between transition">
+            <div className="space-y-2.5">
               <div className="flex items-center justify-between">
-                <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-700 group-hover:scale-105 transition">
-                  <ShieldAlert className="w-6 h-6" />
+                <div className="p-2.5 rounded-lg bg-orange-50 text-[#E65100] border border-orange-200">
+                  <ShieldAlert className="w-5 h-5" />
                 </div>
-                <span className="text-[10px] font-mono bg-amber-50 text-amber-800 px-2.5 py-0.5 rounded-full border border-amber-200 font-bold">
-                  Public Service 02
+                <span className="text-[10px] font-bold text-[#E65100] bg-orange-50 px-2 py-0.5 rounded border border-orange-200">
+                  आपदा सेवा
                 </span>
               </div>
               <div>
-                <h3 className="text-sm font-bold text-slate-900 group-hover:text-amber-700 transition">
-                  Disaster &amp; Emergency AI (आपदा प्रबंधन)
+                <h3 className="text-sm font-bold text-[#0B2545]">
+                  आपदा प्रबंधन एवं चेतावनी (Disaster &amp; Emergency Cell)
                 </h3>
                 <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-                  Track active flood inundation zones, cloud-penetrating SAR radar feeds, forest fire detections, and safe evacuation corridors.
+                  बाढ़ जलभराव क्षेत्र, चक्रवात निगरानी, बादल भेदी रडार स्कैन एवं सुरक्षित राहत शिविरों की वास्तविक समय जानकारी।
                 </p>
-              </div>
-              <div className="pt-2 flex flex-wrap gap-1.5">
-                <span className="text-[10px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">Live Flood Maps</span>
-                <span className="text-[10px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">Cyclone Watch</span>
-                <span className="text-[10px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">NDMA Standards</span>
               </div>
             </div>
 
-            <div className="mt-5 pt-4 border-t border-slate-100">
+            <div className="mt-4 pt-3 border-t border-slate-100">
               <Link
                 href="/disaster"
-                className="w-full py-2.5 px-4 bg-gradient-to-r from-amber-600 via-orange-600 to-amber-600 hover:from-amber-500 hover:to-orange-500 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition shadow-md shadow-amber-600/20"
+                className="w-full py-2 bg-[#E65100] hover:bg-[#D84315] text-white rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition shadow-xs"
               >
-                <span>Open Disaster AI Portal</span>
+                <span>आपदा पोर्टल खोलें (Open Disaster AI)</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
           </div>
 
-          {/* Card 3: Agriculture & Crop Health Audit (India Green) */}
-          <div className="bg-white border border-emerald-200 hover:border-emerald-400 rounded-2xl p-5 shadow-sm hover:shadow-md flex flex-col justify-between group transition">
-            <div className="space-y-3">
+          {/* Service 3 */}
+          <div className="bg-white border border-slate-200 hover:border-[#138808] rounded-xl p-5 shadow-xs hover:shadow-sm flex flex-col justify-between transition">
+            <div className="space-y-2.5">
               <div className="flex items-center justify-between">
-                <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 group-hover:scale-105 transition">
-                  <Wheat className="w-6 h-6" />
+                <div className="p-2.5 rounded-lg bg-emerald-50 text-[#138808] border border-emerald-200">
+                  <Wheat className="w-5 h-5" />
                 </div>
-                <span className="text-[10px] font-mono bg-emerald-50 text-emerald-800 px-2.5 py-0.5 rounded-full border border-emerald-200 font-bold">
-                  Public Service 03
+                <span className="text-[10px] font-bold text-[#138808] bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                  कृषि सेवा
                 </span>
               </div>
               <div>
-                <h3 className="text-sm font-bold text-slate-900 group-hover:text-emerald-700 transition">
-                  Crop Health &amp; Agriculture Audit (फसल निगरानी)
+                <h3 className="text-sm font-bold text-[#0B2545]">
+                  कृषि एवं फसल निगरानी (Crop Health &amp; Agriculture Audit)
                 </h3>
                 <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-                  Analyze NDVI crop greenery, soil moisture, and drought risk. Essential for farmers, agricultural officers, and crop insurance claims.
+                  फसल हरियाली (NDVI), मिट्टी में नमी एवं सूखा जोखिम का उपग्रह आधारित विश्लेषण — फसल बीमा एवं किसान कल्याण हेतु।
                 </p>
-              </div>
-              <div className="pt-2 flex flex-wrap gap-1.5">
-                <span className="text-[10px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">NDVI Vegetation</span>
-                <span className="text-[10px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">Drought Early Warning</span>
-                <span className="text-[10px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">PMFBY Subsidy Aid</span>
               </div>
             </div>
 
-            <div className="mt-5 pt-4 border-t border-slate-100">
+            <div className="mt-4 pt-3 border-t border-slate-100">
               <Link
                 href="/image-analysis"
-                className="w-full py-2.5 px-4 bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600 hover:from-emerald-500 hover:to-green-500 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition shadow-md shadow-emerald-600/20"
+                className="w-full py-2 bg-[#138808] hover:bg-[#0F6B06] text-white rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition shadow-xs"
               >
-                <span>Analyze Crop Imagery</span>
+                <span>फसल विश्लेषण (Analyze Crops)</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
           </div>
 
-          {/* Card 4: Urban Planning & Encroachment Audit (Golden Saffron & Pearl) */}
-          <div className="bg-white border border-amber-200 hover:border-amber-400 rounded-2xl p-5 shadow-sm hover:shadow-md flex flex-col justify-between group transition">
-            <div className="space-y-3">
+          {/* Service 4 */}
+          <div className="bg-white border border-slate-200 hover:border-[#0B3558] rounded-xl p-5 shadow-xs hover:shadow-sm flex flex-col justify-between transition">
+            <div className="space-y-2.5">
               <div className="flex items-center justify-between">
-                <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-700 group-hover:scale-105 transition">
-                  <Building2 className="w-6 h-6" />
+                <div className="p-2.5 rounded-lg bg-amber-50 text-[#B45309] border border-amber-200">
+                  <Building2 className="w-5 h-5" />
                 </div>
-                <span className="text-[10px] font-mono bg-amber-50 text-amber-800 px-2.5 py-0.5 rounded-full border border-amber-200 font-bold">
-                  Public Service 04
+                <span className="text-[10px] font-bold text-[#B45309] bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                  शहरी विकास
                 </span>
               </div>
               <div>
-                <h3 className="text-sm font-bold text-slate-900 group-hover:text-amber-700 transition">
-                  Urban Planning &amp; Encroachment (शहरी नियोजन)
+                <h3 className="text-sm font-bold text-[#0B2545]">
+                  शहरी नियोजन एवं अतिक्रमण (Urban Infrastructure &amp; Change)
                 </h3>
                 <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-                  Identify unauthorized buildings, illegal forest clearing, and infrastructure growth using automated bi-temporal change detection.
+                  अवैध निर्माण, वन आवरण में क्षति एवं शहर विस्तार की स्वचालित उपग्रह निगरानी — नगर निगम एवं विकास प्राधिकरणों हेतु।
                 </p>
-              </div>
-              <div className="pt-2 flex flex-wrap gap-1.5">
-                <span className="text-[10px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">ChangeFormer AI</span>
-                <span className="text-[10px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">Encroachment Vector</span>
-                <span className="text-[10px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">Municipal Audits</span>
               </div>
             </div>
 
-            <div className="mt-5 pt-4 border-t border-slate-100">
+            <div className="mt-4 pt-3 border-t border-slate-100">
               <Link
                 href="/workspace/proj_0001"
-                className="w-full py-2.5 px-4 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition shadow-md"
+                className="w-full py-2 bg-[#0B3558] hover:bg-[#07243D] text-white rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition shadow-xs"
               >
-                <span>Inspect Urban Expansion</span>
+                <span>शहरी ऑडिट देखें (Inspect Urban)</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
           </div>
 
-          {/* Card 5: Ask AI Geospatial Copilot (Ashoka Chakra Navy) */}
-          <div className="bg-white border border-blue-200 hover:border-blue-400 rounded-2xl p-5 shadow-sm hover:shadow-md flex flex-col justify-between group transition">
-            <div className="space-y-3">
+          {/* Service 5 */}
+          <div className="bg-white border border-slate-200 hover:border-[#0B3558] rounded-xl p-5 shadow-xs hover:shadow-sm flex flex-col justify-between transition">
+            <div className="space-y-2.5">
               <div className="flex items-center justify-between">
-                <div className="p-3 rounded-xl bg-blue-50 border border-blue-200 text-blue-700 group-hover:scale-105 transition">
-                  <MessageSquare className="w-6 h-6" />
+                <div className="p-2.5 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-200">
+                  <MessageSquare className="w-5 h-5" />
                 </div>
-                <span className="text-[10px] font-mono bg-blue-50 text-blue-800 px-2.5 py-0.5 rounded-full border border-blue-200 font-bold">
-                  Public Service 05
+                <span className="text-[10px] font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200">
+                  एआई परामर्श
                 </span>
               </div>
               <div>
-                <h3 className="text-sm font-bold text-slate-900 group-hover:text-blue-700 transition">
-                  Citizen &amp; Officer AI Copilot (भू-स्थानिक चैट)
+                <h3 className="text-sm font-bold text-[#0B2545]">
+                  भू-स्थानिक नागरिक एआई सहायक (Geospatial AI Copilot)
                 </h3>
                 <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-                  Ask plain-language questions like "How much greenery was lost in Pune?" or "Is my district under flood risk?" and get instant answers.
+                  सरल हिंदी या अंग्रेजी में प्रश्न पूछें और उपग्रह डेटा से तत्काल प्रामाणिक उत्तर एवं नक्शा संदर्भ प्राप्त करें।
                 </p>
-              </div>
-              <div className="pt-2 flex flex-wrap gap-1.5">
-                <span className="text-[10px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">Natural Language NLP</span>
-                <span className="text-[10px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">No Photos Required</span>
-                <span className="text-[10px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">24x7 Answers</span>
               </div>
             </div>
 
-            <div className="mt-5 pt-4 border-t border-slate-100">
+            <div className="mt-4 pt-3 border-t border-slate-100">
               <Link
                 href="/chat"
-                className="w-full py-2.5 px-4 bg-gradient-to-r from-blue-700 to-indigo-700 hover:from-blue-600 hover:to-indigo-600 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition shadow-md"
+                className="w-full py-2 bg-[#0B3558] hover:bg-[#07243D] text-white rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition shadow-xs"
               >
-                <span>Start AI Consultation</span>
+                <span>एआई से पूछें (Ask AI Copilot)</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
           </div>
 
-          {/* Card 6: Official Audit Reports & Projects (India Green & White) */}
-          <div className="bg-white border border-emerald-200 hover:border-emerald-400 rounded-2xl p-5 shadow-sm hover:shadow-md flex flex-col justify-between group transition">
-            <div className="space-y-3">
+          {/* Service 6 */}
+          <div className="bg-white border border-slate-200 hover:border-[#138808] rounded-xl p-5 shadow-xs hover:shadow-sm flex flex-col justify-between transition">
+            <div className="space-y-2.5">
               <div className="flex items-center justify-between">
-                <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 group-hover:scale-105 transition">
-                  <FileCheck2 className="w-6 h-6" />
+                <div className="p-2.5 rounded-lg bg-teal-50 text-teal-800 border border-teal-200">
+                  <FileCheck2 className="w-5 h-5" />
                 </div>
-                <span className="text-[10px] font-mono bg-emerald-50 text-emerald-800 px-2.5 py-0.5 rounded-full border border-emerald-200 font-bold">
-                  Public Service 06
+                <span className="text-[10px] font-bold text-teal-800 bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
+                  सरकारी रिपोर्ट
                 </span>
               </div>
               <div>
-                <h3 className="text-sm font-bold text-slate-900 group-hover:text-emerald-700 transition">
-                  Certified Reports &amp; Registry (प्रमाणित रिपोर्ट)
+                <h3 className="text-sm font-bold text-[#0B2545]">
+                  प्रमाणित रिपोर्ट एवं डेटा रजिस्ट्री (Official Registry &amp; PDF)
                 </h3>
                 <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-                  Access official government project records, download PDF summaries with GPS coordinates, and view multi-agency verification stamps.
+                  जीपीएस निर्देशांक, उपग्रह टाइमस्टैम्प एवं आधिकारिक सत्यापन के साथ प्रमाणित पीडीएफ सर्वेक्षण सारांश डाउनलोड करें।
                 </p>
-              </div>
-              <div className="pt-2 flex flex-wrap gap-1.5">
-                <span className="text-[10px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">Certified PDF Export</span>
-                <span className="text-[10px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">Audit Trails</span>
-                <span className="text-[10px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">Public Records</span>
               </div>
             </div>
 
-            <div className="mt-5 pt-4 border-t border-slate-100">
+            <div className="mt-4 pt-3 border-t border-slate-100">
               <Link
                 href="/projects"
-                className="w-full py-2.5 px-4 bg-gradient-to-r from-teal-600 via-emerald-600 to-green-600 hover:from-teal-500 hover:to-emerald-500 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition shadow-md shadow-emerald-600/20"
+                className="w-full py-2 bg-[#138808] hover:bg-[#0F6B06] text-white rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition shadow-xs"
               >
-                <span>View Official Projects</span>
+                <span>आधिकारिक रिकॉर्ड देखें (View Registry)</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
@@ -731,67 +654,57 @@ export default function DashboardPage() {
         </div>
       </section>
 
-      {/* 🧭 6. "HOW IT WORKS" — 3 SIMPLE STEPS IN FLAG PROGRESSION ON WHITE */}
+      {/* 🧭 6. "HOW IT WORKS" — 3 SIMPLE STEPS */}
       <section className="max-w-7xl mx-auto px-4 sm:px-8 py-6">
-        <div className="bg-white border border-slate-200 rounded-2xl p-6 relative overflow-hidden shadow-sm">
-          {/* Subtle Tricolor Accent Top Stripe */}
-          <div className="absolute top-0 left-0 right-0 h-1 flex">
-            <div className="flex-1 bg-amber-500" />
-            <div className="flex-1 bg-slate-200" />
-            <div className="flex-1 bg-emerald-500" />
-          </div>
-
-          <div className="flex items-center gap-2.5 mb-5 mt-1">
-            <span className="p-1.5 rounded-lg bg-emerald-100 text-emerald-700 border border-emerald-300">
+        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs">
+          <div className="flex items-center gap-2 mb-4">
+            <span className="p-1 rounded bg-emerald-100 text-emerald-800">
               <HelpCircle className="w-4 h-4" />
             </span>
-            <h2 className="text-base font-extrabold text-slate-900">
+            <h2 className="text-sm font-extrabold text-[#0B2545]">
               {t.howItWorksTitle}
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
-            {/* Step 1: Kesari / Saffron */}
-            <div className="flex items-start gap-4 p-4 rounded-xl bg-amber-50/70 border border-amber-200">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 text-white flex items-center justify-center font-black text-sm shrink-0 shadow-md shadow-amber-500/20">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="flex items-start gap-3 p-3.5 rounded-lg bg-slate-50 border border-slate-200">
+              <div className="w-7 h-7 rounded-md bg-[#E65100] text-white flex items-center justify-center font-bold text-xs shrink-0">
                 1
               </div>
               <div>
-                <h3 className="text-xs font-bold text-amber-800 uppercase tracking-wider">
-                  Step 1: Select Location or Upload
+                <h3 className="text-xs font-bold text-slate-900">
+                  स्थान चुनें या उपग्रह चित्र अपलोड करें
                 </h3>
-                <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-                  Search any Indian district or upload a satellite / drone photograph. The portal automatically recognizes the GPS coordinates and anchors the map.
+                <p className="text-[11px] text-slate-600 mt-0.5 leading-relaxed">
+                  Search any district, village or enter GPS coordinates to instantly anchor the satellite scene.
                 </p>
               </div>
             </div>
 
-            {/* Step 2: Shweta / White & Ashoka Navy */}
-            <div className="flex items-start gap-4 p-4 rounded-xl bg-blue-50/70 border border-blue-200">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-900 to-indigo-900 text-white flex items-center justify-center font-black text-sm shrink-0 shadow-md">
+            <div className="flex items-start gap-3 p-3.5 rounded-lg bg-slate-50 border border-slate-200">
+              <div className="w-7 h-7 rounded-md bg-[#0B3558] text-white flex items-center justify-center font-bold text-xs shrink-0">
                 2
               </div>
               <div>
-                <h3 className="text-xs font-bold text-blue-900 uppercase tracking-wider">
-                  Step 2: Automated AI Spatial Scan
+                <h3 className="text-xs font-bold text-slate-900">
+                  स्वचालित एआई स्थानिक विश्लेषण
                 </h3>
-                <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-                  Our neural networks instantly calculate green canopy (NDVI), water spread (NDWI), and unauthorized building changes with 98%+ precision.
+                <p className="text-[11px] text-slate-600 mt-0.5 leading-relaxed">
+                  AI models calculate vegetation (NDVI), water bodies (NDWI), and unauthorized constructions with 98%+ precision.
                 </p>
               </div>
             </div>
 
-            {/* Step 3: Harita / India Green */}
-            <div className="flex items-start gap-4 p-4 rounded-xl bg-emerald-50/70 border border-emerald-200">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-600 to-green-600 text-white flex items-center justify-center font-black text-sm shrink-0 shadow-md shadow-emerald-500/20">
+            <div className="flex items-start gap-3 p-3.5 rounded-lg bg-slate-50 border border-slate-200">
+              <div className="w-7 h-7 rounded-md bg-[#138808] text-white flex items-center justify-center font-bold text-xs shrink-0">
                 3
               </div>
               <div>
-                <h3 className="text-xs font-bold text-emerald-800 uppercase tracking-wider">
-                  Step 3: Download Certified Reports
+                <h3 className="text-xs font-bold text-slate-900">
+                  प्रमाणित सरकारी रिपोर्ट डाउनलोड करें
                 </h3>
-                <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-                  Export legally valid geospatial audit reports, evidence cards, and map snapshots for municipal approvals, legal cases, or public welfare.
+                <p className="text-[11px] text-slate-600 mt-0.5 leading-relaxed">
+                  Download certified survey summary with coordinates and digital timestamps for official records.
                 </p>
               </div>
             </div>
@@ -799,77 +712,73 @@ export default function DashboardPage() {
         </div>
       </section>
 
-      {/* 📁 7. OFFICIAL GEOSPATIAL AUDITS & ACTIVE INITIATIVES ON WHITE */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-8 py-4 space-y-4">
+      {/* 📁 7. OFFICIAL INITIATIVES REGISTRY */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-8 py-4 space-y-3">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
           <div>
-            <div className="flex items-center gap-2.5">
-              <span className="p-1.5 rounded-lg bg-amber-100 text-amber-700 border border-amber-300">
+            <div className="flex items-center gap-2">
+              <span className="p-1 rounded bg-amber-100 text-[#E65100]">
                 <FolderKanban className="w-4 h-4" />
               </span>
-              <h2 className="text-base sm:text-lg font-bold text-slate-900">
+              <h2 className="text-sm font-bold text-[#0B2545]">
                 {t.recentProjectsTitle}
               </h2>
             </div>
             <p className="text-xs text-slate-500 mt-0.5">
-              Verified spatial surveillance records published for public &amp; inter-departmental transparency
+              Verified public spatial surveillance records
             </p>
           </div>
 
           <Link
             href="/projects"
-            className="text-xs text-amber-700 hover:text-amber-600 font-bold flex items-center gap-1 transition"
+            className="text-xs text-[#0B3558] hover:underline font-bold flex items-center gap-1"
           >
-            <span>Browse Full National Registry ➔</span>
+            <span>सभी परियोजनाएं देखें (Browse Full Registry) ➔</span>
           </Link>
         </div>
 
-        {/* Official Project Cards List */}
-        <div className="space-y-3">
+        <div className="space-y-2.5">
           {filteredProjects.slice(0, 4).map((proj) => (
             <div
               key={proj.id}
-              className="bg-white border border-slate-200 hover:border-amber-400 rounded-2xl p-4 sm:p-5 transition flex flex-col md:flex-row items-start md:items-center justify-between gap-4 group shadow-sm hover:shadow-md"
+              className="bg-white border border-slate-200 hover:border-[#0B3558] rounded-lg p-4 transition flex flex-col md:flex-row items-start md:items-center justify-between gap-3 shadow-xs"
             >
-              <div className="space-y-1.5 max-w-3xl">
+              <div className="space-y-1 max-w-3xl">
                 <div className="flex items-center flex-wrap gap-2">
-                  <span className="font-mono text-[10px] text-amber-800 bg-amber-100 px-2.5 py-0.5 rounded-md border border-amber-300 font-bold">
+                  <span className="text-[10px] font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-300">
                     {proj.id.toUpperCase()}
                   </span>
-                  <span className="text-[10px] font-semibold text-slate-700 bg-slate-100 px-2 py-0.5 rounded-md flex items-center gap-1 border border-slate-200">
+                  <span className="text-[10px] font-semibold text-slate-700 flex items-center gap-1">
                     <MapPin className="w-3 h-3 text-red-600" />
                     <span>{proj.location_name || 'All-India Geospatial Zone'}</span>
                   </span>
-                  <span className="text-[10px] font-semibold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-md border border-emerald-300 flex items-center gap-1">
+                  <span className="text-[10px] font-semibold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-300 flex items-center gap-1">
                     <ShieldCheck className="w-3 h-3 text-emerald-600" />
                     <span>{proj.status || 'Verified Survey'}</span>
                   </span>
                 </div>
 
-                <h3 className="text-sm sm:text-base font-bold text-slate-900 group-hover:text-amber-700 transition">
+                <h3 className="text-sm font-bold text-[#0B2545]">
                   {proj.name}
                 </h3>
                 <p className="text-xs text-slate-600 leading-relaxed">
                   {proj.description}
                 </p>
 
-                <div className="flex items-center flex-wrap gap-4 text-[11px] text-slate-500 font-mono pt-1">
+                <div className="text-[11px] text-slate-500 font-medium">
                   <span>🏛️ {proj.department || 'National Geospatial Authority'}</span>
-                  <span>•</span>
-                  <span>Accuracy: <strong className="text-emerald-700 font-sans">{proj.confidence || '98.5%'}</strong></span>
-                  <span>•</span>
-                  <span>Surveillance Queries: <strong className="text-slate-800 font-sans">{proj.queries_count || 24}</strong></span>
+                  <span className="mx-2">•</span>
+                  <span>Accuracy: <strong className="text-emerald-800">{proj.confidence || '98.5%'}</strong></span>
                 </div>
               </div>
 
-              {/* Action Buttons */}
-              <div className="flex items-center gap-2 w-full md:w-auto shrink-0 pt-2 md:pt-0">
+              <div className="shrink-0 w-full md:w-auto pt-2 md:pt-0">
                 <Link
                   href={`/workspace/${proj.id}`}
-                  className="px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition shadow-sm w-full md:w-auto"
+                  className="px-3.5 py-1.5 bg-[#0B3558] hover:bg-[#07243D] text-white rounded-md text-xs font-bold flex items-center justify-center gap-1.5 transition shadow-xs w-full md:w-auto"
                 >
                   <Globe className="w-3.5 h-3.5" />
-                  <span>Open Map Workspace</span>
+                  <span>Open Map</span>
                 </Link>
               </div>
             </div>
@@ -877,35 +786,35 @@ export default function DashboardPage() {
         </div>
       </section>
 
-      {/* 🛰️ 8. NATIONAL AGENCY & SATELLITE INTEGRATION MATRIX ON WHITE */}
+      {/* 🛰️ 8. NATIONAL AGENCY INTEGRATION MATRIX */}
       <section className="max-w-7xl mx-auto px-4 sm:px-8 py-6">
-        <div className="bg-white border border-slate-200 rounded-2xl p-5 space-y-3 shadow-sm">
+        <div className="bg-white border border-slate-200 rounded-xl p-4 space-y-2.5 shadow-xs">
           <div className="flex items-center justify-between">
             <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
-              <Award className="w-4 h-4 text-amber-600" />
+              <Award className="w-4 h-4 text-[#E65100]" />
               <span>{t.systemIntegrations}</span>
             </h3>
-            <span className="text-[10px] text-emerald-800 font-mono bg-emerald-100 px-2.5 py-0.5 rounded-full border border-emerald-300 font-bold">
-              ● All Feeds Fully Synchronized
+            <span className="text-[10px] text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-300 font-bold">
+              ✓ All Feeds Synchronized
             </span>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 pt-1">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2.5 pt-1">
             {[
-              { name: 'Survey of India (SOI)', type: 'Geodetic CRS (EPSG:4326)', status: 'Active' },
+              { name: 'Survey of India (SOI)', type: 'Geodetic CRS', status: 'Active' },
               { name: 'ISRO Bhuvan Feeds', type: 'High-Res Optical', status: 'Active' },
-              { name: 'Sentinel-1 & 2', type: 'ESA Optical + SAR Radar', status: 'Active' },
-              { name: 'NDMA Disaster Cell', type: 'Emergency Protocols', status: 'Active' },
-              { name: 'Digital India GIS', type: 'National Spatial Grid', status: 'Active' },
-              { name: 'IMD Weather & Rain', type: 'Monsoon Telemetry', status: 'Active' },
+              { name: 'Sentinel-1 & 2', type: 'Optical + SAR', status: 'Active' },
+              { name: 'NDMA Disaster Cell', type: 'Emergency Grid', status: 'Active' },
+              { name: 'Digital India GIS', type: 'National Grid', status: 'Active' },
+              { name: 'IMD Weather & Rain', type: 'Monsoon Radar', status: 'Active' },
             ].map((agency, i) => (
               <div
                 key={i}
-                className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-center flex flex-col justify-between hover:border-amber-400 transition"
+                className="bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-center flex flex-col justify-between"
               >
                 <div className="text-[11px] font-bold text-slate-800">{agency.name}</div>
-                <div className="text-[10px] text-slate-500 mt-1 font-mono">{agency.type}</div>
-                <div className="mt-2 text-[9px] font-mono font-bold text-emerald-800 bg-emerald-100 py-0.5 rounded border border-emerald-300">
+                <div className="text-[10px] text-slate-500 mt-0.5">{agency.type}</div>
+                <div className="mt-1.5 text-[9px] font-bold text-emerald-800 bg-emerald-100 py-0.5 rounded">
                   ✓ {agency.status}
                 </div>
               </div>
@@ -914,80 +823,71 @@ export default function DashboardPage() {
         </div>
       </section>
 
-      {/* 🇮🇳 9. OFFICIAL GOVERNMENT FOOTER ON CLEAN LIGHT BACKGROUND */}
-      <footer className="bg-slate-50 mt-12 text-slate-600 text-xs border-t border-slate-200">
-        {/* Tricolor Ribbon Divider */}
-        <div className="h-1.5 w-full flex">
-          <div className="flex-1 bg-amber-500" />
+      {/* 🇮🇳 9. OFFICIAL GOVERNMENT FOOTER */}
+      <footer className="bg-slate-100 text-slate-600 text-xs border-t border-slate-200 mt-10">
+        <div className="h-1 w-full flex">
+          <div className="flex-1 bg-[#E65100]" />
           <div className="flex-1 bg-white border-y border-slate-200" />
-          <div className="flex-1 bg-emerald-500" />
+          <div className="flex-1 bg-[#138808]" />
         </div>
 
-        <div className="max-w-7xl mx-auto py-10 px-4 sm:px-8 space-y-8">
-          {/* Top Links Columns */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div className="max-w-7xl mx-auto py-8 px-4 sm:px-8 space-y-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <div>
-              <h4 className="text-amber-800 font-bold text-xs uppercase tracking-wider mb-3 flex items-center gap-1.5">
-                <span>🏛️</span>
-                <span>Government Portals</span>
+              <h4 className="text-[#0B2545] font-bold text-xs uppercase tracking-wider mb-2.5">
+                Government Portals
               </h4>
-              <ul className="space-y-2 text-[11px]">
-                <li><a href="https://www.india.gov.in" target="_blank" rel="noreferrer" className="hover:text-amber-700 transition flex items-center gap-1">National Portal of India <ExternalLink className="w-2.5 h-2.5" /></a></li>
-                <li><a href="https://bhuvan.nrsc.gov.in" target="_blank" rel="noreferrer" className="hover:text-amber-700 transition flex items-center gap-1">ISRO Bhuvan Geo-Portal <ExternalLink className="w-2.5 h-2.5" /></a></li>
-                <li><a href="https://surveyofindia.gov.in" target="_blank" rel="noreferrer" className="hover:text-amber-700 transition flex items-center gap-1">Survey of India (SOI) <ExternalLink className="w-2.5 h-2.5" /></a></li>
-                <li><a href="https://ndma.gov.in" target="_blank" rel="noreferrer" className="hover:text-amber-700 transition flex items-center gap-1">NDMA Disaster Cell <ExternalLink className="w-2.5 h-2.5" /></a></li>
+              <ul className="space-y-1.5 text-[11px]">
+                <li><a href="https://www.india.gov.in" target="_blank" rel="noreferrer" className="hover:underline flex items-center gap-1">National Portal of India <ExternalLink className="w-2.5 h-2.5" /></a></li>
+                <li><a href="https://bhuvan.nrsc.gov.in" target="_blank" rel="noreferrer" className="hover:underline flex items-center gap-1">ISRO Bhuvan Geo-Portal <ExternalLink className="w-2.5 h-2.5" /></a></li>
+                <li><a href="https://surveyofindia.gov.in" target="_blank" rel="noreferrer" className="hover:underline flex items-center gap-1">Survey of India (SOI) <ExternalLink className="w-2.5 h-2.5" /></a></li>
+                <li><a href="https://ndma.gov.in" target="_blank" rel="noreferrer" className="hover:underline flex items-center gap-1">NDMA Disaster Cell <ExternalLink className="w-2.5 h-2.5" /></a></li>
               </ul>
             </div>
 
             <div>
-              <h4 className="text-emerald-800 font-bold text-xs uppercase tracking-wider mb-3 flex items-center gap-1.5">
-                <span>🛰️</span>
-                <span>Citizen Services</span>
+              <h4 className="text-[#0B2545] font-bold text-xs uppercase tracking-wider mb-2.5">
+                Citizen Services
               </h4>
-              <ul className="space-y-2 text-[11px]">
-                <li><Link href="/workspace/proj_0001" className="hover:text-emerald-700 transition">View District Satellite Map</Link></li>
-                <li><Link href="/disaster" className="hover:text-emerald-700 transition">Check Flood &amp; Cyclone Alerts</Link></li>
-                <li><Link href="/image-analysis" className="hover:text-emerald-700 transition">Crop Health (NDVI) Assessment</Link></li>
-                <li><Link href="/chat" className="hover:text-emerald-700 transition">Ask AI Spatial Question</Link></li>
+              <ul className="space-y-1.5 text-[11px]">
+                <li><Link href="/workspace/proj_0001" className="hover:underline">View District Satellite Map</Link></li>
+                <li><Link href="/disaster" className="hover:underline">Check Flood &amp; Cyclone Alerts</Link></li>
+                <li><Link href="/image-analysis" className="hover:underline">Crop Health (NDVI) Assessment</Link></li>
+                <li><Link href="/chat" className="hover:underline">Ask AI Spatial Question</Link></li>
               </ul>
             </div>
 
             <div>
-              <h4 className="text-slate-800 font-bold text-xs uppercase tracking-wider mb-3 flex items-center gap-1.5">
-                <span>⚖️</span>
-                <span>Legal &amp; RTI Policies</span>
+              <h4 className="text-[#0B2545] font-bold text-xs uppercase tracking-wider mb-2.5">
+                Legal &amp; RTI Policies
               </h4>
-              <ul className="space-y-2 text-[11px]">
-                <li className="hover:text-slate-900 cursor-pointer">Right to Information (RTI)</li>
-                <li className="hover:text-slate-900 cursor-pointer">National Geospatial Policy 2022</li>
-                <li className="hover:text-slate-900 cursor-pointer">Terms of Use &amp; Copyright</li>
-                <li className="hover:text-slate-900 cursor-pointer">Privacy &amp; Hyperlinking Policy</li>
+              <ul className="space-y-1.5 text-[11px]">
+                <li className="hover:underline cursor-pointer">Right to Information (RTI)</li>
+                <li className="hover:underline cursor-pointer">National Geospatial Policy 2022</li>
+                <li className="hover:underline cursor-pointer">Terms of Use &amp; Copyright</li>
+                <li className="hover:underline cursor-pointer">Privacy &amp; Hyperlinking Policy</li>
               </ul>
             </div>
 
             <div>
-              <h4 className="text-orange-800 font-bold text-xs uppercase tracking-wider mb-3 flex items-center gap-1.5">
-                <span>📞</span>
-                <span>Help &amp; Grievance</span>
+              <h4 className="text-[#0B2545] font-bold text-xs uppercase tracking-wider mb-2.5">
+                Help &amp; Grievance
               </h4>
-              <div className="space-y-2 text-[11px]">
-                <p className="text-slate-800 font-semibold">National Geospatial Helpdesk:</p>
-                <p className="text-emerald-700 font-mono font-extrabold text-sm">1800-11-2026 (Toll-Free)</p>
-                <p className="text-slate-600">Email: helpdesk@corvus.gov.in</p>
-                <p className="text-slate-500 text-[10px]">CPGRAMS Citizen Grievance Redressal Compliant</p>
+              <div className="space-y-1 text-[11px]">
+                <p className="font-semibold text-slate-800">National Geospatial Helpdesk:</p>
+                <p className="text-emerald-800 font-bold text-sm">1800-11-2026 (Toll-Free)</p>
+                <p className="text-slate-500">Email: helpdesk@corvus.gov.in</p>
+                <p className="text-slate-500 text-[10px]">CPGRAMS Citizen Redressal Compliant</p>
               </div>
             </div>
           </div>
 
-          <div className="border-t border-slate-200 pt-6 flex flex-col md:flex-row items-center justify-between gap-4 text-[11px] text-slate-500">
-            <div className="flex items-center gap-2">
-              <span>🏛️</span>
-              <span>
-                Designed and Developed for <strong className="text-slate-700">National Earth Observation &amp; Spatial Surveillance Mission</strong> by Team CORVUS.
-              </span>
+          <div className="border-t border-slate-200 pt-4 flex flex-col md:flex-row items-center justify-between gap-2 text-[11px] text-slate-500">
+            <div>
+              <span>Designed and Developed for <strong>National Earth Observation Mission</strong> by Team CORVUS.</span>
             </div>
             <div>
-              <span>Last Reviewed and Updated: <strong className="text-slate-700">12 September 2026</strong> • Version 4.2.0</span>
+              <span>Last Reviewed: <strong>12 September 2026</strong> • Version 4.2.0</span>
             </div>
           </div>
         </div>
