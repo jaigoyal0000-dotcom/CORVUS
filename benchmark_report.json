@@ -1,0 +1,90 @@
+{
+  "timestamp": "2026-09-12 11:41:05",
+  "device": "cpu",
+  "architecture_profile": {
+    "architecture": "ResNet-18 (Modified 2-Class)",
+    "total_parameters": 11177538,
+    "trainable_parameters": 11177538,
+    "model_ram_footprint_mb": 42.68,
+    "disk_checkpoint_size_mb": 128.05,
+    "floating_point_operations_gflops": 1.82
+  },
+  "latency_throughput": {
+    "batch_1": {
+      "batch_size": 1,
+      "mean_latency_ms": 32.51,
+      "p50_latency_ms": 31.76,
+      "p95_latency_ms": 40.22,
+      "p99_latency_ms": 49.96,
+      "throughput_fps": 30.76,
+      "latency_per_sample_ms": 32.51
+    },
+    "batch_4": {
+      "batch_size": 4,
+      "mean_latency_ms": 305.7,
+      "p50_latency_ms": 295.87,
+      "p95_latency_ms": 394.69,
+      "p99_latency_ms": 415.09,
+      "throughput_fps": 13.08,
+      "latency_per_sample_ms": 76.43
+    },
+    "batch_16": {
+      "batch_size": 16,
+      "mean_latency_ms": 1235.7,
+      "p50_latency_ms": 1168.35,
+      "p95_latency_ms": 1881.63,
+      "p99_latency_ms": 2174.45,
+      "throughput_fps": 12.95,
+      "latency_per_sample_ms": 77.23
+    },
+    "batch_32": {
+      "batch_size": 32,
+      "mean_latency_ms": 2509.95,
+      "p50_latency_ms": 2456.04,
+      "p95_latency_ms": 3512.41,
+      "p99_latency_ms": 3810.57,
+      "throughput_fps": 12.75,
+      "latency_per_sample_ms": 78.44
+    }
+  },
+  "single_image_pipeline_breakdown": {
+    "io_rgb_convert_ms": 9.2,
+    "tensor_transform_ms": 8.15,
+    "model_forward_ms": 137.69,
+    "softmax_postprocess_ms": 0.15,
+    "total_end_to_end_ms": 155.19
+  },
+  "validation_quality_metrics": {
+    "total_samples": 8,
+    "accuracy": 1.0,
+    "accuracy_pct": "100.00%",
+    "confusion_matrix": [
+      [
+        4,
+        0
+      ],
+      [
+        0,
+        4
+      ]
+    ],
+    "classes": [
+      "OPTICAL",
+      "SAR"
+    ],
+    "per_class": {
+      "OPTICAL": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "support": 4
+      },
+      "SAR": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "support": 4
+      }
+    }
+  }
+}

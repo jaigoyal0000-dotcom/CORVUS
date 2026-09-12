@@ -1,0 +1,124 @@
+{
+  "timestamp": "2026-09-12 11:42:42",
+  "speed_benchmark": {
+    "256x256": {
+      "Variance of Laplacian (OpenCV)": {
+        "mean_latency_ms": 0.218,
+        "p95_latency_ms": 0.295,
+        "throughput_fps": 4591.6
+      },
+      "Tenengrad Sobel Gradient": {
+        "mean_latency_ms": 0.32,
+        "p95_latency_ms": 0.472,
+        "throughput_fps": 3120.3
+      },
+      "2D FFT High-Freq Ratio": {
+        "mean_latency_ms": 2.59,
+        "p95_latency_ms": 3.075,
+        "throughput_fps": 386.2
+      }
+    },
+    "512x512": {
+      "Variance of Laplacian (OpenCV)": {
+        "mean_latency_ms": 1.846,
+        "p95_latency_ms": 2.15,
+        "throughput_fps": 541.7
+      },
+      "Tenengrad Sobel Gradient": {
+        "mean_latency_ms": 3.448,
+        "p95_latency_ms": 3.744,
+        "throughput_fps": 290.0
+      },
+      "2D FFT High-Freq Ratio": {
+        "mean_latency_ms": 12.702,
+        "p95_latency_ms": 13.504,
+        "throughput_fps": 78.7
+      }
+    },
+    "1024x1024": {
+      "Variance of Laplacian (OpenCV)": {
+        "mean_latency_ms": 7.608,
+        "p95_latency_ms": 8.745,
+        "throughput_fps": 131.4
+      },
+      "Tenengrad Sobel Gradient": {
+        "mean_latency_ms": 13.372,
+        "p95_latency_ms": 14.451,
+        "throughput_fps": 74.8
+      },
+      "2D FFT High-Freq Ratio": {
+        "mean_latency_ms": 65.688,
+        "p95_latency_ms": 68.656,
+        "throughput_fps": 15.2
+      }
+    }
+  },
+  "classification_metrics": {
+    "dataset_samples": 60,
+    "sharp_count": 20,
+    "blurry_count": 40,
+    "methods": {
+      "Variance of Laplacian (VoL)": {
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "optimal_threshold_raw": 12797.9719,
+        "roc_auc": 1.0
+      },
+      "Tenengrad Focus Measure": {
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "optimal_threshold_raw": 5113.5559,
+        "roc_auc": 1.0
+      },
+      "2D FFT High-Frequency Ratio": {
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "optimal_threshold_raw": 0.6532,
+        "roc_auc": 1.0
+      }
+    }
+  },
+  "model_blur_stress_test": {
+    "baseline_sharp": {
+      "blur_sigma": 0.0,
+      "sar_accuracy": 100.0,
+      "sar_mean_confidence": 100.0,
+      "optical_accuracy": 100.0,
+      "optical_mean_confidence": 94.2
+    },
+    "sigma_1": {
+      "blur_sigma": 1.0,
+      "sar_accuracy": 100.0,
+      "sar_mean_confidence": 99.9,
+      "optical_accuracy": 100.0,
+      "optical_mean_confidence": 76.8
+    },
+    "sigma_3": {
+      "blur_sigma": 3.0,
+      "sar_accuracy": 100.0,
+      "sar_mean_confidence": 95.3,
+      "optical_accuracy": 100.0,
+      "optical_mean_confidence": 81.0
+    },
+    "sigma_5": {
+      "blur_sigma": 5.0,
+      "sar_accuracy": 100.0,
+      "sar_mean_confidence": 70.3,
+      "optical_accuracy": 100.0,
+      "optical_mean_confidence": 60.8
+    },
+    "sigma_9": {
+      "blur_sigma": 9.0,
+      "sar_accuracy": 100.0,
+      "sar_mean_confidence": 68.4,
+      "optical_accuracy": 100.0,
+      "optical_mean_confidence": 55.6
+    }
+  }
+}

@@ -1,0 +1,61 @@
+# Central Model Registry Configuration for CORVUS
+models:
+  vqa:
+    model_id: "geochat-7b"
+    version: "1.0"
+    task: "vqa"
+    modalities: ["single_optical", "single_sar"]
+    input: {"image": "raster", "question": "string"}
+    output: {"answer": "string", "confidence": "float"}
+    confidence_supported: true
+    fallback: "default_vqa"
+
+  captioning:
+    model_id: "geochat-caption"
+    version: "1.0"
+    task: "captioning"
+    modalities: ["single_optical", "single_sar"]
+    input: {"image": "raster"}
+    output: {"caption": "string"}
+    confidence_supported: true
+    fallback: "default_caption"
+
+  grounding:
+    model_id: "grounding-dino"
+    version: "2.1"
+    task: "grounding"
+    modalities: ["single_optical"]
+    input: {"image": "raster", "prompt": "string"}
+    output: {"boxes": "list", "scores": "list"}
+    confidence_supported: true
+    fallback: "sam2_grounding"
+
+  segmentation:
+    model_id: "segformer-b2"
+    version: "1.2"
+    task: "segmentation"
+    modalities: ["single_optical", "single_sar"]
+    input: {"image": "raster"}
+    output: {"mask": "raster", "classes": "list"}
+    confidence_supported: true
+    fallback: "unet_segmentation"
+
+  change_detection:
+    model_id: "changeformer"
+    version: "1.0"
+    task: "change_detection"
+    modalities: ["bi_temporal"]
+    input: {"image_t1": "raster", "image_t2": "raster"}
+    output: {"change_map": "raster", "pct_change": "float"}
+    confidence_supported: true
+    fallback: "bit_changedetect"
+
+  optical_sar_fusion:
+    model_id: "optical-sar-fusion"
+    version: "1.0"
+    task: "optical_sar_fusion"
+    modalities: ["optical_sar"]
+    input: {"optical": "raster", "sar": "raster"}
+    output: {"fused_map": "raster", "extraction": "dict"}
+    confidence_supported: true
+    fallback: "early_fusion"
