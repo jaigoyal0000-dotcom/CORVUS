@@ -195,12 +195,13 @@ export default function OpenLayersMap({
   const [internalBasemap, setInternalBasemap] = useState<BasemapStyle>('google_sat');
   const [internalSpectralFilter, setInternalSpectralFilter] = useState<SpectralFilter>('normal');
   const [internalLayerVisibility, setInternalLayerVisibility] = useState<LandCoverVisibility>({
-    vegetation: false,
-    water: false,
-    urban: false,
-    diff_change: false,
-    roads: false,
+    vegetation: true,
+    water: true,
+    urban: true,
+    diff_change: true,
+    roads: true,
   });
+  const [showControlDeck, setShowControlDeck] = useState(true);
 
   const basemap = externalBasemap !== undefined ? externalBasemap : internalBasemap;
   const setBasemap = (bm: BasemapStyle) => {
@@ -663,8 +664,17 @@ export default function OpenLayersMap({
 
       feat.setStyle(
         new Style({
-          fill: new Fill({ color: 'rgba(16, 185, 129, 0.38)' }),
-          stroke: new Stroke({ color: '#10B981', width: 2 }),
+          fill: new Fill({ color: 'rgba(16, 185, 129, 0.35)' }),
+          stroke: new Stroke({ color: '#10B981', width: 2.5 }),
+          text: new TextStyle({
+            text: idx === 0 ? '🌿 Forest Canopy Reserve' : idx === 1 ? '🌾 Active Crop Basin' : '🌱 Green Riparian Buffer',
+            font: 'bold 11px Inter, sans-serif',
+            fill: new Fill({ color: '#FFFFFF' }),
+            backgroundFill: new Fill({ color: 'rgba(6, 78, 59, 0.90)' }),
+            backgroundStroke: new Stroke({ color: '#10B981', width: 1.5 }),
+            padding: [3, 8, 3, 8],
+            overflow: true,
+          }),
         })
       );
       vegFeatures.push(feat);
@@ -716,8 +726,17 @@ export default function OpenLayersMap({
 
       feat.setStyle(
         new Style({
-          fill: new Fill({ color: 'rgba(2, 132, 199, 0.45)' }),
+          fill: new Fill({ color: 'rgba(2, 132, 199, 0.40)' }),
           stroke: new Stroke({ color: '#38BDF8', width: 2.5 }),
+          text: new TextStyle({
+            text: idx === 0 ? '💧 River Channel (NDWI +0.62)' : '🌊 Retention Basin',
+            font: 'bold 11px Inter, sans-serif',
+            fill: new Fill({ color: '#FFFFFF' }),
+            backgroundFill: new Fill({ color: 'rgba(12, 74, 110, 0.90)' }),
+            backgroundStroke: new Stroke({ color: '#38BDF8', width: 1.5 }),
+            padding: [3, 8, 3, 8],
+            overflow: true,
+          }),
         })
       );
       waterFeatures.push(feat);
@@ -773,8 +792,17 @@ export default function OpenLayersMap({
 
       feat.setStyle(
         new Style({
-          fill: new Fill({ color: 'rgba(249, 115, 22, 0.32)' }),
-          stroke: new Stroke({ color: '#FB923C', width: 2 }),
+          fill: new Fill({ color: 'rgba(249, 115, 22, 0.35)' }),
+          stroke: new Stroke({ color: '#FB923C', width: 2.5 }),
+          text: new TextStyle({
+            text: idx === 0 ? '🏙️ Commercial Core' : idx === 1 ? '🏭 Logistics Terminal' : '🏘️ Residential Zone',
+            font: 'bold 11px Inter, sans-serif',
+            fill: new Fill({ color: '#FFFFFF' }),
+            backgroundFill: new Fill({ color: 'rgba(124, 45, 18, 0.90)' }),
+            backgroundStroke: new Stroke({ color: '#FB923C', width: 1.5 }),
+            padding: [3, 8, 3, 8],
+            overflow: true,
+          }),
         })
       );
       urbanFeatures.push(feat);
@@ -784,7 +812,7 @@ export default function OpenLayersMap({
     const diffFeatures: Feature[] = [];
     const diffItems = [
       {
-        name: '🏗️ New Urban Expansion (T1→T2)',
+        name: '🏗️ New Urban Expansion (+26.5%)',
         subType: 'Urban Construction Growth (+26.5%)',
         color: 'rgba(234, 179, 8, 0.45)',
         borderColor: '#FACC15',
@@ -805,7 +833,7 @@ export default function OpenLayersMap({
         description: 'Verified structural addition detected between Time-1 and Time-2 imagery via ChangeFormer attention diff.',
       },
       {
-        name: '🔻 Vegetation Loss / Deforestation',
+        name: '🔻 Vegetation Loss Alert',
         subType: 'Canopy Reduction Alert',
         color: 'rgba(239, 68, 68, 0.45)',
         borderColor: '#F87171',
@@ -826,7 +854,7 @@ export default function OpenLayersMap({
         description: 'Bi-temporal reduction in Near-Infrared reflectance showing land clearing and canopy degradation.',
       },
       {
-        name: '🌊 Flood Inundation / Water Shift',
+        name: '🌊 Flood Inundation Zone',
         subType: 'Hydrological Surface Expansion',
         color: 'rgba(6, 182, 212, 0.45)',
         borderColor: '#22D3EE',
@@ -866,6 +894,15 @@ export default function OpenLayersMap({
         new Style({
           fill: new Fill({ color: item.color }),
           stroke: new Stroke({ color: item.borderColor, width: 2.5, lineDash: [8, 4] }),
+          text: new TextStyle({
+            text: item.name,
+            font: 'bold 11px Inter, sans-serif',
+            fill: new Fill({ color: '#FFFFFF' }),
+            backgroundFill: new Fill({ color: 'rgba(30, 41, 59, 0.92)' }),
+            backgroundStroke: new Stroke({ color: item.borderColor, width: 1.5 }),
+            padding: [3, 8, 3, 8],
+            overflow: true,
+          }),
         })
       );
       diffFeatures.push(feat);
@@ -911,6 +948,15 @@ export default function OpenLayersMap({
       feat.setStyle(
         new Style({
           stroke: new Stroke({ color: '#F8FAFC', width: 3.5, lineDash: [12, 6] }),
+          text: new TextStyle({
+            text: idx === 0 ? '🛣️ Arterial Highway Corridor' : '🛣️ Expressway Ring',
+            font: 'bold 10px Inter, sans-serif',
+            fill: new Fill({ color: '#FFFFFF' }),
+            backgroundFill: new Fill({ color: 'rgba(15, 23, 42, 0.92)' }),
+            backgroundStroke: new Stroke({ color: '#64748B', width: 1.5 }),
+            padding: [2, 7, 2, 7],
+            overflow: true,
+          }),
         })
       );
       roadFeatures.push(feat);
@@ -1792,12 +1838,12 @@ export default function OpenLayersMap({
         </div>
       )}
 
-      {/* 🚀 Consolidated Aerospace Master HUD Deck */}
-      <div className="absolute top-3 left-3 right-3 z-20 pointer-events-auto flex flex-col gap-2">
-        {/* Row 1: Master Navigation, Basemap, Filter & Search */}
-        <div className="flex items-center justify-between gap-2.5 flex-wrap bg-slate-950/85 backdrop-blur-xl border border-slate-800/90 px-3 py-2 rounded-2xl shadow-2xl">
-          {/* Left: View Mode Toggle & Satellite Basemap & Sensor Filter */}
-          <div className="flex items-center gap-2 flex-wrap">
+      {/* 🚀 Aerospace Floating Modular HUD */}
+      <div className="absolute top-3 left-4 right-4 z-20 pointer-events-none flex flex-col gap-2">
+        {/* Row 1: Floating Navigation Capsule, Deck Toggle & Search Capsule */}
+        <div className="flex items-center justify-between gap-2.5 flex-wrap">
+          {/* Left Glass Capsule: View Mode, Basemap & Sensor Filter */}
+          <div className="pointer-events-auto flex items-center gap-2 flex-wrap bg-slate-950/80 backdrop-blur-xl border border-slate-800/80 p-1.5 rounded-2xl shadow-xl">
             <div className="flex items-center bg-slate-900/90 p-1 rounded-xl border border-slate-800">
               <button
                 onClick={() => setViewMode('map')}
@@ -1860,17 +1906,39 @@ export default function OpenLayersMap({
             )}
           </div>
 
-          {/* Right: Search & Tactical Action Buttons */}
+          {/* Center Glass Capsule: Toggle Layer & Heatmap Deck */}
           {viewMode === 'map' && (
-            <div className="flex items-center gap-2 flex-wrap ml-auto">
+            <div className="pointer-events-auto">
+              <button
+                onClick={() => setShowControlDeck(!showControlDeck)}
+                className={`px-3.5 py-2 rounded-2xl text-xs font-bold flex items-center gap-2 transition border backdrop-blur-xl shadow-xl ${
+                  showControlDeck
+                    ? 'bg-cyan-950/80 border-cyan-500/60 text-cyan-300 shadow-cyan-500/10'
+                    : 'bg-slate-950/80 border-slate-800/90 text-slate-300 hover:text-white hover:border-slate-700'
+                }`}
+                title="Toggle Layers & AI Heatmap Controls"
+              >
+                <Layers className="w-4 h-4 text-cyan-400" />
+                <span>Features &amp; Heatmaps</span>
+                <span className="text-[10px] px-1.5 py-0.5 rounded-full font-mono bg-cyan-400/20 text-cyan-300 font-bold">
+                  {Object.values(currentLayerVisibility).filter(Boolean).length + (showHeatmap ? 1 : 0)} Active
+                </span>
+                <span className={`text-[10px] transition-transform duration-200 ${showControlDeck ? 'rotate-180' : ''}`}>▾</span>
+              </button>
+            </div>
+          )}
+
+          {/* Right Glass Capsule: Search & Tactical Action Buttons */}
+          {viewMode === 'map' && (
+            <div className="pointer-events-auto flex items-center gap-2 flex-wrap bg-slate-950/80 backdrop-blur-xl border border-slate-800/80 p-1.5 rounded-2xl shadow-xl ml-auto">
               {/* Geocoding Search */}
               <form onSubmit={handleGlobalSearch} className="relative flex items-center">
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search city, coordinates..."
-                  className="bg-slate-900/90 border border-slate-800 rounded-xl pl-8 pr-18 py-1.5 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-cyan-500/60 w-48 sm:w-60 font-medium transition"
+                  placeholder="Search city, coords..."
+                  className="bg-slate-900/90 border border-slate-800 rounded-xl pl-8 pr-18 py-1.5 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-cyan-500/60 w-44 sm:w-56 font-medium transition"
                 />
                 <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 pointer-events-none" />
                 <button
@@ -1939,22 +2007,23 @@ export default function OpenLayersMap({
           )}
         </div>
 
-        {/* Row 2: Secondary Tactical Strip — Unified Overlays & AI Heatmap (Single clean row, zero clipping) */}
-        {viewMode === 'map' && (
-          <div className="flex items-center justify-between gap-3 flex-wrap bg-slate-950/85 backdrop-blur-xl border border-slate-800/90 px-3.5 py-2 rounded-2xl shadow-xl text-xs">
+        {/* Row 2: Floating Tactical Intelligence Dock (Centered, Semi-translucent, Collapsible) */}
+        {viewMode === 'map' && showControlDeck && (
+          <div className="pointer-events-auto mx-auto flex items-center justify-between gap-3 flex-wrap bg-slate-950/80 backdrop-blur-xl border border-slate-800/80 px-3.5 py-1.5 rounded-2xl shadow-2xl text-xs animate-fade-down max-w-full">
             {/* Left: Vector Feature Overlays */}
             <div className="flex items-center gap-1.5 flex-wrap">
               <span className="text-[10px] uppercase font-bold text-slate-400 font-mono flex items-center gap-1 pr-2 border-r border-slate-800">
-                <Layers className="w-3.5 h-3.5 text-cyan-400" /> Overlays
+                <Layers className="w-3.5 h-3.5 text-cyan-400" /> Overlays:
               </span>
 
               <button
                 onClick={() => toggleLayer('vegetation')}
                 className={`px-2.5 py-1 rounded-xl text-[11px] font-bold flex items-center gap-1.5 transition border ${
                   currentLayerVisibility.vegetation
-                    ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300 shadow-sm'
+                    ? 'bg-emerald-500/25 border-emerald-400/60 text-emerald-300 shadow-sm shadow-emerald-500/20'
                     : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-white'
                 }`}
+                title="Toggle Vegetation & Canopy Layer"
               >
                 <Trees className="w-3.5 h-3.5 text-emerald-400" />
                 <span>Vegetation</span>
@@ -1964,9 +2033,10 @@ export default function OpenLayersMap({
                 onClick={() => toggleLayer('water')}
                 className={`px-2.5 py-1 rounded-xl text-[11px] font-bold flex items-center gap-1.5 transition border ${
                   currentLayerVisibility.water
-                    ? 'bg-sky-500/20 border-sky-500/40 text-sky-300 shadow-sm'
+                    ? 'bg-sky-500/25 border-sky-400/60 text-sky-300 shadow-sm shadow-sky-500/20'
                     : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-white'
                 }`}
+                title="Toggle Water Bodies & River Layer"
               >
                 <Droplets className="w-3.5 h-3.5 text-sky-400" />
                 <span>Water Bodies</span>
@@ -1976,9 +2046,10 @@ export default function OpenLayersMap({
                 onClick={() => toggleLayer('urban')}
                 className={`px-2.5 py-1 rounded-xl text-[11px] font-bold flex items-center gap-1.5 transition border ${
                   currentLayerVisibility.urban
-                    ? 'bg-orange-500/20 border-orange-500/40 text-orange-300 shadow-sm'
+                    ? 'bg-orange-500/25 border-orange-400/60 text-orange-300 shadow-sm shadow-orange-500/20'
                     : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-white'
                 }`}
+                title="Toggle Urban & Built-Up Infrastructure Layer"
               >
                 <Building2 className="w-3.5 h-3.5 text-orange-400" />
                 <span>Built-up</span>
@@ -1988,9 +2059,10 @@ export default function OpenLayersMap({
                 onClick={() => toggleLayer('diff_change')}
                 className={`px-2.5 py-1 rounded-xl text-[11px] font-bold flex items-center gap-1.5 transition border ${
                   currentLayerVisibility.diff_change
-                    ? 'bg-amber-500/20 border-amber-500/40 text-amber-300 shadow-sm'
+                    ? 'bg-amber-500/25 border-amber-400/60 text-amber-300 shadow-sm shadow-amber-500/20'
                     : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-white'
                 }`}
+                title="Toggle Bi-temporal Change Difference Detections"
               >
                 <GitCompare className="w-3.5 h-3.5 text-amber-400" />
                 <span>Change Diffs</span>
@@ -2000,23 +2072,24 @@ export default function OpenLayersMap({
                 onClick={() => toggleLayer('roads')}
                 className={`px-2.5 py-1 rounded-xl text-[11px] font-bold flex items-center gap-1.5 transition border ${
                   currentLayerVisibility.roads
-                    ? 'bg-slate-700/60 border-slate-500/50 text-slate-200 shadow-sm'
+                    ? 'bg-slate-700/60 border-slate-400/60 text-slate-100 shadow-sm'
                     : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-white'
                 }`}
+                title="Toggle Road Networks"
               >
                 <Route className="w-3.5 h-3.5 text-slate-300" />
                 <span>Roads</span>
               </button>
             </div>
 
-            {/* Right: AI Heatmap Spectral Signatures & Pin Controls */}
+            {/* Middle: AI Heatmap Signatures */}
             <div className="flex items-center gap-2 flex-wrap">
               <div className="flex items-center gap-1.5 pl-2 border-l border-slate-800">
                 <button
                   onClick={() => setShowHeatmap(!showHeatmap)}
                   className={`px-3 py-1 rounded-xl text-[11px] font-extrabold flex items-center gap-1.5 transition border ${
                     showHeatmap
-                      ? 'bg-gradient-to-r from-amber-500/25 to-orange-500/25 border-amber-500/60 text-amber-300 shadow-md shadow-amber-500/10'
+                      ? 'bg-gradient-to-r from-amber-500/25 to-orange-500/25 border-amber-500/60 text-amber-300 shadow-md shadow-amber-500/20'
                       : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-slate-200'
                   }`}
                 >
@@ -2052,6 +2125,7 @@ export default function OpenLayersMap({
                 )}
               </div>
 
+              {/* Right: Target Pin & Relocate */}
               <div className="flex items-center gap-1.5 pl-2 border-l border-slate-800">
                 <button
                   onClick={() => setShowLocationPin(!showLocationPin)}
@@ -2073,6 +2147,14 @@ export default function OpenLayersMap({
                 >
                   <Navigation className="w-3.5 h-3.5 text-cyan-400" />
                   <span>Relocate</span>
+                </button>
+
+                <button
+                  onClick={() => setShowControlDeck(false)}
+                  className="p-1 rounded-lg text-slate-500 hover:text-white hover:bg-slate-800 transition ml-1"
+                  title="Minimize Features Deck"
+                >
+                  <X className="w-3.5 h-3.5" />
                 </button>
               </div>
             </div>

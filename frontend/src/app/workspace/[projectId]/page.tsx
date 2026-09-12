@@ -97,13 +97,13 @@ export default function WorkspacePage({ params }: { params: { projectId: string 
   const [disasterData, setDisasterData] = useState<any | null>(null);
   const [disasterScanning, setDisasterScanning] = useState(false);
 
-  // Multi-Spectral Land Cover & Environmental Feature Layer Visibility State (Default OFF for clean map)
+  // Multi-Spectral Land Cover & Environmental Feature Layer Visibility State (Default ON for clear visualization)
   const [layerVisibility, setLayerVisibility] = useState<LandCoverVisibility>({
-    vegetation: false,
-    water: false,
-    urban: false,
-    diff_change: false,
-    roads: false,
+    vegetation: true,
+    water: true,
+    urban: true,
+    diff_change: true,
+    roads: true,
   });
 
   const [activeBasemap, setActiveBasemap] = useState<BasemapStyle>('google_sat');
@@ -734,7 +734,7 @@ export default function WorkspacePage({ params }: { params: { projectId: string 
           </div>
 
           {/* Map Canvas */}
-          <div className="h-[520px] min-h-[460px] border-b border-slate-800 relative shrink-0">
+          <div className="h-[640px] xl:h-[700px] min-h-[540px] border-b border-slate-800 relative shrink-0">
             {projectData ? (
               <OpenLayersMap
                 centerLonLat={activeCentroid}
