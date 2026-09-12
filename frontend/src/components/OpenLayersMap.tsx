@@ -227,10 +227,12 @@ export default function OpenLayersMap({
   const [currentZoom, setCurrentZoom] = useState<number>(zoom);
 
   // Heatmap controls (gentle defaults so it never blows out or bursts)
-  const [showHeatmap, setShowHeatmap] = useState(false);
-  const [heatmapType, setHeatmapType] = useState<'change' | 'urban' | 'vegetation' | 'water' | 'sar' | 'hazard'>('vegetation');
-  const [heatmapRadius, setHeatmapRadius] = useState(8);
-  const [heatmapBlur, setHeatmapBlur] = useState(12);
+  // 🔥 AI Multi-Spectral Heatmap Controls (Default ON to project AI detection over satellite map)
+  const [showHeatmap, setShowHeatmap] = useState(true);
+  const [heatmapType, setHeatmapType] = useState<'change' | 'urban' | 'vegetation' | 'water' | 'sar' | 'hazard'>('change');
+  const [heatmapRadius, setHeatmapRadius] = useState(18);
+  const [heatmapBlur, setHeatmapBlur] = useState(22);
+  const [heatmapOpacity, setHeatmapOpacity] = useState(75);
   const [showRelocateBar, setShowRelocateBar] = useState(false);
 
   // Tactical & Image adjustments
@@ -242,9 +244,9 @@ export default function OpenLayersMap({
   const [showTunePanel, setShowTunePanel] = useState(false);
   const [showStatsDrawer, setShowStatsDrawer] = useState(false);
 
-  // 🖼️ Real GIS Image Overlay Controls (Aspect Ratio Preserved & Calibrated Scale)
-  const [showImageOverlay, setShowImageOverlay] = useState(true);
-  const [showImageBorder, setShowImageBorder] = useState(true);
+  // 🖼️ Raw Image Overlay Controls (Default OFF so raw photo does NOT obstruct satellite map)
+  const [showImageOverlay, setShowImageOverlay] = useState(false);
+  const [showImageBorder, setShowImageBorder] = useState(false);
   const [imageOverlayOpacity, setImageOverlayOpacity] = useState(85);
   const [imageFootprintKm, setImageFootprintKm] = useState<number>(2.5);
   const [imageDimensions, setImageDimensions] = useState<{ width: number; height: number } | null>(null);
@@ -278,8 +280,8 @@ export default function OpenLayersMap({
   const initialLocName = locationName || (isFreshMap ? 'Unanchored Observation Map' : 'Project Mission AOI');
 
   const [cursorCoords, setCursorCoords] = useState<[number, number]>(initialCentroid);
-  // Optional location pin on map (default false so uploaded raster & heatmaps are completely clean)
-  const [showLocationPin, setShowLocationPin] = useState(false);
+  // 🎯 Location pin & tactical reconnaissance reticle (Locates place on map)
+  const [showLocationPin, setShowLocationPin] = useState(true);
 
   const [recognizedLocation, setRecognizedLocation] = useState<{
     name: string;
@@ -515,7 +517,7 @@ export default function OpenLayersMap({
     });
   }, []);
 
-  // Extract recognized location from uploaded files + render calibrated GIS image overlay
+  // Extract recognized location from uploaded files + locate place on map + project AI Heatmap
   useEffect(() => {
     if (uploadedFiles.length > 0) {
       const activeFile = uploadedFiles.find((f) => f.slot === selectedSlot) || uploadedFiles[0];
@@ -524,161 +526,69 @@ export default function OpenLayersMap({
       const baseCentroid: [number, number] = imageAnchorCoord || (activeFile.metadata?.centroid as [number, number]) || centerLonLat || [77.2000, 28.6500];
       const locName = activeFile.metadata?.location_name || recognizedLocation.name || 'Recognized Satellite AOI';
 
-      // Keep heatmap OFF on upload so the satellite image is pure, crisp, and never blown-out ("burst")
-      setShowHeatmap(false);
+      // 1. Locate the place on the real satellite map:
+      setShowLocationPin(true);
+      flyToLocation(baseCentroid, 14);
 
+      // 2. Select AI Heatmap signature based on file name or sensor:
       const fnLower = (activeFile.file?.name || '').toLowerCase();
+      let detectedType: typeof heatmapType = 'change';
       if (fnLower.includes('sar') || fnLower.includes('interfero') || fnLower.includes('fringe') || fnLower.includes('radar')) {
-        setHeatmapType('sar');
+        detectedType = 'sar';
       } else if (fnLower.includes('water') || fnLower.includes('flood') || fnLower.includes('river')) {
-        setHeatmapType('water');
+        detectedType = 'water';
       } else if (fnLower.includes('urban') || fnLower.includes('city') || fnLower.includes('delhi') || fnLower.includes('mumbai')) {
-        setHeatmapType('urban');
-      } else if (fnLower.includes('change') || fnLower.includes('diff') || fnLower.includes('t1') || fnLower.includes('t2')) {
-        setHeatmapType('change');
+        detectedType = 'urban';
+      } else if (fnLower.includes('veg') || fnLower.includes('canopy') || fnLower.includes('crop') || fnLower.includes('forest')) {
+        detectedType = 'vegetation';
       } else {
-        setHeatmapType('vegetation');
+        detectedType = 'change';
       }
+      setHeatmapType(detectedType);
+
+      // 3. Project AI Heatmap over target place & keep raw photo off map (per user requirement):
+      setShowHeatmap(true);
+      setShowImageOverlay(false);
+      setShowImageBorder(false);
 
       // Reverse geocode if generic
       if (locName.includes('Observed') || locName.includes('Target Scene') || locName.includes('°')) {
         reverseGeocode(baseCentroid[0], baseCentroid[1]).then((reversedName) => {
           if (reversedName) {
             setRecognizedLocation((prev) => ({ ...prev, name: reversedName }));
-            showLocationRecognizedToast(reversedName, baseCentroid, 'Reverse Geocoding');
+            showLocationRecognizedToast(reversedName, baseCentroid, 'Target Geocoded');
           }
         });
       }
 
-      // 🖼️ Load image and compute true aspect ratio in Web Mercator (EPSG:3857)
-      const imgUrl = activeFile.preview;
-      if (imgUrl) {
-        const img = new window.Image();
-        img.crossOrigin = 'anonymous';
-        img.onload = () => {
-          const nw = img.naturalWidth || 1024;
-          const nh = img.naturalHeight || 1024;
-          const ar = nw / nh;
-          setImageDimensions({ width: nw, height: nh });
-          setImageAspectRatio(ar);
+      // Compute bounding box around target coordinate
+      const halfDeg = 0.04;
+      const targetBbox: [number, number, number, number] = [
+        baseCentroid[0] - halfDeg,
+        baseCentroid[1] - halfDeg,
+        baseCentroid[0] + halfDeg,
+        baseCentroid[1] + halfDeg,
+      ];
 
-          if (!mapInstanceRef.current) return;
-          const map = mapInstanceRef.current;
+      setRecognizedLocation({
+        name: locName,
+        centroid: baseCentroid,
+        bbox: targetBbox,
+      });
 
-          // Projected center coordinates in EPSG:3857 (meters)
-          const [cx, cy] = fromLonLat(baseCentroid);
-
-          // Compute ground footprint maintaining 100% true photographic aspect ratio without warping
-          const halfH = (imageFootprintKm * 1000) / 2;
-          const halfW = halfH * ar;
-          const extent3857: [number, number, number, number] = [
-            cx - halfW,
-            cy - halfH,
-            cx + halfW,
-            cy + halfH,
-          ];
-          currentImageExtentRef.current = extent3857;
-
-          // Compute geographic bounds
-          const sw = toLonLat([cx - halfW, cy - halfH]);
-          const ne = toLonLat([cx + halfW, cy + halfH]);
-          const correctedBbox: [number, number, number, number] = [sw[0], sw[1], ne[0], ne[1]];
-
-          setRecognizedLocation({
-            name: locName,
-            centroid: baseCentroid,
-            bbox: correctedBbox,
-          });
-
-          // Remove old layers
-          if (imageOverlayLayerRef.current) {
-            map.removeLayer(imageOverlayLayerRef.current);
-            imageOverlayLayerRef.current = null;
-          }
-          if (imageOverlayBorderLayerRef.current) {
-            map.removeLayer(imageOverlayBorderLayerRef.current);
-            imageOverlayBorderLayerRef.current = null;
-          }
-
-          // ImageStatic raster layer
-          const imgSource = new ImageStatic({
-            url: imgUrl,
-            imageExtent: extent3857,
-            interpolate: true,
-            crossOrigin: 'anonymous',
-          });
-
-          const imgLayer = new ImageLayer({
-            source: imgSource,
-            opacity: imageOverlayOpacity / 100,
-            zIndex: 9,
-            visible: showImageOverlay,
-          });
-
-          // Tactical hairline frame (zero opaque fill so image colors remain 100% natural)
-          const borderSource = new VectorSource();
-          const borderPoly = new Polygon([[
-            [cx - halfW, cy - halfH],
-            [cx + halfW, cy - halfH],
-            [cx + halfW, cy + halfH],
-            [cx - halfW, cy + halfH],
-            [cx - halfW, cy - halfH],
-          ]]);
-          const borderFeature = new Feature({ geometry: borderPoly });
-          borderFeature.setStyle(
-            new Style({
-              stroke: new Stroke({
-                color: '#22D3EE',
-                width: 1.5,
-                lineDash: [8, 6],
-              }),
-            })
-          );
-          borderSource.addFeature(borderFeature);
-
-          // Discreet corner markers
-          const corners = [
-            [cx - halfW, cy - halfH],
-            [cx + halfW, cy - halfH],
-            [cx + halfW, cy + halfH],
-            [cx - halfW, cy + halfH],
-          ];
-          corners.forEach(([corX, corY]) => {
-            const cornerPt = new Feature({ geometry: new Point([corX, corY]) });
-            cornerPt.setStyle(
-              new Style({
-                image: new CircleStyle({
-                  radius: 3.5,
-                  fill: new Fill({ color: '#22D3EE' }),
-                  stroke: new Stroke({ color: '#FFFFFF', width: 1.5 }),
-                }),
-              })
-            );
-            borderSource.addFeature(cornerPt);
-          });
-
-          const borderLayer = new VectorLayer({
-            source: borderSource,
-            zIndex: 11,
-            visible: showImageOverlay && showImageBorder,
-          });
-
-          imageOverlayLayerRef.current = imgLayer;
-          imageOverlayBorderLayerRef.current = borderLayer;
-          map.addLayer(imgLayer);
-          map.addLayer(borderLayer);
-
-          // Smoothly fit view to the calibrated image footprint
-          map.getView().fit(extent3857, {
-            padding: [60, 60, 60, 60],
-            duration: 800,
-            maxZoom: 18,
-          });
-        };
-        img.src = imgUrl;
+      // Clear any raw image overlay layers so the satellite basemap is purely visible with heatmap
+      if (mapInstanceRef.current) {
+        if (imageOverlayLayerRef.current) {
+          mapInstanceRef.current.removeLayer(imageOverlayLayerRef.current);
+          imageOverlayLayerRef.current = null;
+        }
+        if (imageOverlayBorderLayerRef.current) {
+          mapInstanceRef.current.removeLayer(imageOverlayBorderLayerRef.current);
+          imageOverlayBorderLayerRef.current = null;
+        }
       }
 
-      showLocationRecognizedToast(locName, baseCentroid, activeFile.file.name);
+      showLocationRecognizedToast(locName, baseCentroid, `Target Located: ${activeFile.file.name}`);
       if (onPointLocation && !imageAnchorCoord) {
         onPointLocation(baseCentroid, locName, 14);
       }
@@ -1078,31 +988,49 @@ export default function OpenLayersMap({
       });
     }
 
-    // 3. Optional Location Radar Pin Marker (Default OFF so map raster & heatmaps are completely unobstructed)
+    // 3. Location Radar Pin Marker & Tactical Reticle (Locates the place on the map)
     if (showLocationPin) {
+      const pinCoords = fromLonLat([lon, lat]);
       const pinFeature = new Feature({
-        geometry: new Point(fromLonLat([lon, lat])),
+        geometry: new Point(pinCoords),
       });
 
       pinFeature.setStyle(
         new Style({
           image: new CircleStyle({
-            radius: 6,
-            fill: new Fill({ color: '#10B981' }),
-            stroke: new Stroke({ color: '#FFFFFF', width: 2 }),
+            radius: 7,
+            fill: new Fill({ color: '#06B6D4' }),
+            stroke: new Stroke({ color: '#FFFFFF', width: 2.5 }),
           }),
           text: new TextStyle({
-            text: `🎯 ${loc.name}`,
-            offsetY: -20,
-            font: 'bold 11px Inter, sans-serif',
+            text: `🎯 ${loc.name} • Located Target`,
+            offsetY: -22,
+            font: 'bold 12px Inter, sans-serif',
             fill: new Fill({ color: '#FFFFFF' }),
-            backgroundFill: new Fill({ color: 'rgba(15, 23, 42, 0.95)' }),
+            backgroundFill: new Fill({ color: 'rgba(15, 23, 42, 0.92)' }),
             backgroundStroke: new Stroke({ color: '#06B6D4', width: 1.5 }),
-            padding: [4, 8, 4, 8],
+            padding: [5, 10, 5, 10],
           }),
         })
       );
       source.addFeature(pinFeature);
+
+      const ringFeature = new Feature({
+        geometry: new Point(pinCoords),
+      });
+      ringFeature.setStyle(
+        new Style({
+          image: new CircleStyle({
+            radius: 24,
+            stroke: new Stroke({
+              color: 'rgba(6, 182, 212, 0.75)',
+              width: 2,
+              lineDash: [6, 4],
+            }),
+          }),
+        })
+      );
+      source.addFeature(ringFeature);
     }
   }, [isFreshMap, showLocationPin]);
 
@@ -1710,14 +1638,15 @@ export default function OpenLayersMap({
     }
   }, [recognizedLocation, heatmapType, generateHeatmapFeatures]);
 
-  // Update Heatmap visibility and radius
+  // Update Heatmap visibility, radius, blur, and glow opacity
   useEffect(() => {
     if (heatmapLayerRef.current) {
       heatmapLayerRef.current.setVisible(showHeatmap);
       heatmapLayerRef.current.setRadius(heatmapRadius);
       heatmapLayerRef.current.setBlur(heatmapBlur);
+      heatmapLayerRef.current.setOpacity(heatmapOpacity / 100);
     }
-  }, [showHeatmap, heatmapRadius, heatmapBlur]);
+  }, [showHeatmap, heatmapRadius, heatmapBlur, heatmapOpacity]);
 
   // Smooth fly animation
   const flyToLocation = (coords: [number, number], targetZoom: number = 14) => {
@@ -1916,121 +1845,112 @@ export default function OpenLayersMap({
         </div>
       )}
 
-      {/* 🛰️ Floating Uploaded Image Overlay GIS Command HUD */}
-      {viewMode === 'map' && uploadedFiles.length > 0 && (
-        <div className="absolute top-16 left-3 z-20 pointer-events-auto bg-slate-950/95 backdrop-blur-md border border-cyan-500/50 p-2.5 rounded-2xl shadow-2xl shadow-black/80 flex items-center gap-2.5 flex-wrap max-w-2xl animate-fade-in text-xs">
-          {/* Slot badges */}
+      {/* 🔥 Floating AI Satellite Heatmap & Target Location Bar */}
+      {viewMode === 'map' && (
+        <div className="absolute top-16 left-3 z-20 pointer-events-auto bg-slate-950/95 backdrop-blur-md border border-cyan-500/50 p-2.5 rounded-2xl shadow-2xl shadow-black/80 flex items-center gap-2.5 flex-wrap max-w-3xl animate-fade-in text-xs">
+          {/* Target Location Badge */}
           <div className="flex items-center gap-1.5 pr-2 border-r border-slate-800">
-            <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-            <span className="text-[10px] font-extrabold uppercase tracking-wider text-cyan-200">GIS Raster</span>
+            <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping shrink-0" />
+            <span className="text-[11px] font-extrabold text-cyan-200 flex items-center gap-1">
+              <MapPin className="w-3.5 h-3.5 text-cyan-400" />
+              <span>{recognizedLocation.name}</span>
+            </span>
           </div>
 
-          <div className="flex items-center gap-1">
-            {uploadedFiles.map((uf) => (
+          {/* Quick Fly-To Button */}
+          <button
+            onClick={() => flyToLocation(recognizedLocation.centroid, 14)}
+            className="px-2.5 py-1 bg-cyan-950/60 hover:bg-cyan-900/80 text-cyan-300 rounded-lg text-[10px] font-bold border border-cyan-500/40 flex items-center gap-1 transition shadow-sm"
+            title="Focus camera on target place"
+          >
+            <Navigation className="w-3 h-3 text-cyan-400" />
+            <span>Center Target</span>
+          </button>
+
+          {/* Heatmap Signature Selector Pills */}
+          <div className="flex items-center gap-1 pl-1 border-l border-slate-800">
+            <span className="text-[10px] text-slate-400 font-semibold">Heatmap:</span>
+            {[
+              { type: 'change', label: 'Change', icon: '🔄' },
+              { type: 'vegetation', label: 'NDVI', icon: '🌿' },
+              { type: 'water', label: 'Flood', icon: '💧' },
+              { type: 'urban', label: 'Urban', icon: '🏙️' },
+              { type: 'sar', label: 'SAR', icon: '📡' },
+            ].map((hm) => (
               <button
-                key={uf.slot}
-                onClick={() => setSelectedSlot(uf.slot)}
+                key={hm.type}
+                onClick={() => {
+                  setHeatmapType(hm.type as any);
+                  setShowHeatmap(true);
+                }}
                 className={`px-2 py-0.5 rounded-lg text-[10px] font-bold flex items-center gap-1 transition ${
-                  selectedSlot === uf.slot
-                    ? 'bg-cyan-600 text-white shadow-md shadow-cyan-600/30'
+                  heatmapType === hm.type && showHeatmap
+                    ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-extrabold shadow-md shadow-amber-500/30'
                     : 'bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800'
                 }`}
+                title={`Switch to ${hm.label} AI Heatmap`}
               >
-                <span>[{uf.slot}]</span>
-                <span className="truncate max-w-[80px]">{uf.file.name}</span>
+                <span>{hm.icon}</span>
+                <span>{hm.label}</span>
               </button>
             ))}
           </div>
 
-          {/* Dimension & Aspect Badge */}
-          {imageDimensions && (
-            <div className="hidden sm:flex items-center gap-1 px-2 py-0.5 bg-slate-900 rounded-lg border border-slate-800 text-[10px] font-mono text-cyan-300">
-              <span>{imageDimensions.width}×{imageDimensions.height}px</span>
-              <span className="text-slate-500">•</span>
-              <span>{imageAspectRatio.toFixed(2)}:1</span>
-            </div>
-          )}
-
-          {/* Opacity Slider Control directly on map */}
+          {/* Heatmap Glow Opacity Slider */}
           <div className="flex items-center gap-1.5 pl-1 border-l border-slate-800">
-            <span className="text-[10px] text-slate-400 font-medium">Opacity:</span>
+            <span className="text-[10px] text-slate-400 font-medium">Glow:</span>
             <input
               type="range"
-              min="0"
+              min="15"
               max="100"
-              value={imageOverlayOpacity}
-              onChange={(e) => setImageOverlayOpacity(Number(e.target.value))}
-              className="w-16 sm:w-20 h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-400"
-              title="Adjust raster transparency over satellite basemap"
+              value={heatmapOpacity}
+              onChange={(e) => setHeatmapOpacity(Number(e.target.value))}
+              className="w-16 h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-400"
+              title="Adjust heatmap glow opacity"
             />
-            <span className="text-[10px] font-mono text-cyan-300 w-7">{imageOverlayOpacity}%</span>
+            <span className="text-[10px] font-mono text-amber-300 w-6">{heatmapOpacity}%</span>
           </div>
 
-          {/* Ground Footprint Scale Selection */}
-          <div className="flex items-center gap-1 pl-1 border-l border-slate-800">
-            <span className="text-[10px] text-slate-400 font-medium">Scale:</span>
-            {[1, 2.5, 5, 10].map((km) => (
-              <button
-                key={km}
-                onClick={() => setImageFootprintKm(km)}
-                className={`px-1.5 py-0.5 rounded text-[10px] font-mono font-bold transition ${
-                  imageFootprintKm === km
-                    ? 'bg-cyan-500 text-slate-950 font-extrabold shadow-sm'
-                    : 'bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800'
-                }`}
-                title={`Scale ground footprint to ${km} km`}
-              >
-                {km}k
-              </button>
-            ))}
+          {/* Heatmap Radius / Spread Slider */}
+          <div className="flex items-center gap-1.5 pl-1 border-l border-slate-800">
+            <span className="text-[10px] text-slate-400 font-medium">Spread:</span>
+            <input
+              type="range"
+              min="10"
+              max="36"
+              value={heatmapRadius}
+              onChange={(e) => setHeatmapRadius(Number(e.target.value))}
+              className="w-14 h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-400"
+              title="Adjust heatmap blur radius"
+            />
           </div>
 
-          {/* Action Buttons: Anchor to Center & Fit View */}
-          <div className="flex items-center gap-1 pl-1 border-l border-slate-800">
-            <button
-              onClick={handleAnchorToCurrentCenter}
-              className="px-2 py-1 bg-cyan-950/60 hover:bg-cyan-900/80 text-cyan-300 rounded-lg text-[10px] font-bold border border-cyan-500/40 flex items-center gap-1 transition shadow-sm"
-              title="Re-anchor raster to current center of map view"
-            >
-              <Target className="w-3 h-3 text-cyan-400" />
-              <span>Anchor Here</span>
-            </button>
+          {/* Heatmap Toggle Button */}
+          <button
+            onClick={() => setShowHeatmap(!showHeatmap)}
+            className={`px-2 py-1 rounded-lg text-[10px] font-bold border transition flex items-center gap-1 ${
+              showHeatmap
+                ? 'bg-amber-500/20 border-amber-500/50 text-amber-300 shadow-sm'
+                : 'bg-slate-900 border-slate-800 text-slate-500 hover:text-slate-300'
+            }`}
+            title={showHeatmap ? 'Turn Heatmap OFF' : 'Turn AI Heatmap ON'}
+          >
+            <Flame className="w-3.5 h-3.5 text-amber-400" />
+            <span>{showHeatmap ? 'Heatmap ON' : 'Heatmap OFF'}</span>
+          </button>
 
-            <button
-              onClick={handleFitToImage}
-              className="px-2 py-1 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white rounded-lg text-[10px] font-bold border border-slate-700 flex items-center gap-1 transition"
-              title="Fit map view to image bounds"
-            >
-              <Navigation className="w-3 h-3 text-slate-400" />
-              <span>Fit View</span>
-            </button>
-
-            {/* Tactical Hairline Frame Toggle */}
-            <button
-              onClick={() => setShowImageBorder(!showImageBorder)}
-              className={`p-1 rounded-lg text-[10px] border transition ${
-                showImageBorder
-                  ? 'bg-cyan-500/20 border-cyan-500/40 text-cyan-300'
-                  : 'bg-slate-900 border-slate-800 text-slate-500 hover:text-slate-300'
-              }`}
-              title={showImageBorder ? 'Hide Tactical Hairline Frame' : 'Show Tactical Hairline Frame'}
-            >
-              <Square className="w-3.5 h-3.5" />
-            </button>
-
-            {/* Layer Visibility Eye Toggle */}
-            <button
-              onClick={() => setShowImageOverlay(!showImageOverlay)}
-              className={`p-1 rounded-lg text-[10px] border transition ${
-                showImageOverlay
-                  ? 'bg-cyan-500/20 border-cyan-500/40 text-cyan-300'
-                  : 'bg-slate-900 border-slate-800 text-slate-500 hover:text-slate-300'
-              }`}
-              title={showImageOverlay ? 'Hide Image Overlay' : 'Show Image Overlay'}
-            >
-              {showImageOverlay ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
-            </button>
-          </div>
+          {/* Location Pin Toggle */}
+          <button
+            onClick={() => setShowLocationPin(!showLocationPin)}
+            className={`p-1.5 rounded-lg text-[10px] border transition ${
+              showLocationPin
+                ? 'bg-cyan-500/20 border-cyan-500/50 text-cyan-300 shadow-sm'
+                : 'bg-slate-900 border-slate-800 text-slate-500 hover:text-slate-300'
+            }`}
+            title={showLocationPin ? 'Hide Location Target Pin' : 'Show Location Target Pin'}
+          >
+            <Target className="w-3.5 h-3.5" />
+          </button>
         </div>
       )}
 
