@@ -124,13 +124,13 @@ export default function WorkspacePage({ params }: { params: { projectId: string 
   const [disasterData, setDisasterData] = useState<any | null>(null);
   const [disasterScanning, setDisasterScanning] = useState(false);
 
-  // Multi-Spectral Land Cover & Environmental Feature Layer Visibility State
+  // Multi-Spectral Land Cover & Environmental Feature Layer Visibility State (Default OFF for clean map)
   const [layerVisibility, setLayerVisibility] = useState<LandCoverVisibility>({
-    vegetation: true,
-    water: true,
-    urban: true,
-    diff_change: true,
-    roads: true,
+    vegetation: false,
+    water: false,
+    urban: false,
+    diff_change: false,
+    roads: false,
   });
 
   const [activeBasemap, setActiveBasemap] = useState<BasemapStyle>('google_sat');
@@ -544,18 +544,60 @@ export default function WorkspacePage({ params }: { params: { projectId: string 
     const url = URL.createObjectURL(file);
     const reader = new FileReader();
     reader.onload = () => {
+      const b64 = reader.result as string;
       setSingleImage({
         id: `single-${Date.now()}`,
         name: file.name,
         url,
-        base64: reader.result as string,
+        base64: b64,
         slot: 'T1',
         date: 'User Upload',
         sensor: 'Optical / Aerial',
       });
+
+      // Synchronize with OpenLayers uploadedFiles so map receives and renders the raster!
+      const newUploadedFile: UploadedFile = {
+        file,
+        slot: 'T1',
+        preview: url,
+        metadata: {
+          location_name: file.name.replace(/\.[^/.]+$/, ''),
+          centroid: activeCentroid,
+        },
+        validated: true,
+      };
+      setUploadedFiles([newUploadedFile]);
     };
     reader.readAsDataURL(file);
     if (singleFileInputRef.current) singleFileInputRef.current.value = '';
+  };
+
+  const handleSelectPresetImage = (presetName: string, url: string, coords: [number, number], sensorName: string) => {
+    setSingleImage({
+      id: `preset-${Date.now()}`,
+      name: presetName,
+      url,
+      slot: 'T1',
+      date: '2026 Pass',
+      sensor: sensorName,
+    });
+    handlePointLocation(coords, presetName.replace(/\.[^/.]+$/, ''), 14);
+    fetch(url)
+      .then(res => res.blob())
+      .then(blob => {
+        const dummyFile = new File([blob], presetName, { type: blob.type || 'image/jpeg' });
+        setUploadedFiles([{
+          file: dummyFile,
+          slot: 'T1',
+          preview: url,
+          metadata: {
+            location_name: presetName.replace(/\.[^/.]+$/, ''),
+            centroid: coords,
+          },
+          validated: true,
+        }]);
+      })
+      .catch(err => console.error('Preset file load error:', err));
   };
 
   // Dual Image Comparator: Run comparison query (sends both images + query)
@@ -1033,27 +1075,13 @@ export default function WorkspacePage({ params }: { params: { projectId: string 
                             <div className="flex items-center gap-2 mt-2 flex-wrap">
                               <span className="text-[10px] text-slate-500 font-medium">Quick Presets:</span>
                               <button
-                                onClick={() => setSingleImage({
-                                  id: 'sample-delhi',
-                                  name: 'Delhi_Optical_Scene.jpg',
-                                  url: '/sample_t1.jpg',
-                                  slot: 'T1',
-                                  date: '2026 Pass',
-                                  sensor: 'Sentinel-2 VNIR',
-                                })}
+                                onClick={() => handleSelectPresetImage('Delhi_Optical_Scene.jpg', '/sample_t1.jpg', [77.2000, 28.6500], 'Sentinel-2 VNIR')}
                                 className="px-2.5 py-1 bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-cyan-300 text-[10px] font-semibold rounded-lg transition flex items-center gap-1"
                               >
                                 🏙️ Delhi Urban Optical
                               </button>
                               <button
-                                onClick={() => setSingleImage({
-                                  id: 'sample-mumbai',
-                                  name: 'Mumbai_Coastal_Scene.jpg',
-                                  url: '/sample_t2.jpg',
-                                  slot: 'T1',
-                                  date: '2026 Pass',
-                                  sensor: 'Sentinel-2 Multispectral',
-                                })}
+                                onClick={() => handleSelectPresetImage('Mumbai_Coastal_Scene.jpg', '/sample_t2.jpg', [72.8777, 19.0760], 'Sentinel-2 Multispectral')}
                                 className="px-2.5 py-1 bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-teal-300 text-[10px] font-semibold rounded-lg transition flex items-center gap-1"
                               >
                                 🌊 Mumbai Coastal Pass
@@ -1073,7 +1101,10 @@ export default function WorkspacePage({ params }: { params: { projectId: string 
                           </button>
                           {singleImage && (
                             <button
-                              onClick={() => setSingleImage(null)}
+                              onClick={() => {
+                                setSingleImage(null);
+                                setUploadedFiles([]);
+                              }}
                               className="px-3 py-2 bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-slate-400 hover:text-red-400 rounded-xl text-xs transition flex items-center gap-1"
                               title="Clear Image"
                             >

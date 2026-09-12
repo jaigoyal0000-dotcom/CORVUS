@@ -29,7 +29,7 @@ import {
   Ruler, Square, Sliders, Camera, RefreshCw, Sun, Contrast,
   Scan, Compass, ShieldAlert, Activity, Droplets, Trees,
   Building2, GitCompare, Route, Info, X, ChevronRight, BarChart3,
-  LocateFixed, ImageDown, Map as MapIconLucide, Radar
+  LocateFixed, ImageDown, Map as MapIconLucide, Radar, Target
 } from 'lucide-react';
 
 export interface UploadedFile {
@@ -195,11 +195,11 @@ export default function OpenLayersMap({
   const [internalBasemap, setInternalBasemap] = useState<BasemapStyle>('google_sat');
   const [internalSpectralFilter, setInternalSpectralFilter] = useState<SpectralFilter>('normal');
   const [internalLayerVisibility, setInternalLayerVisibility] = useState<LandCoverVisibility>({
-    vegetation: true,
-    water: true,
-    urban: true,
-    diff_change: true,
-    roads: true,
+    vegetation: false,
+    water: false,
+    urban: false,
+    diff_change: false,
+    roads: false,
   });
 
   const basemap = externalBasemap !== undefined ? externalBasemap : internalBasemap;
@@ -242,9 +242,15 @@ export default function OpenLayersMap({
   const [showTunePanel, setShowTunePanel] = useState(false);
   const [showStatsDrawer, setShowStatsDrawer] = useState(false);
 
-  // 🖼️ Image Overlay Controls
+  // 🖼️ Real GIS Image Overlay Controls (Aspect Ratio Preserved & Calibrated Scale)
   const [showImageOverlay, setShowImageOverlay] = useState(true);
-  const [imageOverlayOpacity, setImageOverlayOpacity] = useState(75);
+  const [showImageBorder, setShowImageBorder] = useState(true);
+  const [imageOverlayOpacity, setImageOverlayOpacity] = useState(85);
+  const [imageFootprintKm, setImageFootprintKm] = useState<number>(2.5);
+  const [imageDimensions, setImageDimensions] = useState<{ width: number; height: number } | null>(null);
+  const [imageAspectRatio, setImageAspectRatio] = useState<number>(1.0);
+  const [imageAnchorCoord, setImageAnchorCoord] = useState<[number, number] | null>(null);
+  const currentImageExtentRef = useRef<[number, number, number, number] | null>(null);
 
   // 📍 Location Recognition Toast
   const [locationToast, setLocationToast] = useState<{
@@ -480,74 +486,124 @@ export default function OpenLayersMap({
     setShowRelocateBar(false);
   };
 
-  // Extract recognized location from uploaded files + reverse geocode + render image overlay
+  // Anchor raster image to current map view center
+  const handleAnchorToCurrentCenter = useCallback(() => {
+    if (!mapInstanceRef.current) return;
+    const viewCenterCoords = toLonLat(mapInstanceRef.current.getView().getCenter() || [0, 0]) as [number, number];
+    setImageAnchorCoord(viewCenterCoords);
+    reverseGeocode(viewCenterCoords[0], viewCenterCoords[1]).then((revName) => {
+      const name = revName || `Anchored Location (${viewCenterCoords[1].toFixed(4)}°N, ${viewCenterCoords[0].toFixed(4)}°E)`;
+      setRecognizedLocation({
+        name,
+        centroid: viewCenterCoords,
+        bbox: [viewCenterCoords[0] - 0.04, viewCenterCoords[1] - 0.04, viewCenterCoords[0] + 0.04, viewCenterCoords[1] + 0.04],
+      });
+      showLocationRecognizedToast(name, viewCenterCoords, 'GIS Image Re-anchored');
+      if (onPointLocation) {
+        onPointLocation(viewCenterCoords, name, mapInstanceRef.current?.getView().getZoom() || 14);
+      }
+    });
+  }, [onPointLocation]);
+
+  // Fit view smoothly to the current calibrated image extent
+  const handleFitToImage = useCallback(() => {
+    if (!mapInstanceRef.current || !currentImageExtentRef.current) return;
+    mapInstanceRef.current.getView().fit(currentImageExtentRef.current, {
+      padding: [60, 60, 60, 60],
+      duration: 800,
+      maxZoom: 18,
+    });
+  }, []);
+
+  // Extract recognized location from uploaded files + render calibrated GIS image overlay
   useEffect(() => {
     if (uploadedFiles.length > 0) {
       const activeFile = uploadedFiles.find((f) => f.slot === selectedSlot) || uploadedFiles[0];
-      if (activeFile?.metadata?.centroid) {
-        const centroid = activeFile.metadata.centroid as [number, number];
-        const bbox = (activeFile.metadata.bounding_box || [
-          centroid[0] - 0.05,
-          centroid[1] - 0.05,
-          centroid[0] + 0.05,
-          centroid[1] + 0.05,
-        ]) as [number, number, number, number];
+      if (!activeFile) return;
 
-        const locName = activeFile.metadata.location_name || 'Recognized Satellite AOI';
-        const newLoc = { name: locName, centroid, bbox };
-        setRecognizedLocation(newLoc);
-        flyToLocation(centroid, 14);
+      const baseCentroid: [number, number] = imageAnchorCoord || (activeFile.metadata?.centroid as [number, number]) || centerLonLat || [77.2000, 28.6500];
+      const locName = activeFile.metadata?.location_name || recognizedLocation.name || 'Recognized Satellite AOI';
 
-        // Keep heatmap OFF on upload so the satellite image is pure, crisp, and never blown-out ("burst")
-        setShowHeatmap(false);
-        const fnLower = (activeFile.file?.name || '').toLowerCase();
-        if (fnLower.includes('sar') || fnLower.includes('interfero') || fnLower.includes('fringe') || fnLower.includes('radar')) {
-          setHeatmapType('sar');
-        } else if (fnLower.includes('water') || fnLower.includes('flood') || fnLower.includes('river')) {
-          setHeatmapType('water');
-        } else if (fnLower.includes('urban') || fnLower.includes('city') || fnLower.includes('delhi') || fnLower.includes('mumbai')) {
-          setHeatmapType('urban');
-        } else if (fnLower.includes('change') || fnLower.includes('diff') || fnLower.includes('t1') || fnLower.includes('t2')) {
-          setHeatmapType('change');
-        } else {
-          setHeatmapType('vegetation');
-        }
+      // Keep heatmap OFF on upload so the satellite image is pure, crisp, and never blown-out ("burst")
+      setShowHeatmap(false);
 
-        // Show location recognized toast
-        showLocationRecognizedToast(locName, centroid, activeFile.file.name);
+      const fnLower = (activeFile.file?.name || '').toLowerCase();
+      if (fnLower.includes('sar') || fnLower.includes('interfero') || fnLower.includes('fringe') || fnLower.includes('radar')) {
+        setHeatmapType('sar');
+      } else if (fnLower.includes('water') || fnLower.includes('flood') || fnLower.includes('river')) {
+        setHeatmapType('water');
+      } else if (fnLower.includes('urban') || fnLower.includes('city') || fnLower.includes('delhi') || fnLower.includes('mumbai')) {
+        setHeatmapType('urban');
+      } else if (fnLower.includes('change') || fnLower.includes('diff') || fnLower.includes('t1') || fnLower.includes('t2')) {
+        setHeatmapType('change');
+      } else {
+        setHeatmapType('vegetation');
+      }
 
-        // Reverse geocode if the name looks generic (contains "Observed" or coord-like)
-        if (locName.includes('Observed') || locName.includes('Target Scene') || locName.includes('°')) {
-          reverseGeocode(centroid[0], centroid[1]).then((reversedName) => {
-            if (reversedName) {
-              const updatedLoc = { ...newLoc, name: reversedName };
-              setRecognizedLocation(updatedLoc);
-              showLocationRecognizedToast(reversedName, centroid, 'Reverse Geocoding');
-            }
-          });
-        }
+      // Reverse geocode if generic
+      if (locName.includes('Observed') || locName.includes('Target Scene') || locName.includes('°')) {
+        reverseGeocode(baseCentroid[0], baseCentroid[1]).then((reversedName) => {
+          if (reversedName) {
+            setRecognizedLocation((prev) => ({ ...prev, name: reversedName }));
+            showLocationRecognizedToast(reversedName, baseCentroid, 'Reverse Geocoding');
+          }
+        });
+      }
 
-        // 🖼️ Render uploaded image as overlay on the actual OpenLayers map
-        if (mapInstanceRef.current && activeFile.preview) {
+      // 🖼️ Load image and compute true aspect ratio in Web Mercator (EPSG:3857)
+      const imgUrl = activeFile.preview;
+      if (imgUrl) {
+        const img = new window.Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+          const nw = img.naturalWidth || 1024;
+          const nh = img.naturalHeight || 1024;
+          const ar = nw / nh;
+          setImageDimensions({ width: nw, height: nh });
+          setImageAspectRatio(ar);
+
+          if (!mapInstanceRef.current) return;
           const map = mapInstanceRef.current;
-          const extent = transformExtent(
-            [bbox[0], bbox[1], bbox[2], bbox[3]],
-            'EPSG:4326',
-            'EPSG:3857'
-          );
 
-          // Remove old image overlay if exists
+          // Projected center coordinates in EPSG:3857 (meters)
+          const [cx, cy] = fromLonLat(baseCentroid);
+
+          // Compute ground footprint maintaining 100% true photographic aspect ratio without warping
+          const halfH = (imageFootprintKm * 1000) / 2;
+          const halfW = halfH * ar;
+          const extent3857: [number, number, number, number] = [
+            cx - halfW,
+            cy - halfH,
+            cx + halfW,
+            cy + halfH,
+          ];
+          currentImageExtentRef.current = extent3857;
+
+          // Compute geographic bounds
+          const sw = toLonLat([cx - halfW, cy - halfH]);
+          const ne = toLonLat([cx + halfW, cy + halfH]);
+          const correctedBbox: [number, number, number, number] = [sw[0], sw[1], ne[0], ne[1]];
+
+          setRecognizedLocation({
+            name: locName,
+            centroid: baseCentroid,
+            bbox: correctedBbox,
+          });
+
+          // Remove old layers
           if (imageOverlayLayerRef.current) {
             map.removeLayer(imageOverlayLayerRef.current);
+            imageOverlayLayerRef.current = null;
           }
           if (imageOverlayBorderLayerRef.current) {
             map.removeLayer(imageOverlayBorderLayerRef.current);
+            imageOverlayBorderLayerRef.current = null;
           }
 
-          // Create ImageStatic source from the preview URL with crossOrigin
+          // ImageStatic raster layer
           const imgSource = new ImageStatic({
-            url: activeFile.preview,
-            imageExtent: extent,
+            url: imgUrl,
+            imageExtent: extent3857,
             interpolate: true,
             crossOrigin: 'anonymous',
           });
@@ -559,58 +615,72 @@ export default function OpenLayersMap({
             visible: showImageOverlay,
           });
 
-          // Create a glowing bounding box border around the image extent
+          // Tactical hairline frame (zero opaque fill so image colors remain 100% natural)
           const borderSource = new VectorSource();
           const borderPoly = new Polygon([[
-            fromLonLat([bbox[0], bbox[1]]),
-            fromLonLat([bbox[2], bbox[1]]),
-            fromLonLat([bbox[2], bbox[3]]),
-            fromLonLat([bbox[0], bbox[3]]),
-            fromLonLat([bbox[0], bbox[1]]),
+            [cx - halfW, cy - halfH],
+            [cx + halfW, cy - halfH],
+            [cx + halfW, cy + halfH],
+            [cx - halfW, cy + halfH],
+            [cx - halfW, cy - halfH],
           ]]);
           const borderFeature = new Feature({ geometry: borderPoly });
-          borderFeature.setStyle(new Style({
-            stroke: new Stroke({
-              color: '#22D3EE',
-              width: 3,
-              lineDash: [12, 6],
-            }),
-            fill: new Fill({ color: 'rgba(6, 182, 212, 0.04)' }),
-          }));
-
-          // Add corner markers
-          const corners = [
-            [bbox[0], bbox[1]], [bbox[2], bbox[1]],
-            [bbox[2], bbox[3]], [bbox[0], bbox[3]],
-          ];
-          corners.forEach(([cLon, cLat]) => {
-            const cornerFeat = new Feature({
-              geometry: new Point(fromLonLat([cLon, cLat])),
-            });
-            cornerFeat.setStyle(new Style({
-              image: new CircleStyle({
-                radius: 4,
-                fill: new Fill({ color: '#22D3EE' }),
-                stroke: new Stroke({ color: '#FFFFFF', width: 1.5 }),
+          borderFeature.setStyle(
+            new Style({
+              stroke: new Stroke({
+                color: '#22D3EE',
+                width: 1.5,
+                lineDash: [8, 6],
               }),
-            }));
-            borderSource.addFeature(cornerFeat);
-          });
-
-          // Add tactical bounding border (unobstructed view - no center text label)
+            })
+          );
           borderSource.addFeature(borderFeature);
+
+          // Discreet corner markers
+          const corners = [
+            [cx - halfW, cy - halfH],
+            [cx + halfW, cy - halfH],
+            [cx + halfW, cy + halfH],
+            [cx - halfW, cy + halfH],
+          ];
+          corners.forEach(([corX, corY]) => {
+            const cornerPt = new Feature({ geometry: new Point([corX, corY]) });
+            cornerPt.setStyle(
+              new Style({
+                image: new CircleStyle({
+                  radius: 3.5,
+                  fill: new Fill({ color: '#22D3EE' }),
+                  stroke: new Stroke({ color: '#FFFFFF', width: 1.5 }),
+                }),
+              })
+            );
+            borderSource.addFeature(cornerPt);
+          });
 
           const borderLayer = new VectorLayer({
             source: borderSource,
             zIndex: 11,
-            visible: showImageOverlay,
+            visible: showImageOverlay && showImageBorder,
           });
 
           imageOverlayLayerRef.current = imgLayer;
           imageOverlayBorderLayerRef.current = borderLayer;
           map.addLayer(imgLayer);
           map.addLayer(borderLayer);
-        }
+
+          // Smoothly fit view to the calibrated image footprint
+          map.getView().fit(extent3857, {
+            padding: [60, 60, 60, 60],
+            duration: 800,
+            maxZoom: 18,
+          });
+        };
+        img.src = imgUrl;
+      }
+
+      showLocationRecognizedToast(locName, baseCentroid, activeFile.file.name);
+      if (onPointLocation && !imageAnchorCoord) {
+        onPointLocation(baseCentroid, locName, 14);
       }
     } else {
       // No uploaded files — remove image overlay if exists
@@ -624,8 +694,10 @@ export default function OpenLayersMap({
           imageOverlayBorderLayerRef.current = null;
         }
       }
+      currentImageExtentRef.current = null;
+      setImageDimensions(null);
     }
-  }, [uploadedFiles, selectedSlot, showImageOverlay]);
+  }, [uploadedFiles, selectedSlot, imageAnchorCoord, imageFootprintKm]);
 
   // Generate Synthetic Land Cover Vector Polygons and Line Features around AOI Centroid
   const generateLandCoverFeatures = useCallback((center: [number, number]) => {
@@ -949,57 +1021,62 @@ export default function OpenLayersMap({
     const [lon, lat] = loc.centroid;
     const [minLon, minLat, maxLon, maxLat] = loc.bbox;
 
-    // 1. AOI Bounding Box Polygon with tactical glow style
-    const polyCoords = [
-      [
-        fromLonLat([minLon, minLat]),
-        fromLonLat([maxLon, minLat]),
-        fromLonLat([maxLon, maxLat]),
-        fromLonLat([minLon, maxLat]),
-        fromLonLat([minLon, minLat]),
-      ],
-    ];
+    // If an image overlay is active, the image already has its calibrated hairline frame.
+    // Suppress duplicate overlapping AOI polygon and corner dots to prevent map burst/visual clash!
+    const hasActiveImageOverlay = uploadedFiles.length > 0 && showImageOverlay;
+    if (!hasActiveImageOverlay) {
+      // 1. AOI Bounding Box Polygon with tactical glow style
+      const polyCoords = [
+        [
+          fromLonLat([minLon, minLat]),
+          fromLonLat([maxLon, minLat]),
+          fromLonLat([maxLon, maxLat]),
+          fromLonLat([minLon, maxLat]),
+          fromLonLat([minLon, minLat]),
+        ],
+      ];
 
-    const aoiFeature = new Feature({
-      geometry: new Polygon(polyCoords),
-    });
-
-    aoiFeature.setStyle(
-      new Style({
-        stroke: new Stroke({
-          color: '#06B6D4',
-          width: 2.5,
-          lineDash: [10, 6],
-        }),
-        fill: new Fill({
-          color: 'rgba(6, 182, 212, 0.08)',
-        }),
-      })
-    );
-    source.addFeature(aoiFeature);
-
-    // 2. Corner Target Brackets for AOI
-    const cornerOffsets = [
-      [minLon, minLat],
-      [maxLon, minLat],
-      [maxLon, maxLat],
-      [minLon, maxLat],
-    ];
-    cornerOffsets.forEach(([cLon, cLat]) => {
-      const cornerPoint = new Feature({
-        geometry: new Point(fromLonLat([cLon, cLat])),
+      const aoiFeature = new Feature({
+        geometry: new Polygon(polyCoords),
       });
-      cornerPoint.setStyle(
+
+      aoiFeature.setStyle(
         new Style({
-          image: new CircleStyle({
-            radius: 4,
-            fill: new Fill({ color: '#06B6D4' }),
-            stroke: new Stroke({ color: '#FFFFFF', width: 2 }),
+          stroke: new Stroke({
+            color: '#06B6D4',
+            width: 2.5,
+            lineDash: [10, 6],
+          }),
+          fill: new Fill({
+            color: 'rgba(6, 182, 212, 0.08)',
           }),
         })
       );
-      source.addFeature(cornerPoint);
-    });
+      source.addFeature(aoiFeature);
+
+      // 2. Corner Target Brackets for AOI
+      const cornerOffsets = [
+        [minLon, minLat],
+        [maxLon, minLat],
+        [maxLon, maxLat],
+        [minLon, maxLat],
+      ];
+      cornerOffsets.forEach(([cLon, cLat]) => {
+        const cornerPoint = new Feature({
+          geometry: new Point(fromLonLat([cLon, cLat])),
+        });
+        cornerPoint.setStyle(
+          new Style({
+            image: new CircleStyle({
+              radius: 4,
+              fill: new Fill({ color: '#06B6D4' }),
+              stroke: new Stroke({ color: '#FFFFFF', width: 2 }),
+            }),
+          })
+        );
+        source.addFeature(cornerPoint);
+      });
+    }
 
     // 3. Optional Location Radar Pin Marker (Default OFF so map raster & heatmaps are completely unobstructed)
     if (showLocationPin) {
@@ -1421,9 +1498,9 @@ export default function OpenLayersMap({
       imageOverlayLayerRef.current.setOpacity(imageOverlayOpacity / 100);
     }
     if (imageOverlayBorderLayerRef.current) {
-      imageOverlayBorderLayerRef.current.setVisible(showImageOverlay);
+      imageOverlayBorderLayerRef.current.setVisible(showImageOverlay && showImageBorder);
     }
-  }, [showImageOverlay, imageOverlayOpacity]);
+  }, [showImageOverlay, showImageBorder, imageOverlayOpacity]);
 
   // Update Basemap Provider
   useEffect(() => {
@@ -1839,24 +1916,20 @@ export default function OpenLayersMap({
         </div>
       )}
 
-      {/* 🛰️ Floating Uploaded Image Overlay HUD (when images uploaded and in map view) */}
+      {/* 🛰️ Floating Uploaded Image Overlay GIS Command HUD */}
       {viewMode === 'map' && uploadedFiles.length > 0 && (
-        <div className="absolute top-16 left-3 z-20 pointer-events-auto bg-slate-950/90 backdrop-blur-md border border-cyan-500/40 p-2 rounded-xl shadow-2xl flex items-center gap-2 flex-wrap max-w-lg animate-fade-in">
+        <div className="absolute top-16 left-3 z-20 pointer-events-auto bg-slate-950/95 backdrop-blur-md border border-cyan-500/50 p-2.5 rounded-2xl shadow-2xl shadow-black/80 flex items-center gap-2.5 flex-wrap max-w-2xl animate-fade-in text-xs">
+          {/* Slot badges */}
           <div className="flex items-center gap-1.5 pr-2 border-r border-slate-800">
             <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-            <span className="text-[10px] font-bold text-slate-200">Image Layer:</span>
+            <span className="text-[10px] font-extrabold uppercase tracking-wider text-cyan-200">GIS Raster</span>
           </div>
 
           <div className="flex items-center gap-1">
             {uploadedFiles.map((uf) => (
               <button
                 key={uf.slot}
-                onClick={() => {
-                  setSelectedSlot(uf.slot);
-                  if (uf.metadata?.centroid) {
-                    flyToLocation(uf.metadata.centroid, 14);
-                  }
-                }}
+                onClick={() => setSelectedSlot(uf.slot)}
                 className={`px-2 py-0.5 rounded-lg text-[10px] font-bold flex items-center gap-1 transition ${
                   selectedSlot === uf.slot
                     ? 'bg-cyan-600 text-white shadow-md shadow-cyan-600/30'
@@ -1864,39 +1937,100 @@ export default function OpenLayersMap({
                 }`}
               >
                 <span>[{uf.slot}]</span>
-                <span className="truncate max-w-[70px]">{uf.file.name}</span>
+                <span className="truncate max-w-[80px]">{uf.file.name}</span>
               </button>
             ))}
           </div>
 
-          {/* Quick Fly-To Button */}
-          {(() => {
-            const activeUf = uploadedFiles.find(f => f.slot === selectedSlot) || uploadedFiles[0];
-            if (activeUf?.metadata?.centroid) {
-              return (
-                <button
-                  onClick={() => flyToLocation(activeUf.metadata.centroid, 14)}
-                  className="px-2 py-0.5 bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 rounded-lg text-[10px] font-bold border border-cyan-500/30 flex items-center gap-1 transition"
-                  title="Fly to Image Location"
-                >
-                  <Navigation className="w-3 h-3" />
-                  <span>Center</span>
-                </button>
-              );
-            }
-            return null;
-          })()}
+          {/* Dimension & Aspect Badge */}
+          {imageDimensions && (
+            <div className="hidden sm:flex items-center gap-1 px-2 py-0.5 bg-slate-900 rounded-lg border border-slate-800 text-[10px] font-mono text-cyan-300">
+              <span>{imageDimensions.width}×{imageDimensions.height}px</span>
+              <span className="text-slate-500">•</span>
+              <span>{imageAspectRatio.toFixed(2)}:1</span>
+            </div>
+          )}
 
-          {/* Toggle visibility */}
-          <button
-            onClick={() => setShowImageOverlay(!showImageOverlay)}
-            className={`p-1 rounded-lg text-[10px] border transition ${
-              showImageOverlay ? 'bg-cyan-500/20 border-cyan-500/40 text-cyan-300' : 'bg-slate-800 border-slate-700 text-slate-400'
-            }`}
-            title={showImageOverlay ? 'Hide Image Overlay' : 'Show Image Overlay'}
-          >
-            {showImageOverlay ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
-          </button>
+          {/* Opacity Slider Control directly on map */}
+          <div className="flex items-center gap-1.5 pl-1 border-l border-slate-800">
+            <span className="text-[10px] text-slate-400 font-medium">Opacity:</span>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              value={imageOverlayOpacity}
+              onChange={(e) => setImageOverlayOpacity(Number(e.target.value))}
+              className="w-16 sm:w-20 h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-400"
+              title="Adjust raster transparency over satellite basemap"
+            />
+            <span className="text-[10px] font-mono text-cyan-300 w-7">{imageOverlayOpacity}%</span>
+          </div>
+
+          {/* Ground Footprint Scale Selection */}
+          <div className="flex items-center gap-1 pl-1 border-l border-slate-800">
+            <span className="text-[10px] text-slate-400 font-medium">Scale:</span>
+            {[1, 2.5, 5, 10].map((km) => (
+              <button
+                key={km}
+                onClick={() => setImageFootprintKm(km)}
+                className={`px-1.5 py-0.5 rounded text-[10px] font-mono font-bold transition ${
+                  imageFootprintKm === km
+                    ? 'bg-cyan-500 text-slate-950 font-extrabold shadow-sm'
+                    : 'bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800'
+                }`}
+                title={`Scale ground footprint to ${km} km`}
+              >
+                {km}k
+              </button>
+            ))}
+          </div>
+
+          {/* Action Buttons: Anchor to Center & Fit View */}
+          <div className="flex items-center gap-1 pl-1 border-l border-slate-800">
+            <button
+              onClick={handleAnchorToCurrentCenter}
+              className="px-2 py-1 bg-cyan-950/60 hover:bg-cyan-900/80 text-cyan-300 rounded-lg text-[10px] font-bold border border-cyan-500/40 flex items-center gap-1 transition shadow-sm"
+              title="Re-anchor raster to current center of map view"
+            >
+              <Target className="w-3 h-3 text-cyan-400" />
+              <span>Anchor Here</span>
+            </button>
+
+            <button
+              onClick={handleFitToImage}
+              className="px-2 py-1 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white rounded-lg text-[10px] font-bold border border-slate-700 flex items-center gap-1 transition"
+              title="Fit map view to image bounds"
+            >
+              <Navigation className="w-3 h-3 text-slate-400" />
+              <span>Fit View</span>
+            </button>
+
+            {/* Tactical Hairline Frame Toggle */}
+            <button
+              onClick={() => setShowImageBorder(!showImageBorder)}
+              className={`p-1 rounded-lg text-[10px] border transition ${
+                showImageBorder
+                  ? 'bg-cyan-500/20 border-cyan-500/40 text-cyan-300'
+                  : 'bg-slate-900 border-slate-800 text-slate-500 hover:text-slate-300'
+              }`}
+              title={showImageBorder ? 'Hide Tactical Hairline Frame' : 'Show Tactical Hairline Frame'}
+            >
+              <Square className="w-3.5 h-3.5" />
+            </button>
+
+            {/* Layer Visibility Eye Toggle */}
+            <button
+              onClick={() => setShowImageOverlay(!showImageOverlay)}
+              className={`p-1 rounded-lg text-[10px] border transition ${
+                showImageOverlay
+                  ? 'bg-cyan-500/20 border-cyan-500/40 text-cyan-300'
+                  : 'bg-slate-900 border-slate-800 text-slate-500 hover:text-slate-300'
+              }`}
+              title={showImageOverlay ? 'Hide Image Overlay' : 'Show Image Overlay'}
+            >
+              {showImageOverlay ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+            </button>
+          </div>
         </div>
       )}
 
