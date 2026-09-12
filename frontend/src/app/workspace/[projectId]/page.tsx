@@ -10,8 +10,7 @@ import {
   Trees, Droplets, Building2, GitCompare, Route, Sliders,
   BarChart3, Globe, Sparkles, CheckCircle2, Eye, EyeOff,
   AlertTriangle, Flame, Waves, ShieldAlert, Compass, Navigation,
-  HelpCircle, RefreshCw, X, ArrowUpRight, ArrowRightLeft, Image as ImageIcon,
-  Upload
+  HelpCircle, RefreshCw, X
 } from 'lucide-react';
 import { isAuthenticated } from '@/lib/auth';
 import Navbar from '@/components/Navbar';
@@ -21,7 +20,6 @@ import PipelineVisualizer, { DEFAULT_PIPELINE_STEPS, PipelineStep } from '@/comp
 import ModelRegistry from '@/components/ModelRegistry';
 import ResultsPanel from '@/components/ResultsPanel';
 import ExecutionTrace from '@/components/ExecutionTrace';
-import { DualImageComparator, DualImageItem } from '@/components/DualImageComparator';
 import {
   LandCoverVisibility,
   BasemapStyle,
@@ -77,33 +75,8 @@ export default function WorkspacePage({ params }: { params: { projectId: string 
   const [showResults, setShowResults] = useState(false);
   const [showTrace, setShowTrace] = useState(false);
   const [showValidation, setShowValidation] = useState(false);
-  // Two Separately Featured Modes:
-  // 1. 'image_analysis': Upload Images & Ask Questions (Visual AI, Single & Dual Image Analysis)
-  // 2. 'pure_chat': Pure AI Chat (Ask Anything - Weather, Satellites, Geography, Science)
-  const [activeFeature, setActiveFeature] = useState<'image_analysis' | 'pure_chat'>('image_analysis');
-
-  // Sub-mode inside Feature 1: 'single' (Single Image) or 'dual' (Dual-Image Comparison)
-  const [imageSubMode, setImageSubMode] = useState<'single' | 'dual'>('single');
-
-  // Single Image State
-  const [singleImage, setSingleImage] = useState<DualImageItem | null>({
-    id: 'sample-single-delhi',
-    name: 'Delhi_Optical_Scene.jpg',
-    url: '/sample_t1.jpg',
-    slot: 'T1',
-    date: 'Recent Pass',
-    sensor: 'Sentinel-2 VNIR',
-  });
-
-  // Dual Image Comparator State
-  const [dualImageA, setDualImageA] = useState<DualImageItem | null>(null);
-  const [dualImageB, setDualImageB] = useState<DualImageItem | null>(null);
-
-  // Independent Chat Histories for the two features
+  // Unified GIS Mission Copilot Chat History
   const [imageChatHistory, setImageChatHistory] = useState<ChatMessage[]>([]);
-  const [pureChatHistory, setPureChatHistory] = useState<ChatMessage[]>([]);
-
-  const singleFileInputRef = useRef<HTMLInputElement>(null);
 
   // Project Data & Map Anchor State
   const [projectData, setProjectData] = useState<any | null>({
@@ -222,24 +195,14 @@ export default function WorkspacePage({ params }: { params: { projectId: string 
     { name: 'Mumbai Delta', label: 'Mithi River Delta', centroid: [72.8700, 19.0700], hazard: 'urban_flood', icon: '🏖️' },
   ];
 
-  // Quick Queries for Feature 1 (Image Analysis)
-  const imageQuickQueries = [
-    { text: 'Describe what is visible in this image', icon: '🔍' },
-    { text: 'Detect buildings and urban infrastructure', icon: '🏗️' },
-    { text: 'Analyze vegetation health and farm crops', icon: '🌿' },
-    { text: 'Identify rivers, lakes, and surface water', icon: '💧' },
-    { text: 'Where are the main roads and transport routes?', icon: '🛣️' },
-    { text: 'Compare differences between before and after', icon: '⚖️' },
-  ];
-
-  // Quick Queries for Feature 2 (Pure AI Chat - Ask Anything)
-  const pureChatQuickQueries = [
-    { text: 'What is the weather and ground condition in Odisha right now?', icon: '🌤️' },
-    { text: 'How does Synthetic Aperture Radar (SAR) penetrate clouds?', icon: '🛰️' },
-    { text: 'Explain NDVI vegetation index in simple words', icon: '🌿' },
-    { text: 'What are standard emergency evacuation steps during floods?', icon: '🚨' },
-    { text: 'How do satellites calculate elevation and building heights?', icon: '⛰️' },
-    { text: 'What are the main land cover categories in remote sensing?', icon: '🗺️' },
+  // Quick GIS Mission Intelligence Queries
+  const gisMissionPrompts = [
+    'Summarize land cover distribution in this AOI',
+    'Detect changes between before and after satellite passes',
+    'Calculate vegetation health and NDVI stress levels',
+    'Evaluate flood risks and surface water proximity',
+    'Identify urban encroachment and new buildings',
+    'Extract critical infrastructure and road transport routes',
   ];
 
   const toggleLayer = (key: keyof LandCoverVisibility) => {
@@ -324,11 +287,7 @@ export default function WorkspacePage({ params }: { params: { projectId: string 
           },
         };
 
-        if (activeFeature === 'pure_chat') {
-          setPureChatHistory(prev => [...prev, disasterChatMessage]);
-        } else {
-          setImageChatHistory(prev => [...prev, disasterChatMessage]);
-        }
+        setImageChatHistory(prev => [...prev, disasterChatMessage]);
       }
     } catch (err) {
       console.error('Error running disaster assessment:', err);
@@ -386,15 +345,8 @@ export default function WorkspacePage({ params }: { params: { projectId: string 
       attachments,
     };
 
-    const isPure = activeFeature === 'pure_chat';
-    const activeHistory = isPure ? pureChatHistory : imageChatHistory;
-    const currentHistory = [...activeHistory, userMsg];
-
-    if (isPure) {
-      setPureChatHistory(currentHistory);
-    } else {
-      setImageChatHistory(currentHistory);
-    }
+    const currentHistory = [...imageChatHistory, userMsg];
+    setImageChatHistory(currentHistory);
 
     // Reset pipeline
     setPipelineSteps(DEFAULT_PIPELINE_STEPS.map(s => ({ ...s, status: 'waiting' as const })));
@@ -407,7 +359,7 @@ export default function WorkspacePage({ params }: { params: { projectId: string 
     const mapContextPayload = {
       location_name: activeLocationName,
       centroid: activeCentroid,
-      zoom: 13,
+      zoom: mapZoom,
       basemap: activeBasemap,
       spectral_filter: activeSpectralFilter,
       layer_visibility: layerVisibility,
@@ -431,44 +383,25 @@ export default function WorkspacePage({ params }: { params: { projectId: string 
       let imageBase64B: string | undefined;
       let analysisMode: string = 'text_only';
 
-      if (isPure) {
-        // Feature 2: Pure AI Chat (Ask Anything - No image attached)
-        analysisMode = 'text_only';
-        imageBase64A = undefined;
-        imageBase64B = undefined;
-      } else {
-        // Feature 1: Image Analysis (Upload & Ask)
-        if (imageSubMode === 'dual' && dualImageA) {
-          imageBase64A = dualImageA.base64 || (dualImageA.url ? await blobUrlToBase64(dualImageA.url) : undefined);
-          if (dualImageB) {
-            imageBase64B = dualImageB.base64 || (dualImageB.url ? await blobUrlToBase64(dualImageB.url) : undefined);
-            analysisMode = 'dual_image';
-          } else {
-            analysisMode = 'single_image';
-          }
-        } else if (singleImage) {
-          imageBase64A = singleImage.base64 || (singleImage.url ? await blobUrlToBase64(singleImage.url) : undefined);
+      if (attachments && attachments.length > 0) {
+        const imgAttachments = attachments.filter(a => a.url);
+        if (imgAttachments.length >= 1 && imgAttachments[0].url) {
+          imageBase64A = await blobUrlToBase64(imgAttachments[0].url);
           analysisMode = 'single_image';
-        } else if (attachments && attachments.length > 0) {
-          const imgAttachments = attachments.filter(a => a.url);
-          if (imgAttachments.length >= 1 && imgAttachments[0].url) {
-            imageBase64A = await blobUrlToBase64(imgAttachments[0].url);
-            analysisMode = 'single_image';
-          }
-          if (imgAttachments.length >= 2 && imgAttachments[1].url) {
-            imageBase64B = await blobUrlToBase64(imgAttachments[1].url);
-            analysisMode = 'dual_image';
-          }
-        } else if (t1File) {
-          imageBase64A = await fileToBase64(t1File.file);
-          analysisMode = 'single_image';
-          if (t2File) {
-            imageBase64B = await fileToBase64(t2File.file);
-            analysisMode = 'dual_image';
-          } else if (sarFile) {
-            imageBase64B = await fileToBase64(sarFile.file);
-            analysisMode = 'dual_image';
-          }
+        }
+        if (imgAttachments.length >= 2 && imgAttachments[1].url) {
+          imageBase64B = await blobUrlToBase64(imgAttachments[1].url);
+          analysisMode = 'dual_image';
+        }
+      } else if (t1File) {
+        imageBase64A = await fileToBase64(t1File.file);
+        analysisMode = 'single_image';
+        if (t2File) {
+          imageBase64B = await fileToBase64(t2File.file);
+          analysisMode = 'dual_image';
+        } else if (sarFile) {
+          imageBase64B = await fileToBase64(sarFile.file);
+          analysisMode = 'dual_image';
         }
       }
 
@@ -482,9 +415,9 @@ export default function WorkspacePage({ params }: { params: { projectId: string 
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           query: actualQuery,
-          filename_t1: isPure ? null : (t1File?.file.name || singleImage?.name || dualImageA?.name || 'Delhi_Optical_T1.tif'),
-          filename_t2: isPure ? null : (t2File?.file.name || dualImageB?.name || null),
-          filename_sar: isPure ? null : (sarFile?.file.name || null),
+          filename_t1: t1File?.file.name || 'Delhi_Optical_T1.tif',
+          filename_t2: t2File?.file.name || null,
+          filename_sar: sarFile?.file.name || null,
           image_base64_a: imageBase64A || undefined,
           image_base64_b: imageBase64B || undefined,
           mode: analysisMode,
@@ -508,11 +441,7 @@ export default function WorkspacePage({ params }: { params: { projectId: string 
           analysisResult: data,
         };
 
-        if (isPure) {
-          setPureChatHistory(prev => [...prev, corvusMsg]);
-        } else {
-          setImageChatHistory(prev => [...prev, corvusMsg]);
-        }
+        setImageChatHistory(prev => [...prev, corvusMsg]);
       } else {
         throw new Error(`API error: ${res.statusText}`);
       }
@@ -528,91 +457,11 @@ export default function WorkspacePage({ params }: { params: { projectId: string 
         text: 'I encountered an issue processing this query. Please check your connection or try a different prompt.',
         timestamp: new Date().toLocaleTimeString('en-US', { hour12: false }),
       };
-      if (isPure) {
-        setPureChatHistory(prev => [...prev, errCorvusMsg]);
-      } else {
-        setImageChatHistory(prev => [...prev, errCorvusMsg]);
-      }
+      setImageChatHistory(prev => [...prev, errCorvusMsg]);
     } finally {
       setLoading(false);
     }
   };
-
-  const handleSingleImageFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const url = URL.createObjectURL(file);
-    const reader = new FileReader();
-    reader.onload = () => {
-      const b64 = reader.result as string;
-      setSingleImage({
-        id: `single-${Date.now()}`,
-        name: file.name,
-        url,
-        base64: b64,
-        slot: 'T1',
-        date: 'User Upload',
-        sensor: 'Optical / Aerial',
-      });
-
-      // Synchronize with OpenLayers uploadedFiles so map receives and renders the raster!
-      const newUploadedFile: UploadedFile = {
-        file,
-        slot: 'T1',
-        preview: url,
-        metadata: {
-          location_name: file.name.replace(/\.[^/.]+$/, ''),
-          centroid: activeCentroid,
-        },
-        validated: true,
-      };
-      setUploadedFiles([newUploadedFile]);
-    };
-    reader.readAsDataURL(file);
-    if (singleFileInputRef.current) singleFileInputRef.current.value = '';
-  };
-
-  const handleSelectPresetImage = (presetName: string, url: string, coords: [number, number], sensorName: string) => {
-    setSingleImage({
-      id: `preset-${Date.now()}`,
-      name: presetName,
-      url,
-      slot: 'T1',
-      date: '2026 Pass',
-      sensor: sensorName,
-    });
-    handlePointLocation(coords, presetName.replace(/\.[^/.]+$/, ''), 14);
-    fetch(url)
-      .then(res => res.blob())
-      .then(blob => {
-        const dummyFile = new File([blob], presetName, { type: blob.type || 'image/jpeg' });
-        setUploadedFiles([{
-          file: dummyFile,
-          slot: 'T1',
-          preview: url,
-          metadata: {
-            location_name: presetName.replace(/\.[^/.]+$/, ''),
-            centroid: coords,
-          },
-          validated: true,
-        }]);
-      })
-      .catch(err => console.error('Preset file load error:', err));
-  };
-
-  // Dual Image Comparator: Run comparison query (sends both images + query)
-  const handleDualComparisonQuery = useCallback(async (prompt: string) => {
-    setActiveFeature('image_analysis');
-    setImageSubMode('dual');
-    const attachments: ChatMessage['attachments'] = [];
-    if (dualImageA) {
-      attachments.push({ name: `[Side A] ${dualImageA.name}`, url: dualImageA.url, slot: 'T1' });
-    }
-    if (dualImageB) {
-      attachments.push({ name: `[Side B] ${dualImageB.name}`, url: dualImageB.url, slot: 'T2' });
-    }
-    await handleAnalyze(prompt, attachments.length > 0 ? attachments : undefined);
-  }, [dualImageA, dualImageB, handleAnalyze]);
 
   return (
     <div className="min-h-screen bg-transparent flex flex-col">
@@ -885,7 +734,7 @@ export default function WorkspacePage({ params }: { params: { projectId: string 
           </div>
 
           {/* Map Canvas */}
-          <div className="h-[430px] border-b border-slate-800 relative shrink-0">
+          <div className="h-[520px] min-h-[460px] border-b border-slate-800 relative shrink-0">
             {projectData ? (
               <OpenLayersMap
                 centerLonLat={activeCentroid}
@@ -909,368 +758,70 @@ export default function WorkspacePage({ params }: { params: { projectId: string 
             )}
           </div>
 
-          {/* Top Two-Feature Navigation Buttons (Opens Dedicated New Pages) */}
-          <div className="px-5 py-3 bg-slate-900/90 border-b border-slate-800/80 flex items-center justify-between flex-wrap gap-3">
-            <div className="flex items-center gap-3 flex-wrap">
-              {/* Feature 1 Dedicated Page Link Button */}
-              <Link
-                id="btn-open-image-analysis-page"
-                href="/image-analysis"
-                className="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-cyan-900/40 via-slate-900 to-blue-900/40 hover:from-cyan-800/50 hover:to-blue-800/50 border border-cyan-500/40 hover:border-cyan-400 text-white shadow-lg shadow-cyan-950/40 transition-all flex items-center gap-3 group"
-              >
-                <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-sm shadow-md group-hover:scale-105 transition">
-                  🖼️
+          {/* Content & Mission Intelligence Copilot Area */}
+          <div className="flex-1 overflow-y-auto p-5 space-y-5">
+            {/* Active AOI Geospatial Mission Status Banner */}
+            <div className="bg-slate-900/60 border border-slate-800/80 rounded-2xl px-5 py-3 flex items-center justify-between flex-wrap gap-3 shadow-inner">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+                  <Globe className="w-4 h-4" />
                 </div>
-                <div className="text-left">
-                  <div className="text-xs font-extrabold text-cyan-200 flex items-center gap-1.5">
-                    Feature 1: Image Analysis
-                    <span className="px-1.5 py-0.5 bg-cyan-400/20 text-cyan-300 text-[9px] rounded font-mono flex items-center gap-0.5">
-                      New Page <ArrowUpRight className="w-2.5 h-2.5" />
+                <div>
+                  <div className="text-xs font-bold text-white flex items-center gap-2">
+                    <span>{activeLocationName}</span>
+                    <span className="px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 text-[10px] font-mono">
+                      GIS AOI Active
                     </span>
                   </div>
-                  <div className="text-[10px] text-slate-300">
-                    Upload images & ask visual questions ➔
+                  <div className="text-[11px] text-slate-400 font-mono mt-0.5">
+                    Centroid: {activeCentroid[0].toFixed(4)}°E, {activeCentroid[1].toFixed(4)}°N • Zoom: {mapZoom} • Basemap: {activeBasemap.toUpperCase()}
                   </div>
                 </div>
-              </Link>
+              </div>
 
-              {/* Feature 2 Dedicated Page Link Button */}
-              <Link
-                id="btn-open-pure-chat-page"
-                href="/chat"
-                className="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-900/40 via-slate-900 to-teal-900/40 hover:from-emerald-800/50 hover:to-teal-800/50 border border-emerald-500/40 hover:border-emerald-400 text-white shadow-lg shadow-emerald-950/40 transition-all flex items-center gap-3 group"
-              >
-                <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-sm shadow-md group-hover:scale-105 transition">
-                  💬
-                </div>
-                <div className="text-left">
-                  <div className="text-xs font-extrabold text-emerald-200 flex items-center gap-1.5">
-                    Feature 2: Pure AI Chat
-                    <span className="px-1.5 py-0.5 bg-emerald-400/20 text-emerald-300 text-[9px] rounded font-mono flex items-center gap-0.5">
-                      New Page <ArrowUpRight className="w-2.5 h-2.5" />
-                    </span>
-                  </div>
-                  <div className="text-[10px] text-slate-300">
-                    Ask anything freely • No images needed ➔
-                  </div>
-                </div>
-              </Link>
+              <div className="flex items-center gap-2 text-xs">
+                <span className="px-2.5 py-1 rounded-lg bg-slate-800/80 border border-slate-700 text-slate-300 font-mono text-[11px]">
+                  {Object.values(layerVisibility).filter(Boolean).length}/5 Layers Enabled
+                </span>
+              </div>
             </div>
 
-            {/* In-page view toggle */}
-            <div className="flex items-center gap-1 bg-slate-950/80 p-1 rounded-xl border border-slate-800">
-              <button
-                onClick={() => setActiveFeature('image_analysis')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
-                  activeFeature === 'image_analysis'
-                    ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
-                    : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                <span>🖼️ Map View: Visual Q&A</span>
-              </button>
-              <button
-                onClick={() => setActiveFeature('pure_chat')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
-                  activeFeature === 'pure_chat'
-                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                    : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                <span>💬 Map View: Pure Chat</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Content & Chat Area */}
-          <div className="flex-1 overflow-y-auto p-5 space-y-6">
-            {activeFeature === 'image_analysis' ? (
-              <>
-                {/* Feature 1 Sub-Mode Selector */}
-                <div className="flex items-center justify-between flex-wrap gap-3 pb-2 border-b border-slate-800/60">
-                  <div className="flex items-center bg-slate-900/80 p-1 rounded-xl border border-slate-800">
-                    <button
-                      onClick={() => setImageSubMode('single')}
-                      className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
-                        imageSubMode === 'single'
-                          ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm'
-                          : 'text-slate-400 hover:text-white'
-                      }`}
-                    >
-                      <ImageIcon className="w-3.5 h-3.5" />
-                      Single Image Analysis
-                    </button>
-                    <button
-                      onClick={() => setImageSubMode('dual')}
-                      className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
-                        imageSubMode === 'dual'
-                          ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40 shadow-sm'
-                          : 'text-slate-400 hover:text-white'
-                      }`}
-                    >
-                      <ArrowRightLeft className="w-3.5 h-3.5" />
-                      Dual-Image Comparison (Side A vs B)
-                    </button>
-                  </div>
-
-                  <span className="text-[11px] text-slate-400">
-                    {imageSubMode === 'single'
-                      ? 'Upload 1 image and ask any visual questions'
-                      : 'Upload 2 images to compare changes side-by-side'}
-                  </span>
+            {/* Pipeline Execution & Model Registry Display */}
+            {showPipeline && (
+              <div className="space-y-4 pt-2 animate-fade-in">
+                <div className="p-5 rounded-2xl bg-[#080f19]/90 border border-slate-800 shadow-xl">
+                  <PipelineVisualizer steps={pipelineSteps} visible={true} />
                 </div>
-
-                {imageSubMode === 'single' ? (
-                  <>
-                    {/* Single Image Upload & Preview Card */}
-                    <div className="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-4">
-                      <input
-                        ref={singleFileInputRef}
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={handleSingleImageFile}
-                      />
-
-                      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                        <div className="flex items-center gap-4 flex-1">
-                          {singleImage ? (
-                            <div className="relative group w-20 h-20 rounded-xl overflow-hidden border border-cyan-500/40 bg-slate-950 shrink-0 shadow-md">
-                              <img
-                                src={singleImage.url}
-                                alt={singleImage.name}
-                                className="w-full h-full object-cover group-hover:scale-105 transition"
-                              />
-                              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
-                                <span className="text-[9px] text-white font-mono bg-black/70 px-1.5 py-0.5 rounded">
-                                  Preview
-                                </span>
-                              </div>
-                            </div>
-                          ) : (
-                            <div className="w-20 h-20 rounded-xl border border-dashed border-slate-700 bg-slate-950/60 flex flex-col items-center justify-center text-slate-500 shrink-0">
-                              <Upload className="w-5 h-5 mb-1" />
-                              <span className="text-[9px]">No Image</span>
-                            </div>
-                          )}
-
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <h4 className="text-xs font-bold text-slate-200">
-                                {singleImage ? singleImage.name : 'No Image Selected'}
-                              </h4>
-                              {singleImage && (
-                                <span className="px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] font-mono rounded-full flex items-center gap-1">
-                                  <CheckCircle2 className="w-3 h-3" /> Ready for Q&A
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-[11px] text-slate-400 mt-0.5">
-                              {singleImage
-                                ? `Sensor: ${singleImage.sensor || 'Optical'} • Attached to visual analysis prompt`
-                                : 'Upload your own satellite/aerial photo, or click a preset below to test instantly'}
-                            </p>
-
-                            {/* Preset Buttons */}
-                            <div className="flex items-center gap-2 mt-2 flex-wrap">
-                              <span className="text-[10px] text-slate-500 font-medium">Quick Presets:</span>
-                              <button
-                                onClick={() => handleSelectPresetImage('Delhi_Optical_Scene.jpg', '/sample_t1.jpg', [77.2000, 28.6500], 'Sentinel-2 VNIR')}
-                                className="px-2.5 py-1 bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-cyan-300 text-[10px] font-semibold rounded-lg transition flex items-center gap-1"
-                              >
-                                🏙️ Delhi Urban Optical
-                              </button>
-                              <button
-                                onClick={() => handleSelectPresetImage('Mumbai_Coastal_Scene.jpg', '/sample_t2.jpg', [72.8777, 19.0760], 'Sentinel-2 Multispectral')}
-                                className="px-2.5 py-1 bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-teal-300 text-[10px] font-semibold rounded-lg transition flex items-center gap-1"
-                              >
-                                🌊 Mumbai Coastal Pass
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Action Buttons */}
-                        <div className="flex items-center gap-2 shrink-0">
-                          <button
-                            onClick={() => singleFileInputRef.current?.click()}
-                            className="px-3.5 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-md shadow-cyan-600/20"
-                          >
-                            <Upload className="w-3.5 h-3.5" />
-                            <span>{singleImage ? 'Upload New Image' : 'Select Image'}</span>
-                          </button>
-                          {singleImage && (
-                            <button
-                              onClick={() => {
-                                setSingleImage(null);
-                                setUploadedFiles([]);
-                              }}
-                              className="px-3 py-2 bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-slate-400 hover:text-red-400 rounded-xl text-xs transition flex items-center gap-1"
-                              title="Clear Image"
-                            >
-                              <X className="w-3.5 h-3.5" />
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Quick Visual Prompt Pills */}
-                    <div className="flex flex-wrap gap-2 items-center">
-                      <span className="text-xs text-slate-400 font-semibold flex items-center gap-1.5 py-1">
-                        <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-                        Image Questions:
-                      </span>
-                      {imageQuickQueries.map((qq, i) => (
-                        <button
-                          key={i}
-                          onClick={() => { setQuery(qq.text); handleAnalyze(qq.text); }}
-                          className="px-3 py-1.5 bg-slate-900/80 hover:bg-slate-800 border border-slate-800 hover:border-cyan-500/50 rounded-full text-[11px] text-slate-300 transition flex items-center gap-1.5"
-                        >
-                          <span>{qq.icon}</span> {qq.text}
-                        </button>
-                      ))}
-                    </div>
-
-                    {/* Pipeline Execution & Model Registry Display */}
-                    {showPipeline && (
-                      <div className="space-y-4 pt-2 animate-fade-in">
-                        <div className="p-5 rounded-2xl bg-[#080f19]/90 border border-slate-800 shadow-xl">
-                          <PipelineVisualizer steps={pipelineSteps} visible={true} />
-                        </div>
-                        {showModelRegistry && (
-                          <div className="p-5 rounded-2xl bg-[#080f19]/90 border border-slate-800 shadow-xl">
-                            <ModelRegistry activeTask={analysisResult?.task || 'captioning'} visible={true} />
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Advanced Chat Feed for Image Analysis */}
-                    <div className="min-h-[560px]">
-                      <AdvancedChat
-                        chatHistory={imageChatHistory}
-                        mode="image_analysis"
-                        customTitle="Feature 1: Image Analysis AI"
-                        customSubtitle="Ask specific questions about your uploaded image or preset satellite scene"
-                        placeholder="Ask anything about the uploaded image (e.g. detect buildings, check crop health, spot water)..."
-                        customSuggestedPrompts={imageQuickQueries.map(q => q.text)}
-                        onSendMessage={(txt, atts, key) => handleAnalyze(txt, atts, key)}
-                        loading={loading}
-                        uploadedFiles={uploadedFiles}
-                        onSelectMapLayer={(l) => {}}
-                        onClearHistory={() => setImageChatHistory([])}
-                        mapContextSummary={{
-                          locationName: activeLocationName,
-                          centroid: activeCentroid as [number, number],
-                          zoom: 13,
-                          activeLayersCount: Object.values(layerVisibility).filter(Boolean).length,
-                        }}
-                      />
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    {/* Dual Image Comparator Mode */}
-                    <DualImageComparator
-                      imageA={dualImageA}
-                      imageB={dualImageB}
-                      onImageAChange={setDualImageA}
-                      onImageBChange={setDualImageB}
-                      onRunComparisonQuery={handleDualComparisonQuery}
-                    />
-
-                    {/* Chat feed below comparator for showing dual comparison results */}
-                    {imageChatHistory.length > 0 && (
-                      <div className="min-h-[400px]">
-                        <AdvancedChat
-                          chatHistory={imageChatHistory}
-                          mode="image_analysis"
-                          customTitle="Dual-Image Comparison Intelligence"
-                          customSubtitle="Comparative analysis of Side A vs Side B"
-                          onSendMessage={(txt, atts, key) => handleAnalyze(txt, atts, key)}
-                          loading={loading}
-                          uploadedFiles={uploadedFiles}
-                          onSelectMapLayer={(l) => {}}
-                          onClearHistory={() => setImageChatHistory([])}
-                          mapContextSummary={{
-                            locationName: activeLocationName,
-                            centroid: activeCentroid as [number, number],
-                            zoom: 13,
-                            activeLayersCount: Object.values(layerVisibility).filter(Boolean).length,
-                          }}
-                        />
-                      </div>
-                    )}
-                  </>
+                {showModelRegistry && (
+                  <div className="p-5 rounded-2xl bg-[#080f19]/90 border border-slate-800 shadow-xl">
+                    <ModelRegistry activeTask={analysisResult?.task || 'captioning'} visible={true} />
+                  </div>
                 )}
-              </>
-            ) : (
-              <>
-                {/* Feature 2: Pure AI Chat (Ask Anything - No Image Required) */}
-                <div className="bg-gradient-to-r from-emerald-950/40 via-slate-900/70 to-teal-950/40 border border-emerald-500/30 rounded-2xl p-5 shadow-lg shadow-emerald-950/20">
-                  <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-xl shadow-md shadow-emerald-500/20 shrink-0">
-                      💬
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h3 className="text-sm font-bold text-white">
-                          Feature 2: Pure AI Chat (Ask Anything)
-                        </h3>
-                        <span className="px-2 py-0.5 bg-emerald-500/20 text-emerald-300 text-[10px] font-bold rounded-full border border-emerald-500/40">
-                          Full NLP • Correct & Friendly
-                        </span>
-                      </div>
-                      <p className="text-xs text-slate-300 mt-1 leading-relaxed">
-                        No image needed. Ask any question about satellite technology, live weather conditions in Odisha or Delhi, how SAR radar penetrates storm clouds, NDVI formulas, flood emergency evacuation protocols, or general science and geography.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Pure Chat Knowledge Prompt Pills */}
-                <div className="flex flex-wrap gap-2 items-center">
-                  <span className="text-xs text-slate-400 font-semibold flex items-center gap-1.5 py-1">
-                    <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-                    Explore Topics:
-                  </span>
-                  {pureChatQuickQueries.map((qq, i) => (
-                    <button
-                      key={i}
-                      onClick={() => { setQuery(qq.text); handleAnalyze(qq.text); }}
-                      className="px-3 py-1.5 bg-slate-900/80 hover:bg-slate-800 border border-slate-800 hover:border-emerald-500/50 rounded-full text-[11px] text-slate-300 transition flex items-center gap-1.5"
-                    >
-                      <span>{qq.icon}</span> {qq.text}
-                    </button>
-                  ))}
-                </div>
-
-                {/* Advanced Chat Feed for Pure AI Chat */}
-                <div className="min-h-[560px]">
-                  <AdvancedChat
-                    chatHistory={pureChatHistory}
-                    mode="pure_chat"
-                    customTitle="Feature 2: Pure AI Knowledge Assistant"
-                    customSubtitle="Full NLP conversational AI — ask anything freely with grounded, natural answers"
-                    placeholder="Ask any question (e.g. Odisha weather, how SAR works, NDVI formula, flood safety)..."
-                    customSuggestedPrompts={pureChatQuickQueries.map(q => q.text)}
-                    hideAttachmentBar={true}
-                    onSendMessage={(txt, atts, key) => handleAnalyze(txt, atts, key)}
-                    loading={loading}
-                    uploadedFiles={uploadedFiles}
-                    onSelectMapLayer={(l) => {}}
-                    onClearHistory={() => setPureChatHistory([])}
-                    mapContextSummary={{
-                      locationName: activeLocationName,
-                      centroid: activeCentroid as [number, number],
-                      zoom: 13,
-                      activeLayersCount: Object.values(layerVisibility).filter(Boolean).length,
-                    }}
-                  />
-                </div>
-              </>
+              </div>
             )}
+
+            {/* Advanced Chat Feed for GIS Mission Intelligence */}
+            <div className="min-h-[540px]">
+              <AdvancedChat
+                chatHistory={imageChatHistory}
+                mode="gis_copilot"
+                customTitle="GIS Mission Intelligence Copilot"
+                customSubtitle="Natural language spatial intelligence, risk assessment & satellite telemetry"
+                placeholder="Ask anything about this AOI, land cover changes, flood risks, or geospatial coordinates..."
+                customSuggestedPrompts={gisMissionPrompts}
+                onSendMessage={(txt, atts, key) => handleAnalyze(txt, atts, key)}
+                loading={loading}
+                uploadedFiles={uploadedFiles}
+                onSelectMapLayer={() => {}}
+                onClearHistory={() => setImageChatHistory([])}
+                mapContextSummary={{
+                  locationName: activeLocationName,
+                  centroid: activeCentroid as [number, number],
+                  zoom: mapZoom,
+                  activeLayersCount: Object.values(layerVisibility).filter(Boolean).length,
+                }}
+              />
+            </div>
 
             {/* Pipeline Execution */}
             <PipelineVisualizer steps={pipelineSteps} visible={showPipeline} />

@@ -55,7 +55,7 @@ interface AdvancedChatProps {
     zoom: number;
     activeLayersCount: number;
   };
-  mode?: 'image_analysis' | 'pure_chat';
+  mode?: 'image_analysis' | 'pure_chat' | 'gis_copilot';
   customTitle?: string;
   customSubtitle?: string;
   placeholder?: string;
@@ -661,17 +661,23 @@ export default function AdvancedChat({
             {/* Status Live Badge */}
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900/90 border border-cyan-500/30 text-[11px] font-medium text-cyan-300 mb-2.5 shadow-inner">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
-              <span>{mode === 'pure_chat' ? 'CORVUS Conversational Intelligence' : 'Visual Scene Intelligence'}</span>
+              <span>{mode === 'gis_copilot' ? 'GIS Mission Intelligence' : mode === 'pure_chat' ? 'CORVUS Conversational Intelligence' : 'Visual Scene Intelligence'}</span>
               <span className="text-slate-600">•</span>
               <span className="text-slate-400 font-mono text-[10px]">Gemini 3.5 Multi-Cascade</span>
             </div>
 
             {/* Hero Title & Subtitle */}
             <h4 className="text-lg sm:text-xl font-black text-white tracking-tight mb-2">
-              {mode === 'pure_chat' ? 'CORVUS Universal AI Assistant (Ask Anything)' : 'CORVUS Visual Intelligence & Image Q&A'}
+              {mode === 'gis_copilot'
+                ? 'CORVUS GIS Mission Intelligence Copilot'
+                : mode === 'pure_chat'
+                ? 'CORVUS Universal AI Assistant (Ask Anything)'
+                : 'CORVUS Visual Intelligence & Image Q&A'}
             </h4>
             <p className="text-xs sm:text-sm text-slate-400 max-w-xl mb-6 leading-relaxed">
-              {mode === 'pure_chat'
+              {mode === 'gis_copilot'
+                ? 'Natural language spatial intelligence, AOI query resolution, land cover telemetry, and disaster hazard assessment.'
+                : mode === 'pure_chat'
                 ? 'Ask any question across live weather, radar satellite physics, disaster evacuation, agricultural vegetation indices, topography, or general knowledge.'
                 : 'Upload satellite or aerial imagery to inspect terrain, detect urban infrastructure, evaluate crop vigor, locate standing water, and measure land features.'}
             </p>
