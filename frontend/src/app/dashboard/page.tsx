@@ -182,60 +182,68 @@ export default function DashboardPage() {
         fontScale === 'large' ? 'text-base' : fontScale === 'larger' ? 'text-lg' : 'text-sm'
       }`}
     >
-      {/* 🇮🇳 1. OFFICIAL GOVERNMENT TRICOLOR TOP STRIP & ACCESSIBILITY BAR */}
-      <div className="bg-gradient-to-r from-amber-600 via-white to-emerald-600 h-1.5 w-full shrink-0" />
+      {/* 🇮🇳 1. VIBRANT NATIONAL TRICOLOR TOP STRIP (Saffron • White • Green) */}
+      <div className="h-2 w-full flex shrink-0 shadow-lg">
+        <div className="flex-1 bg-gradient-to-r from-amber-600 to-orange-500" />
+        <div className="flex-1 bg-white relative flex items-center justify-center">
+          <div className="w-1.5 h-1.5 rounded-full bg-blue-900" />
+        </div>
+        <div className="flex-1 bg-gradient-to-r from-emerald-600 to-green-600" />
+      </div>
       
-      {/* Official Government of India Top Banner */}
-      <div className="bg-slate-900/90 border-b border-slate-800 text-xs py-1.5 px-4 sm:px-8 flex flex-wrap items-center justify-between gap-3 text-slate-300">
+      {/* Official Government of India Top Banner with Tricolor Accents */}
+      <div className="bg-slate-900/95 border-b border-slate-800 text-xs py-2 px-4 sm:px-8 flex flex-wrap items-center justify-between gap-3 text-slate-300">
         <div className="flex items-center gap-3">
           {/* National Ashoka Emblem / National Seal Graphic */}
-          <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded-full bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-[10px] text-amber-300 font-serif font-bold">
+          <div className="flex items-center gap-2.5">
+            <div className="w-6 h-6 rounded-full bg-amber-500/20 border-2 border-amber-500/50 flex items-center justify-center text-xs shadow-sm shadow-amber-500/20">
               🏛️
             </div>
-            <span className="font-semibold tracking-wider text-slate-200">
-              {t.govIndia}
-            </span>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2">
+              <span className="font-extrabold tracking-wider text-amber-400 uppercase">
+                {t.govIndia}
+              </span>
+              <span className="text-slate-600 hidden sm:inline">•</span>
+              <span className="text-slate-300 text-[11px] font-medium">
+                {t.ministry}
+              </span>
+            </div>
           </div>
-          <span className="text-slate-600 hidden sm:inline">|</span>
-          <span className="text-slate-400 hidden md:inline font-medium">
-            {t.ministry}
-          </span>
         </div>
 
-        {/* Accessibility & Language Controls */}
+        {/* Accessibility & Language Controls with National Palette */}
         <div className="flex items-center gap-3 font-mono text-[11px]">
-          {/* Live IST Clock */}
-          <div className="hidden lg:flex items-center gap-1.5 text-cyan-400 bg-slate-950/70 px-2.5 py-0.5 rounded border border-slate-800">
-            <Activity className="w-3 h-3 text-emerald-400 animate-pulse" />
-            <span>{currentTime || '19:26:00 IST'}</span>
+          {/* Live IST Clock with Navy & Cyan Hue */}
+          <div className="hidden lg:flex items-center gap-1.5 text-cyan-300 bg-blue-950/60 px-2.5 py-1 rounded-md border border-blue-800/60 shadow-inner">
+            <Activity className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
+            <span className="font-bold">{currentTime || '19:35:00 IST'}</span>
           </div>
 
-          {/* Citizen Helpline */}
-          <div className="hidden sm:flex items-center gap-1 text-emerald-400 bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-500/30">
-            <Phone className="w-3 h-3" />
-            <span className="font-sans font-bold">Toll-Free: 1800-11-2026</span>
+          {/* Citizen Helpline in India Green */}
+          <div className="hidden sm:flex items-center gap-1.5 text-emerald-300 bg-emerald-950/60 px-2.5 py-1 rounded-md border border-emerald-500/40 shadow-sm">
+            <Phone className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="font-sans font-extrabold">Toll-Free: 1800-11-2026</span>
           </div>
 
           {/* Font Scaler (A- | A | A+) */}
-          <div className="flex items-center bg-slate-800/80 rounded border border-slate-700 overflow-hidden">
+          <div className="flex items-center bg-slate-800/90 rounded-md border border-slate-700 overflow-hidden">
             <button
               onClick={() => setFontScale('normal')}
-              className={`px-2 py-0.5 font-bold hover:bg-slate-700 transition ${fontScale === 'normal' ? 'bg-blue-600 text-white' : 'text-slate-300'}`}
+              className={`px-2 py-0.5 font-bold transition ${fontScale === 'normal' ? 'bg-amber-500 text-slate-950' : 'text-slate-300 hover:text-white'}`}
               title="Standard Font Size"
             >
               A-
             </button>
             <button
               onClick={() => setFontScale('large')}
-              className={`px-2 py-0.5 font-bold hover:bg-slate-700 transition ${fontScale === 'large' ? 'bg-blue-600 text-white' : 'text-slate-300'}`}
+              className={`px-2 py-0.5 font-bold transition ${fontScale === 'large' ? 'bg-amber-500 text-slate-950' : 'text-slate-300 hover:text-white'}`}
               title="Large Font Size"
             >
               A
             </button>
             <button
               onClick={() => setFontScale('larger')}
-              className={`px-2 py-0.5 font-bold hover:bg-slate-700 transition ${fontScale === 'larger' ? 'bg-blue-600 text-white' : 'text-slate-300'}`}
+              className={`px-2 py-0.5 font-bold transition ${fontScale === 'larger' ? 'bg-amber-500 text-slate-950' : 'text-slate-300 hover:text-white'}`}
               title="Extra Large Font Size"
             >
               A+
@@ -245,26 +253,26 @@ export default function DashboardPage() {
           {/* High Contrast Toggle */}
           <button
             onClick={() => setHighContrast(!highContrast)}
-            className={`px-2 py-0.5 rounded border text-[10px] font-sans font-semibold transition ${
+            className={`px-2.5 py-1 rounded-md border text-[10px] font-sans font-bold transition ${
               highContrast
                 ? 'bg-amber-400 text-black border-amber-300'
                 : 'bg-slate-800 border-slate-700 text-slate-300 hover:text-white'
             }`}
           >
-            {highContrast ? 'Standard Mode' : 'High Contrast'}
+            {highContrast ? 'Standard' : 'Contrast'}
           </button>
 
-          {/* Language Selector */}
-          <div className="flex items-center bg-slate-800/80 rounded border border-slate-700 overflow-hidden font-sans">
+          {/* Language Selector in Tricolor (Saffron Active / Green Border) */}
+          <div className="flex items-center bg-slate-800/90 rounded-md border border-slate-700 overflow-hidden font-sans">
             <button
               onClick={() => setLanguage('en')}
-              className={`px-2.5 py-0.5 font-bold transition ${language === 'en' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'}`}
+              className={`px-2.5 py-1 font-bold transition ${language === 'en' ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-black' : 'text-slate-400 hover:text-white'}`}
             >
               English
             </button>
             <button
               onClick={() => setLanguage('hi')}
-              className={`px-2.5 py-0.5 font-bold transition ${language === 'hi' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'}`}
+              className={`px-2.5 py-1 font-bold transition ${language === 'hi' ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-black' : 'text-slate-400 hover:text-white'}`}
             >
               हिंदी
             </button>
@@ -275,66 +283,72 @@ export default function DashboardPage() {
       {/* Main Standard Nav */}
       <Navbar />
 
-      {/* 📢 2. LIVE EMERGENCY & SATELLITE BULLETIN TICKER */}
-      <div className="bg-gradient-to-r from-blue-950 via-slate-900 to-indigo-950 border-b border-blue-900/40 px-4 sm:px-8 py-2 flex items-center gap-3">
-        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-red-600 text-white font-bold text-[10px] uppercase tracking-wider shrink-0 shadow-sm animate-pulse">
-          <AlertTriangle className="w-3 h-3" />
+      {/* 📢 2. LIVE EMERGENCY BULLETIN (Saffron Badge & India Green Trims) */}
+      <div className="bg-gradient-to-r from-amber-950/40 via-slate-900 to-emerald-950/40 border-b border-amber-500/20 px-4 sm:px-8 py-2.5 flex items-center gap-3">
+        <div className="flex items-center gap-1.5 px-3 py-1 rounded-md bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 text-white font-extrabold text-[10px] uppercase tracking-wider shrink-0 shadow-md shadow-amber-600/30 animate-pulse">
+          <AlertTriangle className="w-3.5 h-3.5" />
           <span>{t.bulletinTitle}</span>
         </div>
-        <div className="overflow-hidden whitespace-nowrap text-xs text-blue-200 font-medium">
+        <div className="overflow-hidden whitespace-nowrap text-xs text-amber-100 font-medium">
           <p className="inline-block">{t.bulletinText}</p>
         </div>
       </div>
 
-      {/* 🏛️ 3. OFFICIAL NATIONAL PORTAL MASTHEAD & SEARCH */}
-      <header className="bg-gradient-to-b from-slate-900 to-slate-950 border-b border-slate-800/80 px-4 sm:px-8 py-8">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          <div className="space-y-2 max-w-3xl">
-            <div className="flex items-center gap-2.5">
-              <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-600 p-0.5 shadow-lg shadow-blue-500/20">
-                <div className="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center text-cyan-400">
+      {/* 🏛️ 3. OFFICIAL NATIONAL PORTAL MASTHEAD (With Tricolor Aura & Emblems) */}
+      <header className="relative overflow-hidden bg-gradient-to-b from-slate-900 via-slate-900/95 to-slate-950 border-b border-slate-800/80 px-4 sm:px-8 py-9">
+        {/* Subtle Ambient Flag Color Glow Orbs */}
+        <div className="absolute -top-12 left-10 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-12 right-10 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative z-10">
+          <div className="space-y-2.5 max-w-3xl">
+            <div className="flex items-center gap-3.5">
+              {/* Emblem Box with Tricolor Gradient Border */}
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 via-white to-emerald-500 p-0.5 shadow-xl shadow-amber-500/20 shrink-0">
+                <div className="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center text-amber-400">
                   <Satellite className="w-6 h-6" />
                 </div>
               </div>
               <div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-mono font-bold text-cyan-400 tracking-wider uppercase">
+                <div className="flex items-center flex-wrap gap-2">
+                  <span className="text-xs font-mono font-extrabold text-amber-400 tracking-wider uppercase">
                     CORVUS — NATIONAL EARTH OBSERVATION MISSION
                   </span>
-                  <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] font-bold font-mono">
+                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 text-[10px] font-bold font-mono shadow-sm">
                     ✓ Survey of India Calibrated
                   </span>
                 </div>
-                <h1 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight">
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-white to-emerald-400">
                   {t.portalName}
                 </h1>
               </div>
             </div>
-            <p className="text-xs sm:text-sm text-slate-400 font-normal leading-relaxed pl-1">
+            <p className="text-xs sm:text-sm text-slate-300 font-normal leading-relaxed pl-1">
               {t.portalSub}
             </p>
           </div>
 
-          {/* Official Officer Badge & Direct Quick Mission Button */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full md:w-auto">
+          {/* Official Officer Badge & Primary Saffron CTA Button */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full md:w-auto shrink-0">
             <div className="bg-slate-900/90 border border-slate-800 rounded-xl p-3 text-xs w-full sm:w-auto">
-              <div className="text-[10px] font-mono text-slate-500 uppercase tracking-wider">
+              <div className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">
                 Logged in Official / Citizen
               </div>
-              <div className="font-bold text-slate-200 flex items-center gap-1.5 mt-0.5">
+              <div className="font-bold text-slate-100 flex items-center gap-1.5 mt-0.5">
                 <UserCheck className="w-3.5 h-3.5 text-emerald-400" />
                 <span>{user?.full_name || 'Corvus Mission Director'}</span>
-                <span className="text-[10px] font-mono text-cyan-400 bg-cyan-950/60 px-1.5 py-0.5 rounded border border-cyan-500/30">
+                <span className="text-[10px] font-mono text-emerald-300 bg-emerald-950/80 px-1.5 py-0.5 rounded border border-emerald-500/40">
                   Authorized
                 </span>
               </div>
             </div>
 
+            {/* Launch Workspace CTA in Bold Saffron / Tiranga Accent */}
             <Link
               href="/workspace/proj_0001"
-              className="px-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-lg shadow-blue-600/30 transition shrink-0 w-full sm:w-auto"
+              className="px-5 py-3.5 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black rounded-xl text-xs flex items-center justify-center gap-2 shadow-xl shadow-amber-500/20 transition shrink-0 w-full sm:w-auto"
             >
-              <Globe className="w-4 h-4" />
+              <Globe className="w-4 h-4 text-slate-950" />
               <span>Launch GIS Satellite Map ➔</span>
             </Link>
           </div>
@@ -342,46 +356,46 @@ export default function DashboardPage() {
 
         {/* Universal District / Village / Coordinates Locator Bar */}
         <div className="max-w-7xl mx-auto mt-6">
-          <div className="bg-slate-900/90 border-2 border-blue-500/30 hover:border-blue-500/50 rounded-2xl p-2.5 flex flex-col sm:flex-row items-center gap-2.5 shadow-xl transition">
+          <div className="bg-slate-900/90 border-2 border-amber-500/30 hover:border-amber-500/50 focus-within:border-amber-400 rounded-2xl p-2.5 flex flex-col sm:flex-row items-center gap-2.5 shadow-2xl transition">
             <div className="flex items-center gap-2.5 px-3 w-full flex-1">
-              <Search className="w-4 h-4 text-cyan-400 shrink-0" />
+              <Search className="w-4 h-4 text-amber-400 shrink-0" />
               <input
                 type="text"
                 value={searchDistrict}
                 onChange={(e) => setSearchDistrict(e.target.value)}
                 placeholder={t.searchPlaceholder}
-                className="bg-transparent border-none text-white text-xs sm:text-sm placeholder-slate-500 focus:outline-none w-full"
+                className="bg-transparent border-none text-white text-xs sm:text-sm placeholder-slate-400 focus:outline-none w-full"
               />
               {searchDistrict && (
                 <button
                   onClick={() => setSearchDistrict('')}
-                  className="text-xs text-slate-500 hover:text-slate-300 font-bold px-1.5"
+                  className="text-xs text-slate-400 hover:text-white font-bold px-1.5"
                 >
                   ✕
                 </button>
               )}
             </div>
             
-            {/* Quick jump presets */}
+            {/* Quick jump presets in Tricolor badges */}
             <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0 px-2 sm:px-0">
-              <span className="text-[10px] text-slate-500 font-mono hidden lg:inline">Popular:</span>
+              <span className="text-[10px] text-slate-400 font-mono hidden lg:inline">Popular:</span>
               {[
-                { name: 'Delhi NCR', id: 'proj_0001' },
-                { name: 'Patna (Ganga)', id: 'proj_0001' },
-                { name: 'Assam (Flood)', id: 'proj_0002' },
-                { name: 'Mumbai Coast', id: 'proj_0004' },
+                { name: 'Delhi NCR', border: 'border-amber-500/30 text-amber-300' },
+                { name: 'Patna (Ganga)', border: 'border-blue-500/30 text-blue-300' },
+                { name: 'Assam (Flood)', border: 'border-orange-500/30 text-orange-300' },
+                { name: 'Mumbai Coast', border: 'border-emerald-500/30 text-emerald-300' },
               ].map((loc) => (
                 <button
                   key={loc.name}
                   onClick={() => setSearchDistrict(loc.name)}
-                  className="px-2.5 py-1 bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg text-[11px] font-medium whitespace-nowrap transition border border-slate-700"
+                  className={`px-2.5 py-1 bg-slate-800/80 hover:bg-slate-700 ${loc.border} rounded-lg text-[11px] font-medium whitespace-nowrap transition border`}
                 >
                   {loc.name}
                 </button>
               ))}
               <Link
                 href="/workspace/proj_0001"
-                className="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shrink-0 ml-1"
+                className="px-4 py-2 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shrink-0 ml-1 shadow-md shadow-emerald-600/20"
               >
                 <span>{t.searchBtn}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -391,111 +405,138 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      {/* 📊 4. NATIONAL GEOSPATIAL KEY INDICATORS (KPIs in plain, understandable words) */}
+      {/* 📊 4. NATIONAL GEOSPATIAL KEY INDICATORS (Harmonized with Flag Palette: Saffron • White • Green • Emergency) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-8 py-6">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[
-            {
-              title: t.kpiArea,
-              value: '3.287M km²',
-              subtitle: 'Pan-India Territory Tracked',
-              icon: Globe,
-              accent: 'text-cyan-400 bg-cyan-500/10 border-cyan-500/20'
-            },
-            {
-              title: t.kpiSat,
-              value: '14 Active Satellites',
-              subtitle: 'Sentinel, Landsat & Radar SAR',
-              icon: Satellite,
-              accent: 'text-blue-400 bg-blue-500/10 border-blue-500/20'
-            },
-            {
-              title: t.kpiAudits,
-              value: '1,280+ Panchayats',
-              subtitle: 'Urban & Agricultural Surveys',
-              icon: FileCheck2,
-              accent: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20'
-            },
-            {
-              title: t.kpiDisaster,
-              value: '24x7 Surveillance',
-              subtitle: 'Flood, Cyclone & Fire Alerts',
-              icon: ShieldAlert,
-              accent: 'text-amber-400 bg-amber-500/10 border-amber-500/20'
-            },
-          ].map((kpi, idx) => (
-            <div
-              key={idx}
-              className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 sm:p-5 flex flex-col justify-between hover:border-slate-700 transition shadow-sm"
-            >
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                  {kpi.title}
-                </span>
-                <div className={`p-2 rounded-xl border ${kpi.accent}`}>
-                  <kpi.icon className="w-4 h-4" />
-                </div>
-              </div>
-              <div>
-                <div className="text-xl sm:text-2xl font-black text-white tracking-tight">
-                  {kpi.value}
-                </div>
-                <div className="text-[11px] text-slate-400 mt-1 font-mono">
-                  {kpi.subtitle}
-                </div>
+          {/* KPI 1: Saffron / Kesari */}
+          <div className="bg-gradient-to-br from-slate-900 via-slate-900 to-amber-950/30 border border-amber-500/30 hover:border-amber-500/60 rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-lg transition group">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-[11px] font-bold text-amber-400 uppercase tracking-wider">
+                {t.kpiArea}
+              </span>
+              <div className="p-2 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-400 group-hover:scale-105 transition">
+                <Globe className="w-4 h-4" />
               </div>
             </div>
-          ))}
+            <div>
+              <div className="text-xl sm:text-2xl font-black text-white tracking-tight">
+                3.287M km²
+              </div>
+              <div className="text-[11px] text-amber-200/70 mt-1 font-mono">
+                Pan-India Territory Tracked
+              </div>
+            </div>
+          </div>
+
+          {/* KPI 2: Ashoka Navy / White */}
+          <div className="bg-gradient-to-br from-slate-900 via-slate-900 to-blue-950/30 border border-blue-500/30 hover:border-blue-500/60 rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-lg transition group">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-[11px] font-bold text-blue-300 uppercase tracking-wider">
+                {t.kpiSat}
+              </span>
+              <div className="p-2 rounded-xl bg-blue-500/20 border border-blue-500/40 text-blue-300 group-hover:scale-105 transition">
+                <Satellite className="w-4 h-4" />
+              </div>
+            </div>
+            <div>
+              <div className="text-xl sm:text-2xl font-black text-white tracking-tight">
+                14 Active Satellites
+              </div>
+              <div className="text-[11px] text-blue-200/70 mt-1 font-mono">
+                Sentinel, Landsat &amp; Radar SAR
+              </div>
+            </div>
+          </div>
+
+          {/* KPI 3: India Green / Harita */}
+          <div className="bg-gradient-to-br from-slate-900 via-slate-900 to-emerald-950/30 border border-emerald-500/30 hover:border-emerald-500/60 rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-lg transition group">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-[11px] font-bold text-emerald-400 uppercase tracking-wider">
+                {t.kpiAudits}
+              </span>
+              <div className="p-2 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 group-hover:scale-105 transition">
+                <FileCheck2 className="w-4 h-4" />
+              </div>
+            </div>
+            <div>
+              <div className="text-xl sm:text-2xl font-black text-white tracking-tight">
+                1,280+ Panchayats
+              </div>
+              <div className="text-[11px] text-emerald-200/70 mt-1 font-mono">
+                Urban &amp; Agricultural Surveys
+              </div>
+            </div>
+          </div>
+
+          {/* KPI 4: 24x7 Surveillance / Saffron-Orange Emergency */}
+          <div className="bg-gradient-to-br from-slate-900 via-slate-900 to-orange-950/30 border border-orange-500/30 hover:border-orange-500/60 rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-lg transition group">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-[11px] font-bold text-orange-400 uppercase tracking-wider">
+                {t.kpiDisaster}
+              </span>
+              <div className="p-2 rounded-xl bg-orange-500/20 border border-orange-500/40 text-orange-400 group-hover:scale-105 transition">
+                <ShieldAlert className="w-4 h-4" />
+              </div>
+            </div>
+            <div>
+              <div className="text-xl sm:text-2xl font-black text-white tracking-tight">
+                24x7 Surveillance
+              </div>
+              <div className="text-[11px] text-orange-200/70 mt-1 font-mono">
+                Flood, Cyclone &amp; Fire Alerts
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* 🚀 5. KEY CITIZEN & DEPARTMENT SERVICES (6 Simple, Intuitive, Colorful Cards) */}
+      {/* 🚀 5. KEY CITIZEN & DEPARTMENT SERVICES (Tricolor Theme) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-8 py-4 space-y-4">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="p-1.5 rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30">
+          <div className="flex items-center gap-2.5">
+            <span className="p-1.5 rounded-lg bg-amber-500/20 text-amber-400 border border-amber-500/30">
               <Landmark className="w-4 h-4" />
             </span>
             <h2 className="text-base sm:text-lg font-extrabold text-white">
               {t.quickServices}
             </h2>
           </div>
-          <p className="text-xs text-slate-400 mt-0.5">
+          <p className="text-xs text-slate-300 mt-0.5">
             {t.quickServicesSub}
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {/* Card 1: Interactive GIS Satellite Map */}
-          <div className="bg-gradient-to-br from-slate-900 via-slate-900/90 to-blue-950/40 border border-blue-500/30 hover:border-blue-500/60 rounded-2xl p-5 shadow-lg flex flex-col justify-between group transition">
+          {/* Card 1: Interactive GIS Satellite Map (Ashoka Navy / Blue) */}
+          <div className="bg-gradient-to-br from-slate-900 via-slate-900/95 to-blue-950/50 border border-blue-500/40 hover:border-blue-400 rounded-2xl p-5 shadow-xl flex flex-col justify-between group transition">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <div className="p-3 rounded-xl bg-blue-500/20 border border-blue-500/40 text-blue-400 group-hover:scale-105 transition">
+                <div className="p-3 rounded-xl bg-blue-500/20 border border-blue-500/40 text-blue-300 group-hover:scale-105 transition">
                   <Globe className="w-6 h-6" />
                 </div>
-                <span className="text-[10px] font-mono bg-blue-950/80 text-blue-300 px-2 py-0.5 rounded-full border border-blue-500/30 font-bold">
+                <span className="text-[10px] font-mono bg-blue-950/80 text-blue-300 px-2.5 py-0.5 rounded-full border border-blue-500/40 font-bold">
                   Public Service 01
                 </span>
               </div>
               <div>
-                <h3 className="text-sm font-bold text-white group-hover:text-cyan-300 transition">
+                <h3 className="text-sm font-bold text-white group-hover:text-blue-300 transition">
                   Interactive GIS Satellite Map (नक्शा पोर्टल)
                 </h3>
-                <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                <p className="text-xs text-slate-300 mt-1 leading-relaxed">
                   View high-resolution satellite imagery across any Indian village or town. Toggle road networks, tree canopies, and water boundaries.
                 </p>
               </div>
               <div className="pt-2 flex flex-wrap gap-1.5">
-                <span className="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded">Real-Time OpenLayers</span>
-                <span className="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded">Multi-Spectral</span>
-                <span className="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded">GPS Anchored</span>
+                <span className="text-[10px] bg-slate-800/90 text-slate-200 px-2 py-0.5 rounded border border-slate-700">Real-Time OpenLayers</span>
+                <span className="text-[10px] bg-slate-800/90 text-slate-200 px-2 py-0.5 rounded border border-slate-700">Multi-Spectral</span>
+                <span className="text-[10px] bg-slate-800/90 text-slate-200 px-2 py-0.5 rounded border border-slate-700">GPS Anchored</span>
               </div>
             </div>
 
             <div className="mt-5 pt-4 border-t border-slate-800">
               <Link
                 href="/workspace/proj_0001"
-                className="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition shadow-md"
+                className="w-full py-2.5 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition shadow-md"
               >
                 <span>Launch Interactive Map</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -503,36 +544,36 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Card 2: Disaster & Emergency AI Portal */}
-          <div className="bg-gradient-to-br from-slate-900 via-slate-900/90 to-red-950/40 border border-red-500/30 hover:border-red-500/60 rounded-2xl p-5 shadow-lg flex flex-col justify-between group transition">
+          {/* Card 2: Disaster & Emergency AI Portal (Saffron / Orange) */}
+          <div className="bg-gradient-to-br from-slate-900 via-slate-900/95 to-amber-950/50 border border-amber-500/40 hover:border-amber-400 rounded-2xl p-5 shadow-xl flex flex-col justify-between group transition">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <div className="p-3 rounded-xl bg-red-500/20 border border-red-500/40 text-red-400 group-hover:scale-105 transition">
+                <div className="p-3 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-400 group-hover:scale-105 transition">
                   <ShieldAlert className="w-6 h-6" />
                 </div>
-                <span className="text-[10px] font-mono bg-red-950/80 text-red-300 px-2 py-0.5 rounded-full border border-red-500/30 font-bold">
+                <span className="text-[10px] font-mono bg-amber-950/80 text-amber-300 px-2.5 py-0.5 rounded-full border border-amber-500/40 font-bold">
                   Public Service 02
                 </span>
               </div>
               <div>
-                <h3 className="text-sm font-bold text-white group-hover:text-red-300 transition">
-                  Disaster & Emergency AI (आपदा प्रबंधन)
+                <h3 className="text-sm font-bold text-white group-hover:text-amber-300 transition">
+                  Disaster &amp; Emergency AI (आपदा प्रबंधन)
                 </h3>
-                <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                <p className="text-xs text-slate-300 mt-1 leading-relaxed">
                   Track active flood inundation zones, cloud-penetrating SAR radar feeds, forest fire detections, and safe evacuation corridors.
                 </p>
               </div>
               <div className="pt-2 flex flex-wrap gap-1.5">
-                <span className="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded">Live Flood Maps</span>
-                <span className="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded">Cyclone Watch</span>
-                <span className="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded">NDMA Standards</span>
+                <span className="text-[10px] bg-slate-800/90 text-slate-200 px-2 py-0.5 rounded border border-slate-700">Live Flood Maps</span>
+                <span className="text-[10px] bg-slate-800/90 text-slate-200 px-2 py-0.5 rounded border border-slate-700">Cyclone Watch</span>
+                <span className="text-[10px] bg-slate-800/90 text-slate-200 px-2 py-0.5 rounded border border-slate-700">NDMA Standards</span>
               </div>
             </div>
 
             <div className="mt-5 pt-4 border-t border-slate-800">
               <Link
                 href="/disaster"
-                className="w-full py-2.5 px-4 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 hover:to-orange-500 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition shadow-md"
+                className="w-full py-2.5 px-4 bg-gradient-to-r from-amber-600 via-orange-600 to-amber-600 hover:from-amber-500 hover:to-orange-500 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition shadow-md shadow-amber-600/20"
               >
                 <span>Open Disaster AI Portal</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -540,36 +581,36 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Card 3: Agriculture & Crop Health Audit */}
-          <div className="bg-gradient-to-br from-slate-900 via-slate-900/90 to-emerald-950/40 border border-emerald-500/30 hover:border-emerald-500/60 rounded-2xl p-5 shadow-lg flex flex-col justify-between group transition">
+          {/* Card 3: Agriculture & Crop Health Audit (India Green) */}
+          <div className="bg-gradient-to-br from-slate-900 via-slate-900/95 to-emerald-950/50 border border-emerald-500/40 hover:border-emerald-400 rounded-2xl p-5 shadow-xl flex flex-col justify-between group transition">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <div className="p-3 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 group-hover:scale-105 transition">
                   <Wheat className="w-6 h-6" />
                 </div>
-                <span className="text-[10px] font-mono bg-emerald-950/80 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-500/30 font-bold">
+                <span className="text-[10px] font-mono bg-emerald-950/80 text-emerald-300 px-2.5 py-0.5 rounded-full border border-emerald-500/40 font-bold">
                   Public Service 03
                 </span>
               </div>
               <div>
                 <h3 className="text-sm font-bold text-white group-hover:text-emerald-300 transition">
-                  Crop Health & Agriculture Audit (फसल निगरानी)
+                  Crop Health &amp; Agriculture Audit (फसल निगरानी)
                 </h3>
-                <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                <p className="text-xs text-slate-300 mt-1 leading-relaxed">
                   Analyze NDVI crop greenery, soil moisture, and drought risk. Essential for farmers, agricultural officers, and crop insurance claims.
                 </p>
               </div>
               <div className="pt-2 flex flex-wrap gap-1.5">
-                <span className="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded">NDVI Vegetation</span>
-                <span className="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded">Drought Early Warning</span>
-                <span className="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded">PMFBY Subsidy Aid</span>
+                <span className="text-[10px] bg-slate-800/90 text-slate-200 px-2 py-0.5 rounded border border-slate-700">NDVI Vegetation</span>
+                <span className="text-[10px] bg-slate-800/90 text-slate-200 px-2 py-0.5 rounded border border-slate-700">Drought Early Warning</span>
+                <span className="text-[10px] bg-slate-800/90 text-slate-200 px-2 py-0.5 rounded border border-slate-700">PMFBY Subsidy Aid</span>
               </div>
             </div>
 
             <div className="mt-5 pt-4 border-t border-slate-800">
               <Link
                 href="/image-analysis"
-                className="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition shadow-md"
+                className="w-full py-2.5 px-4 bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600 hover:from-emerald-500 hover:to-green-500 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition shadow-md shadow-emerald-600/20"
               >
                 <span>Analyze Crop Imagery</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -577,36 +618,36 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Card 4: Urban Planning & Encroachment Audit */}
-          <div className="bg-gradient-to-br from-slate-900 via-slate-900/90 to-amber-950/40 border border-amber-500/30 hover:border-amber-500/60 rounded-2xl p-5 shadow-lg flex flex-col justify-between group transition">
+          {/* Card 4: Urban Planning & Encroachment Audit (Golden Saffron & Pearl) */}
+          <div className="bg-gradient-to-br from-slate-900 via-slate-900/95 to-amber-950/40 border border-amber-500/30 hover:border-amber-400 rounded-2xl p-5 shadow-xl flex flex-col justify-between group transition">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <div className="p-3 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-400 group-hover:scale-105 transition">
                   <Building2 className="w-6 h-6" />
                 </div>
-                <span className="text-[10px] font-mono bg-amber-950/80 text-amber-300 px-2 py-0.5 rounded-full border border-amber-500/30 font-bold">
+                <span className="text-[10px] font-mono bg-amber-950/80 text-amber-300 px-2.5 py-0.5 rounded-full border border-amber-500/30 font-bold">
                   Public Service 04
                 </span>
               </div>
               <div>
                 <h3 className="text-sm font-bold text-white group-hover:text-amber-300 transition">
-                  Urban Planning & Encroachment (शहरी नियोजन)
+                  Urban Planning &amp; Encroachment (शहरी नियोजन)
                 </h3>
-                <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                <p className="text-xs text-slate-300 mt-1 leading-relaxed">
                   Identify unauthorized buildings, illegal forest clearing, and infrastructure growth using automated bi-temporal change detection.
                 </p>
               </div>
               <div className="pt-2 flex flex-wrap gap-1.5">
-                <span className="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded">ChangeFormer AI</span>
-                <span className="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded">Encroachment Vector</span>
-                <span className="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded">Municipal Audits</span>
+                <span className="text-[10px] bg-slate-800/90 text-slate-200 px-2 py-0.5 rounded border border-slate-700">ChangeFormer AI</span>
+                <span className="text-[10px] bg-slate-800/90 text-slate-200 px-2 py-0.5 rounded border border-slate-700">Encroachment Vector</span>
+                <span className="text-[10px] bg-slate-800/90 text-slate-200 px-2 py-0.5 rounded border border-slate-700">Municipal Audits</span>
               </div>
             </div>
 
             <div className="mt-5 pt-4 border-t border-slate-800">
               <Link
                 href="/workspace/proj_0001"
-                className="w-full py-2.5 px-4 bg-amber-600 hover:bg-amber-500 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition shadow-md"
+                className="w-full py-2.5 px-4 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition shadow-md"
               >
                 <span>Inspect Urban Expansion</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -614,36 +655,36 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Card 5: Ask AI Geospatial Copilot */}
-          <div className="bg-gradient-to-br from-slate-900 via-slate-900/90 to-indigo-950/40 border border-indigo-500/30 hover:border-indigo-500/60 rounded-2xl p-5 shadow-lg flex flex-col justify-between group transition">
+          {/* Card 5: Ask AI Geospatial Copilot (Ashoka Chakra Navy) */}
+          <div className="bg-gradient-to-br from-slate-900 via-slate-900/95 to-blue-950/40 border border-blue-500/30 hover:border-blue-400 rounded-2xl p-5 shadow-xl flex flex-col justify-between group transition">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <div className="p-3 rounded-xl bg-indigo-500/20 border border-indigo-500/40 text-indigo-400 group-hover:scale-105 transition">
+                <div className="p-3 rounded-xl bg-blue-500/20 border border-blue-500/40 text-blue-400 group-hover:scale-105 transition">
                   <MessageSquare className="w-6 h-6" />
                 </div>
-                <span className="text-[10px] font-mono bg-indigo-950/80 text-indigo-300 px-2 py-0.5 rounded-full border border-indigo-500/30 font-bold">
+                <span className="text-[10px] font-mono bg-blue-950/80 text-blue-300 px-2.5 py-0.5 rounded-full border border-blue-500/30 font-bold">
                   Public Service 05
                 </span>
               </div>
               <div>
-                <h3 className="text-sm font-bold text-white group-hover:text-indigo-300 transition">
-                  Citizen & Officer AI Copilot (भू-स्थानिक चैट)
+                <h3 className="text-sm font-bold text-white group-hover:text-blue-300 transition">
+                  Citizen &amp; Officer AI Copilot (भू-स्थानिक चैट)
                 </h3>
-                <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                <p className="text-xs text-slate-300 mt-1 leading-relaxed">
                   Ask plain-language questions like "How much greenery was lost in Pune?" or "Is my district under flood risk?" and get instant answers.
                 </p>
               </div>
               <div className="pt-2 flex flex-wrap gap-1.5">
-                <span className="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded">Natural Language NLP</span>
-                <span className="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded">No Photos Required</span>
-                <span className="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded">24x7 Answers</span>
+                <span className="text-[10px] bg-slate-800/90 text-slate-200 px-2 py-0.5 rounded border border-slate-700">Natural Language NLP</span>
+                <span className="text-[10px] bg-slate-800/90 text-slate-200 px-2 py-0.5 rounded border border-slate-700">No Photos Required</span>
+                <span className="text-[10px] bg-slate-800/90 text-slate-200 px-2 py-0.5 rounded border border-slate-700">24x7 Answers</span>
               </div>
             </div>
 
             <div className="mt-5 pt-4 border-t border-slate-800">
               <Link
                 href="/chat"
-                className="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition shadow-md"
+                className="w-full py-2.5 px-4 bg-gradient-to-r from-blue-700 to-indigo-700 hover:from-blue-600 hover:to-indigo-600 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition shadow-md"
               >
                 <span>Start AI Consultation</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -651,36 +692,36 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Card 6: Official Audit Reports & Projects */}
-          <div className="bg-gradient-to-br from-slate-900 via-slate-900/90 to-cyan-950/40 border border-cyan-500/30 hover:border-cyan-500/60 rounded-2xl p-5 shadow-lg flex flex-col justify-between group transition">
+          {/* Card 6: Official Audit Reports & Projects (India Green & White) */}
+          <div className="bg-gradient-to-br from-slate-900 via-slate-900/95 to-emerald-950/40 border border-emerald-500/30 hover:border-emerald-400 rounded-2xl p-5 shadow-xl flex flex-col justify-between group transition">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <div className="p-3 rounded-xl bg-cyan-500/20 border border-cyan-500/40 text-cyan-400 group-hover:scale-105 transition">
+                <div className="p-3 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 group-hover:scale-105 transition">
                   <FileCheck2 className="w-6 h-6" />
                 </div>
-                <span className="text-[10px] font-mono bg-cyan-950/80 text-cyan-300 px-2 py-0.5 rounded-full border border-cyan-500/30 font-bold">
+                <span className="text-[10px] font-mono bg-emerald-950/80 text-emerald-300 px-2.5 py-0.5 rounded-full border border-emerald-500/30 font-bold">
                   Public Service 06
                 </span>
               </div>
               <div>
-                <h3 className="text-sm font-bold text-white group-hover:text-cyan-300 transition">
-                  Certified Reports & Registry (प्रमाणित रिपोर्ट)
+                <h3 className="text-sm font-bold text-white group-hover:text-emerald-300 transition">
+                  Certified Reports &amp; Registry (प्रमाणित रिपोर्ट)
                 </h3>
-                <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                <p className="text-xs text-slate-300 mt-1 leading-relaxed">
                   Access official government project records, download PDF summaries with GPS coordinates, and view multi-agency verification stamps.
                 </p>
               </div>
               <div className="pt-2 flex flex-wrap gap-1.5">
-                <span className="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded">Certified PDF Export</span>
-                <span className="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded">Audit Trails</span>
-                <span className="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded">Public Records</span>
+                <span className="text-[10px] bg-slate-800/90 text-slate-200 px-2 py-0.5 rounded border border-slate-700">Certified PDF Export</span>
+                <span className="text-[10px] bg-slate-800/90 text-slate-200 px-2 py-0.5 rounded border border-slate-700">Audit Trails</span>
+                <span className="text-[10px] bg-slate-800/90 text-slate-200 px-2 py-0.5 rounded border border-slate-700">Public Records</span>
               </div>
             </div>
 
             <div className="mt-5 pt-4 border-t border-slate-800">
               <Link
                 href="/projects"
-                className="w-full py-2.5 px-4 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition shadow-md"
+                className="w-full py-2.5 px-4 bg-gradient-to-r from-teal-600 via-emerald-600 to-green-600 hover:from-teal-500 hover:to-emerald-500 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition shadow-md shadow-emerald-600/20"
               >
                 <span>View Official Projects</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -690,59 +731,66 @@ export default function DashboardPage() {
         </div>
       </section>
 
-      {/* 🧭 6. "HOW IT WORKS" — 3 SIMPLE STEPS FOR EVERY CITIZEN & OFFICER */}
+      {/* 🧭 6. "HOW IT WORKS" — 3 SIMPLE STEPS IN FLAG PROGRESSION (1: Saffron, 2: White/Navy, 3: Green) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-8 py-6">
-        <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-6">
-          <div className="flex items-center gap-2 mb-4">
+        <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 relative overflow-hidden">
+          {/* Subtle Tricolor Accent Top Stripe */}
+          <div className="absolute top-0 left-0 right-0 h-1 flex">
+            <div className="flex-1 bg-amber-500" />
+            <div className="flex-1 bg-white" />
+            <div className="flex-1 bg-emerald-500" />
+          </div>
+
+          <div className="flex items-center gap-2.5 mb-5 mt-1">
             <span className="p-1.5 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
               <HelpCircle className="w-4 h-4" />
             </span>
-            <h2 className="text-base font-bold text-white">
+            <h2 className="text-base font-extrabold text-white">
               {t.howItWorksTitle}
             </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
-            {/* Step 1 */}
-            <div className="flex items-start gap-4">
-              <div className="w-10 h-10 rounded-xl bg-blue-600/20 border border-blue-500/30 text-blue-400 flex items-center justify-center font-bold text-sm shrink-0">
+            {/* Step 1: Kesari / Saffron */}
+            <div className="flex items-start gap-4 p-4 rounded-xl bg-amber-950/20 border border-amber-500/20">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 text-slate-950 flex items-center justify-center font-black text-sm shrink-0 shadow-md shadow-amber-500/20">
                 1
               </div>
               <div>
-                <h3 className="text-xs font-bold text-white uppercase tracking-wider">
-                  Step 1: Select Your Location or Upload
+                <h3 className="text-xs font-bold text-amber-400 uppercase tracking-wider">
+                  Step 1: Select Location or Upload
                 </h3>
-                <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                <p className="text-xs text-slate-300 mt-1 leading-relaxed">
                   Search any Indian district or upload a satellite / drone photograph. The portal automatically recognizes the GPS coordinates and anchors the map.
                 </p>
               </div>
             </div>
 
-            {/* Step 2 */}
-            <div className="flex items-start gap-4">
-              <div className="w-10 h-10 rounded-xl bg-emerald-600/20 border border-emerald-500/30 text-emerald-400 flex items-center justify-center font-bold text-sm shrink-0">
+            {/* Step 2: Shweta / White & Ashoka Navy */}
+            <div className="flex items-start gap-4 p-4 rounded-xl bg-blue-950/20 border border-blue-400/20">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-white to-slate-200 text-blue-950 flex items-center justify-center font-black text-sm shrink-0 shadow-md">
                 2
               </div>
               <div>
-                <h3 className="text-xs font-bold text-white uppercase tracking-wider">
+                <h3 className="text-xs font-bold text-slate-100 uppercase tracking-wider">
                   Step 2: Automated AI Spatial Scan
                 </h3>
-                <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                <p className="text-xs text-slate-300 mt-1 leading-relaxed">
                   Our neural networks instantly calculate green canopy (NDVI), water spread (NDWI), and unauthorized building changes with 98%+ precision.
                 </p>
               </div>
             </div>
 
-            {/* Step 3 */}
-            <div className="flex items-start gap-4">
-              <div className="w-10 h-10 rounded-xl bg-amber-600/20 border border-amber-500/30 text-amber-400 flex items-center justify-center font-bold text-sm shrink-0">
+            {/* Step 3: Harita / India Green */}
+            <div className="flex items-start gap-4 p-4 rounded-xl bg-emerald-950/20 border border-emerald-500/20">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 text-slate-950 flex items-center justify-center font-black text-sm shrink-0 shadow-md shadow-emerald-500/20">
                 3
               </div>
               <div>
-                <h3 className="text-xs font-bold text-white uppercase tracking-wider">
+                <h3 className="text-xs font-bold text-emerald-400 uppercase tracking-wider">
                   Step 3: Download Certified Reports
                 </h3>
-                <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                <p className="text-xs text-slate-300 mt-1 leading-relaxed">
                   Export legally valid geospatial audit reports, evidence cards, and map snapshots for municipal approvals, legal cases, or public welfare.
                 </p>
               </div>
@@ -751,26 +799,26 @@ export default function DashboardPage() {
         </div>
       </section>
 
-      {/* 📁 7. OFFICIAL GEOSPATIAL AUDITS & ACTIVE INITIATIVES (Plain Table) */}
+      {/* 📁 7. OFFICIAL GEOSPATIAL AUDITS & ACTIVE INITIATIVES (Tricolor Status Badges) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-8 py-4 space-y-4">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
           <div>
-            <div className="flex items-center gap-2">
-              <span className="p-1.5 rounded-lg bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
+            <div className="flex items-center gap-2.5">
+              <span className="p-1.5 rounded-lg bg-amber-500/20 text-amber-400 border border-amber-500/30">
                 <FolderKanban className="w-4 h-4" />
               </span>
               <h2 className="text-base sm:text-lg font-bold text-white">
                 {t.recentProjectsTitle}
               </h2>
             </div>
-            <p className="text-xs text-slate-400 mt-0.5">
-              Verified spatial surveillance records published for public & inter-departmental transparency
+            <p className="text-xs text-slate-300 mt-0.5">
+              Verified spatial surveillance records published for public &amp; inter-departmental transparency
             </p>
           </div>
 
           <Link
             href="/projects"
-            className="text-xs text-cyan-400 hover:text-cyan-300 font-bold flex items-center gap-1 transition"
+            className="text-xs text-amber-400 hover:text-amber-300 font-bold flex items-center gap-1 transition"
           >
             <span>Browse Full National Registry ➔</span>
           </Link>
@@ -781,36 +829,36 @@ export default function DashboardPage() {
           {filteredProjects.slice(0, 4).map((proj) => (
             <div
               key={proj.id}
-              className="bg-slate-900/70 border border-slate-800 hover:border-blue-500/40 rounded-2xl p-4 sm:p-5 transition flex flex-col md:flex-row items-start md:items-center justify-between gap-4 group"
+              className="bg-slate-900/80 border border-slate-800 hover:border-amber-500/40 rounded-2xl p-4 sm:p-5 transition flex flex-col md:flex-row items-start md:items-center justify-between gap-4 group shadow-md"
             >
               <div className="space-y-1.5 max-w-3xl">
                 <div className="flex items-center flex-wrap gap-2">
-                  <span className="font-mono text-[10px] text-cyan-400 bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-500/30 font-bold">
+                  <span className="font-mono text-[10px] text-amber-300 bg-amber-950/60 px-2.5 py-0.5 rounded-md border border-amber-500/30 font-bold">
                     {proj.id.toUpperCase()}
                   </span>
-                  <span className="text-[10px] font-semibold text-slate-400 bg-slate-800 px-2 py-0.5 rounded flex items-center gap-1">
+                  <span className="text-[10px] font-semibold text-slate-300 bg-slate-800/90 px-2 py-0.5 rounded-md flex items-center gap-1 border border-slate-700">
                     <MapPin className="w-3 h-3 text-red-400" />
                     <span>{proj.location_name || 'All-India Geospatial Zone'}</span>
                   </span>
-                  <span className="text-[10px] font-semibold text-emerald-400 bg-emerald-950/50 px-2 py-0.5 rounded border border-emerald-500/30 flex items-center gap-1">
-                    <ShieldCheck className="w-3 h-3" />
+                  <span className="text-[10px] font-semibold text-emerald-300 bg-emerald-950/60 px-2 py-0.5 rounded-md border border-emerald-500/40 flex items-center gap-1">
+                    <ShieldCheck className="w-3 h-3 text-emerald-400" />
                     <span>{proj.status || 'Verified Survey'}</span>
                   </span>
                 </div>
 
-                <h3 className="text-sm sm:text-base font-bold text-white group-hover:text-blue-400 transition">
+                <h3 className="text-sm sm:text-base font-bold text-white group-hover:text-amber-300 transition">
                   {proj.name}
                 </h3>
-                <p className="text-xs text-slate-400 leading-relaxed">
+                <p className="text-xs text-slate-300 leading-relaxed">
                   {proj.description}
                 </p>
 
-                <div className="flex items-center flex-wrap gap-4 text-[11px] text-slate-500 font-mono pt-1">
+                <div className="flex items-center flex-wrap gap-4 text-[11px] text-slate-400 font-mono pt-1">
                   <span>🏛️ {proj.department || 'National Geospatial Authority'}</span>
                   <span>•</span>
                   <span>Accuracy: <strong className="text-emerald-400 font-sans">{proj.confidence || '98.5%'}</strong></span>
                   <span>•</span>
-                  <span>Surveillance Queries: <strong className="text-slate-300 font-sans">{proj.queries_count || 24}</strong></span>
+                  <span>Surveillance Queries: <strong className="text-slate-200 font-sans">{proj.queries_count || 24}</strong></span>
                 </div>
               </div>
 
@@ -818,7 +866,7 @@ export default function DashboardPage() {
               <div className="flex items-center gap-2 w-full md:w-auto shrink-0 pt-2 md:pt-0">
                 <Link
                   href={`/workspace/${proj.id}`}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition shadow-sm w-full md:w-auto"
+                  className="px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition shadow-sm w-full md:w-auto"
                 >
                   <Globe className="w-3.5 h-3.5" />
                   <span>Open Map Workspace</span>
@@ -833,11 +881,11 @@ export default function DashboardPage() {
       <section className="max-w-7xl mx-auto px-4 sm:px-8 py-6">
         <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
+            <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2">
               <Award className="w-4 h-4 text-amber-400" />
               <span>{t.systemIntegrations}</span>
             </h3>
-            <span className="text-[10px] text-emerald-400 font-mono bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-500/30">
+            <span className="text-[10px] text-emerald-300 font-mono bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-500/40 font-bold">
               ● All Feeds Fully Synchronized
             </span>
           </div>
@@ -853,11 +901,11 @@ export default function DashboardPage() {
             ].map((agency, i) => (
               <div
                 key={i}
-                className="bg-slate-950/80 border border-slate-800/80 rounded-xl p-3 text-center flex flex-col justify-between"
+                className="bg-slate-950/90 border border-slate-800/90 rounded-xl p-3 text-center flex flex-col justify-between hover:border-amber-500/30 transition"
               >
                 <div className="text-[11px] font-bold text-slate-200">{agency.name}</div>
-                <div className="text-[10px] text-slate-500 mt-1 font-mono">{agency.type}</div>
-                <div className="mt-2 text-[9px] font-mono font-bold text-emerald-400 bg-emerald-950/40 py-0.5 rounded">
+                <div className="text-[10px] text-slate-400 mt-1 font-mono">{agency.type}</div>
+                <div className="mt-2 text-[9px] font-mono font-bold text-emerald-300 bg-emerald-950/60 py-0.5 rounded border border-emerald-500/30">
                   ✓ {agency.status}
                 </div>
               </div>
@@ -866,69 +914,80 @@ export default function DashboardPage() {
         </div>
       </section>
 
-      {/* 🇮🇳 9. OFFICIAL GOVERNMENT FOOTER & COMPLIANCE */}
-      <footer className="bg-slate-950 border-t border-slate-800 mt-12 py-10 px-4 sm:px-8 text-slate-400 text-xs">
-        <div className="max-w-7xl mx-auto space-y-8">
+      {/* 🇮🇳 9. OFFICIAL GOVERNMENT FOOTER WITH TRICOLOR TOP DIVIDER */}
+      <footer className="bg-slate-950 mt-12 text-slate-400 text-xs">
+        {/* Tricolor Ribbon Divider */}
+        <div className="h-1.5 w-full flex">
+          <div className="flex-1 bg-amber-500" />
+          <div className="flex-1 bg-white" />
+          <div className="flex-1 bg-emerald-500" />
+        </div>
+
+        <div className="max-w-7xl mx-auto py-10 px-4 sm:px-8 space-y-8">
           {/* Top Links Columns */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div>
-              <h4 className="text-white font-bold text-xs uppercase tracking-wider mb-3">
-                Government Portals
+              <h4 className="text-amber-400 font-bold text-xs uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                <span>🏛️</span>
+                <span>Government Portals</span>
               </h4>
               <ul className="space-y-2 text-[11px]">
-                <li><a href="https://www.india.gov.in" target="_blank" rel="noreferrer" className="hover:text-cyan-400 transition flex items-center gap-1">National Portal of India <ExternalLink className="w-2.5 h-2.5" /></a></li>
-                <li><a href="https://bhuvan.nrsc.gov.in" target="_blank" rel="noreferrer" className="hover:text-cyan-400 transition flex items-center gap-1">ISRO Bhuvan Geo-Portal <ExternalLink className="w-2.5 h-2.5" /></a></li>
-                <li><a href="https://surveyofindia.gov.in" target="_blank" rel="noreferrer" className="hover:text-cyan-400 transition flex items-center gap-1">Survey of India (SOI) <ExternalLink className="w-2.5 h-2.5" /></a></li>
-                <li><a href="https://ndma.gov.in" target="_blank" rel="noreferrer" className="hover:text-cyan-400 transition flex items-center gap-1">NDMA Disaster Cell <ExternalLink className="w-2.5 h-2.5" /></a></li>
+                <li><a href="https://www.india.gov.in" target="_blank" rel="noreferrer" className="hover:text-amber-300 transition flex items-center gap-1">National Portal of India <ExternalLink className="w-2.5 h-2.5" /></a></li>
+                <li><a href="https://bhuvan.nrsc.gov.in" target="_blank" rel="noreferrer" className="hover:text-amber-300 transition flex items-center gap-1">ISRO Bhuvan Geo-Portal <ExternalLink className="w-2.5 h-2.5" /></a></li>
+                <li><a href="https://surveyofindia.gov.in" target="_blank" rel="noreferrer" className="hover:text-amber-300 transition flex items-center gap-1">Survey of India (SOI) <ExternalLink className="w-2.5 h-2.5" /></a></li>
+                <li><a href="https://ndma.gov.in" target="_blank" rel="noreferrer" className="hover:text-amber-300 transition flex items-center gap-1">NDMA Disaster Cell <ExternalLink className="w-2.5 h-2.5" /></a></li>
               </ul>
             </div>
 
             <div>
-              <h4 className="text-white font-bold text-xs uppercase tracking-wider mb-3">
-                Citizen Services
+              <h4 className="text-emerald-400 font-bold text-xs uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                <span>🛰️</span>
+                <span>Citizen Services</span>
               </h4>
               <ul className="space-y-2 text-[11px]">
-                <li><Link href="/workspace/proj_0001" className="hover:text-cyan-400 transition">View District Satellite Map</Link></li>
-                <li><Link href="/disaster" className="hover:text-cyan-400 transition">Check Flood & Cyclone Alerts</Link></li>
-                <li><Link href="/image-analysis" className="hover:text-cyan-400 transition">Crop Health (NDVI) Assessment</Link></li>
-                <li><Link href="/chat" className="hover:text-cyan-400 transition">Ask AI Spatial Question</Link></li>
+                <li><Link href="/workspace/proj_0001" className="hover:text-emerald-300 transition">View District Satellite Map</Link></li>
+                <li><Link href="/disaster" className="hover:text-emerald-300 transition">Check Flood &amp; Cyclone Alerts</Link></li>
+                <li><Link href="/image-analysis" className="hover:text-emerald-300 transition">Crop Health (NDVI) Assessment</Link></li>
+                <li><Link href="/chat" className="hover:text-emerald-300 transition">Ask AI Spatial Question</Link></li>
               </ul>
             </div>
 
             <div>
-              <h4 className="text-white font-bold text-xs uppercase tracking-wider mb-3">
-                Legal & RTI Policies
+              <h4 className="text-slate-200 font-bold text-xs uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                <span>⚖️</span>
+                <span>Legal &amp; RTI Policies</span>
               </h4>
               <ul className="space-y-2 text-[11px]">
-                <li className="hover:text-slate-200 cursor-pointer">Right to Information (RTI)</li>
-                <li className="hover:text-slate-200 cursor-pointer">National Geospatial Policy 2022</li>
-                <li className="hover:text-slate-200 cursor-pointer">Terms of Use & Copyright</li>
-                <li className="hover:text-slate-200 cursor-pointer">Privacy & Hyperlinking Policy</li>
+                <li className="hover:text-white cursor-pointer">Right to Information (RTI)</li>
+                <li className="hover:text-white cursor-pointer">National Geospatial Policy 2022</li>
+                <li className="hover:text-white cursor-pointer">Terms of Use &amp; Copyright</li>
+                <li className="hover:text-white cursor-pointer">Privacy &amp; Hyperlinking Policy</li>
               </ul>
             </div>
 
             <div>
-              <h4 className="text-white font-bold text-xs uppercase tracking-wider mb-3">
-                Help & Grievance
+              <h4 className="text-orange-400 font-bold text-xs uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                <span>📞</span>
+                <span>Help &amp; Grievance</span>
               </h4>
               <div className="space-y-2 text-[11px]">
-                <p className="text-slate-300 font-semibold">National Geospatial Helpdesk:</p>
-                <p className="text-emerald-400 font-mono font-bold">📞 1800-11-2026 (Toll-Free)</p>
-                <p className="text-slate-400">Email: helpdesk@corvus.gov.in</p>
-                <p className="text-slate-500 text-[10px]">CPGRAMS Citizen Grievance Redressal Compliant</p>
+                <p className="text-slate-200 font-semibold">National Geospatial Helpdesk:</p>
+                <p className="text-emerald-400 font-mono font-extrabold text-sm">1800-11-2026 (Toll-Free)</p>
+                <p className="text-slate-300">Email: helpdesk@corvus.gov.in</p>
+                <p className="text-slate-400 text-[10px]">CPGRAMS Citizen Grievance Redressal Compliant</p>
               </div>
             </div>
           </div>
 
-          <div className="border-t border-slate-800 pt-6 flex flex-col md:flex-row items-center justify-between gap-4 text-[11px] text-slate-500">
+          <div className="border-t border-slate-800 pt-6 flex flex-col md:flex-row items-center justify-between gap-4 text-[11px] text-slate-400">
             <div className="flex items-center gap-2">
               <span>🏛️</span>
               <span>
-                Designed and Developed for <strong>National Earth Observation & Spatial Surveillance Mission</strong> by Team CORVUS.
+                Designed and Developed for <strong className="text-slate-200">National Earth Observation &amp; Spatial Surveillance Mission</strong> by Team CORVUS.
               </span>
             </div>
             <div>
-              <span>Last Reviewed and Updated: <strong>12 September 2026</strong> • Version 4.2.0</span>
+              <span>Last Reviewed and Updated: <strong className="text-slate-200">12 September 2026</strong> • Version 4.2.0</span>
             </div>
           </div>
         </div>
