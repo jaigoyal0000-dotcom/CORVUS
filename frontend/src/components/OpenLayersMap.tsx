@@ -201,7 +201,7 @@ export default function OpenLayersMap({
     diff_change: true,
     roads: true,
   });
-  const [showControlDeck, setShowControlDeck] = useState(true);
+  const [showControlDeck, setShowControlDeck] = useState(false);
 
   const basemap = externalBasemap !== undefined ? externalBasemap : internalBasemap;
   const setBasemap = (bm: BasemapStyle) => {
@@ -1838,36 +1838,38 @@ export default function OpenLayersMap({
         </div>
       )}
 
-      {/* 🚀 Aerospace Floating Modular HUD */}
-      <div className="absolute top-3 left-4 right-4 z-20 pointer-events-none flex flex-col gap-2">
-        {/* Row 1: Floating Navigation Capsule, Deck Toggle & Search Capsule */}
-        <div className="flex items-center justify-between gap-2.5 flex-wrap">
-          {/* Left Glass Capsule: View Mode, Basemap & Sensor Filter */}
-          <div className="pointer-events-auto flex items-center gap-2 flex-wrap bg-slate-950/80 backdrop-blur-xl border border-slate-800/80 p-1.5 rounded-2xl shadow-xl">
-            <div className="flex items-center bg-slate-900/90 p-1 rounded-xl border border-slate-800">
+      {/* 🚀 Aerospace Single-Line Command Strip & Popover Drawer */}
+      <div className="absolute top-3 left-3 right-3 z-20 pointer-events-none flex flex-col gap-2">
+        {/* Row 1: Single Unwrapping Aerospace Header */}
+        <div className="pointer-events-auto flex items-center justify-between gap-2 bg-slate-950/85 backdrop-blur-xl border border-slate-800/90 px-3 py-2 rounded-2xl shadow-2xl">
+          {/* Left: View Mode, Basemap & Sensor */}
+          <div className="flex items-center gap-1.5 shrink-0">
+            <div className="flex items-center bg-slate-900/90 p-0.5 rounded-xl border border-slate-800">
               <button
                 onClick={() => setViewMode('map')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition ${
+                className={`px-2.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition ${
                   viewMode === 'map'
                     ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-md shadow-cyan-600/20'
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
                 <Globe className="w-3.5 h-3.5" />
-                <span>Satellite Map</span>
+                <span className="hidden sm:inline">Satellite Map</span>
+                <span className="sm:hidden">Map</span>
               </button>
               <button
                 onClick={() => setViewMode('uploaded')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition ${
+                className={`px-2.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition ${
                   viewMode === 'uploaded'
                     ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-md shadow-cyan-600/20'
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
                 <ImageIcon className="w-3.5 h-3.5" />
-                <span>Uploaded Raster</span>
+                <span className="hidden sm:inline">Uploaded Raster</span>
+                <span className="sm:hidden">Raster</span>
                 {uploadedFiles.length > 0 && (
-                  <span className="ml-1 bg-cyan-400/20 text-cyan-300 text-[10px] px-1.5 py-0.5 rounded-full font-mono font-bold">
+                  <span className="ml-1 bg-cyan-400/20 text-cyan-300 text-[10px] px-1.5 py-0.2 rounded-full font-mono font-bold">
                     {uploadedFiles.length}
                   </span>
                 )}
@@ -1876,11 +1878,10 @@ export default function OpenLayersMap({
 
             {viewMode === 'map' && (
               <>
-                {/* Basemap Dropdown */}
                 <select
                   value={basemap}
                   onChange={(e) => setBasemap(e.target.value as BasemapStyle)}
-                  className="bg-slate-900/90 text-xs text-slate-200 font-medium rounded-xl px-2.5 py-1.5 border border-slate-800 focus:outline-none focus:border-cyan-500/60 cursor-pointer shadow-inner"
+                  className="bg-slate-900/90 text-xs text-slate-200 font-medium rounded-xl px-2 py-1.5 border border-slate-800 focus:outline-none focus:border-cyan-500/60 cursor-pointer shadow-inner max-w-[140px] sm:max-w-[170px]"
                 >
                   {(Object.keys(BASEMAP_PROVIDERS) as BasemapStyle[]).map((key) => (
                     <option key={key} value={key}>
@@ -1889,11 +1890,10 @@ export default function OpenLayersMap({
                   ))}
                 </select>
 
-                {/* Spectral Sensor Filter */}
                 <select
                   value={spectralFilter}
                   onChange={(e) => setSpectralFilter(e.target.value as SpectralFilter)}
-                  className="bg-slate-900/90 text-xs text-slate-200 font-medium rounded-xl px-2.5 py-1.5 border border-slate-800 focus:outline-none focus:border-cyan-500/60 cursor-pointer shadow-inner"
+                  className="bg-slate-900/90 text-xs text-slate-200 font-medium rounded-xl px-2 py-1.5 border border-slate-800 focus:outline-none focus:border-cyan-500/60 cursor-pointer shadow-inner max-w-[130px] sm:max-w-[160px]"
                 >
                   <option value="normal">🌈 True Color RGB</option>
                   <option value="cir_infrared">🌿 False Color NIR</option>
@@ -1906,79 +1906,76 @@ export default function OpenLayersMap({
             )}
           </div>
 
-          {/* Center Glass Capsule: Toggle Layer & Heatmap Deck */}
+          {/* Center: Search input */}
           {viewMode === 'map' && (
-            <div className="pointer-events-auto">
+            <form onSubmit={handleGlobalSearch} className="relative flex items-center shrink">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search city, coords..."
+                className="bg-slate-900/90 border border-slate-800 rounded-xl pl-7 pr-16 py-1.5 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-cyan-500/60 w-32 sm:w-44 md:w-52 font-medium transition"
+              />
+              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2 pointer-events-none" />
+              <button
+                type="submit"
+                disabled={isSearching}
+                className="absolute right-1 px-2 py-0.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white rounded-lg text-[10px] font-bold transition disabled:opacity-50"
+              >
+                {isSearching ? <span className="w-2 h-2 border-2 border-white border-t-transparent rounded-full animate-spin" /> : 'LOCATE'}
+              </button>
+            </form>
+          )}
+
+          {/* Right: Features Deck Toggle & Quick Actions */}
+          {viewMode === 'map' && (
+            <div className="flex items-center gap-1.5 shrink-0 ml-auto">
               <button
                 onClick={() => setShowControlDeck(!showControlDeck)}
-                className={`px-3.5 py-2 rounded-2xl text-xs font-bold flex items-center gap-2 transition border backdrop-blur-xl shadow-xl ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition border ${
                   showControlDeck
-                    ? 'bg-cyan-950/80 border-cyan-500/60 text-cyan-300 shadow-cyan-500/10'
-                    : 'bg-slate-950/80 border-slate-800/90 text-slate-300 hover:text-white hover:border-slate-700'
+                    ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white border-cyan-400 shadow-md shadow-cyan-600/30'
+                    : 'bg-slate-900/90 text-slate-200 hover:text-white border-slate-800 hover:border-slate-700'
                 }`}
-                title="Toggle Layers & AI Heatmap Controls"
+                title="Toggle Classified Feature Layers & AI Heatmap Drawer"
               >
-                <Layers className="w-4 h-4 text-cyan-400" />
-                <span>Features &amp; Heatmaps</span>
-                <span className="text-[10px] px-1.5 py-0.5 rounded-full font-mono bg-cyan-400/20 text-cyan-300 font-bold">
-                  {Object.values(currentLayerVisibility).filter(Boolean).length + (showHeatmap ? 1 : 0)} Active
+                <Layers className="w-3.5 h-3.5 text-cyan-300" />
+                <span className="hidden md:inline">Layers &amp; Heatmap</span>
+                <span className="md:hidden">Layers</span>
+                <span className="text-[10px] px-1.5 py-0.2 rounded-full font-mono bg-cyan-400/20 text-cyan-300 font-bold">
+                  {Object.values(currentLayerVisibility).filter(Boolean).length + (showHeatmap ? 1 : 0)}
                 </span>
                 <span className={`text-[10px] transition-transform duration-200 ${showControlDeck ? 'rotate-180' : ''}`}>▾</span>
               </button>
-            </div>
-          )}
 
-          {/* Right Glass Capsule: Search & Tactical Action Buttons */}
-          {viewMode === 'map' && (
-            <div className="pointer-events-auto flex items-center gap-2 flex-wrap bg-slate-950/80 backdrop-blur-xl border border-slate-800/80 p-1.5 rounded-2xl shadow-xl ml-auto">
-              {/* Geocoding Search */}
-              <form onSubmit={handleGlobalSearch} className="relative flex items-center">
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search city, coords..."
-                  className="bg-slate-900/90 border border-slate-800 rounded-xl pl-8 pr-18 py-1.5 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-cyan-500/60 w-44 sm:w-56 font-medium transition"
-                />
-                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 pointer-events-none" />
-                <button
-                  type="submit"
-                  disabled={isSearching}
-                  className="absolute right-1 px-2.5 py-1 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white rounded-lg text-[10px] font-bold transition disabled:opacity-50"
-                >
-                  {isSearching ? <span className="w-2.5 h-2.5 border-2 border-white border-t-transparent rounded-full animate-spin" /> : 'LOCATE'}
-                </button>
-              </form>
-
-              {/* Quick Action Buttons Group */}
-              <div className="flex items-center gap-1 bg-slate-900/90 p-1 rounded-xl border border-slate-800">
+              <div className="flex items-center gap-0.5 bg-slate-900/90 p-0.5 rounded-xl border border-slate-800">
                 <button
                   onClick={() => flyToLocation(recognizedLocation.centroid, 14)}
                   title="Center on Target AOI"
                   className="p-1.5 rounded-lg text-slate-400 hover:text-cyan-300 hover:bg-slate-800 transition"
                 >
-                  <Navigation className="w-4 h-4" />
+                  <Navigation className="w-3.5 h-3.5" />
                 </button>
                 <button
                   onClick={() => setShowReticle(!showReticle)}
                   title="Toggle Tactical Crosshair"
                   className={`p-1.5 rounded-lg transition ${showReticle ? 'bg-cyan-500/20 text-cyan-300' : 'text-slate-400 hover:text-white hover:bg-slate-800'}`}
                 >
-                  <Crosshair className="w-4 h-4" />
+                  <Crosshair className="w-3.5 h-3.5" />
                 </button>
                 <button
                   onClick={() => setShowTunePanel(!showTunePanel)}
                   title="Sensor Radiometry Tuning"
                   className={`p-1.5 rounded-lg transition ${showTunePanel ? 'bg-indigo-500/20 text-indigo-300' : 'text-slate-400 hover:text-white hover:bg-slate-800'}`}
                 >
-                  <Sliders className="w-4 h-4" />
+                  <Sliders className="w-3.5 h-3.5" />
                 </button>
                 <button
                   onClick={() => setShowStatsDrawer(!showStatsDrawer)}
                   title="GIS Metrics Drawer"
                   className={`p-1.5 rounded-lg transition ${showStatsDrawer ? 'bg-emerald-500/20 text-emerald-300' : 'text-slate-400 hover:text-white hover:bg-slate-800'}`}
                 >
-                  <BarChart3 className="w-4 h-4" />
+                  <BarChart3 className="w-3.5 h-3.5" />
                 </button>
                 <button
                   onClick={handleBrowserGeolocation}
@@ -1986,177 +1983,226 @@ export default function OpenLayersMap({
                   disabled={geoLocating}
                   className="p-1.5 rounded-lg text-slate-400 hover:text-blue-300 hover:bg-slate-800 transition disabled:opacity-50"
                 >
-                  <LocateFixed className={`w-4 h-4 ${geoLocating ? 'animate-spin text-blue-400' : ''}`} />
+                  <LocateFixed className={`w-3.5 h-3.5 ${geoLocating ? 'animate-spin text-blue-400' : ''}`} />
                 </button>
                 <button
                   onClick={handleExportSnapshot}
                   title="Export Satellite Snapshot"
                   className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
                 >
-                  <Camera className="w-4 h-4" />
+                  <Camera className="w-3.5 h-3.5" />
                 </button>
                 <button
                   onClick={() => setIsFullScreen(!isFullScreen)}
                   title={isFullScreen ? "Exit Fullscreen" : "Fullscreen Map"}
                   className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
                 >
-                  {isFullScreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+                  {isFullScreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-4 h-4" />}
                 </button>
               </div>
             </div>
           )}
         </div>
 
-        {/* Row 2: Floating Tactical Intelligence Dock (Centered, Semi-translucent, Collapsible) */}
-        {viewMode === 'map' && showControlDeck && (
-          <div className="pointer-events-auto mx-auto flex items-center justify-between gap-3 flex-wrap bg-slate-950/80 backdrop-blur-xl border border-slate-800/80 px-3.5 py-1.5 rounded-2xl shadow-2xl text-xs animate-fade-down max-w-full">
-            {/* Left: Vector Feature Overlays */}
-            <div className="flex items-center gap-1.5 flex-wrap">
-              <span className="text-[10px] uppercase font-bold text-slate-400 font-mono flex items-center gap-1 pr-2 border-r border-slate-800">
-                <Layers className="w-3.5 h-3.5 text-cyan-400" /> Overlays:
-              </span>
-
+        {/* 🎛️ Aerospace Multi-Spectral & Heatmap Popover Drawer */}
+        {showControlDeck && viewMode === 'map' && (
+          <div className="pointer-events-auto ml-auto w-96 max-w-[calc(100vw-2rem)] bg-slate-950/95 backdrop-blur-2xl border border-slate-700/80 rounded-2xl shadow-2xl p-4 space-y-3.5 text-xs animate-fade-down">
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 rounded-lg bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">
+                  <Layers className="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-white text-xs">Features &amp; AI Heatmap</h4>
+                  <p className="text-[10px] text-slate-400 font-mono">Multi-spectral ground intelligence</p>
+                </div>
+              </div>
               <button
-                onClick={() => toggleLayer('vegetation')}
-                className={`px-2.5 py-1 rounded-xl text-[11px] font-bold flex items-center gap-1.5 transition border ${
-                  currentLayerVisibility.vegetation
-                    ? 'bg-emerald-500/25 border-emerald-400/60 text-emerald-300 shadow-sm shadow-emerald-500/20'
-                    : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-white'
-                }`}
-                title="Toggle Vegetation & Canopy Layer"
+                onClick={() => setShowControlDeck(false)}
+                className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+                title="Close Drawer"
               >
-                <Trees className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Vegetation</span>
-              </button>
-
-              <button
-                onClick={() => toggleLayer('water')}
-                className={`px-2.5 py-1 rounded-xl text-[11px] font-bold flex items-center gap-1.5 transition border ${
-                  currentLayerVisibility.water
-                    ? 'bg-sky-500/25 border-sky-400/60 text-sky-300 shadow-sm shadow-sky-500/20'
-                    : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-white'
-                }`}
-                title="Toggle Water Bodies & River Layer"
-              >
-                <Droplets className="w-3.5 h-3.5 text-sky-400" />
-                <span>Water Bodies</span>
-              </button>
-
-              <button
-                onClick={() => toggleLayer('urban')}
-                className={`px-2.5 py-1 rounded-xl text-[11px] font-bold flex items-center gap-1.5 transition border ${
-                  currentLayerVisibility.urban
-                    ? 'bg-orange-500/25 border-orange-400/60 text-orange-300 shadow-sm shadow-orange-500/20'
-                    : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-white'
-                }`}
-                title="Toggle Urban & Built-Up Infrastructure Layer"
-              >
-                <Building2 className="w-3.5 h-3.5 text-orange-400" />
-                <span>Built-up</span>
-              </button>
-
-              <button
-                onClick={() => toggleLayer('diff_change')}
-                className={`px-2.5 py-1 rounded-xl text-[11px] font-bold flex items-center gap-1.5 transition border ${
-                  currentLayerVisibility.diff_change
-                    ? 'bg-amber-500/25 border-amber-400/60 text-amber-300 shadow-sm shadow-amber-500/20'
-                    : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-white'
-                }`}
-                title="Toggle Bi-temporal Change Difference Detections"
-              >
-                <GitCompare className="w-3.5 h-3.5 text-amber-400" />
-                <span>Change Diffs</span>
-              </button>
-
-              <button
-                onClick={() => toggleLayer('roads')}
-                className={`px-2.5 py-1 rounded-xl text-[11px] font-bold flex items-center gap-1.5 transition border ${
-                  currentLayerVisibility.roads
-                    ? 'bg-slate-700/60 border-slate-400/60 text-slate-100 shadow-sm'
-                    : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-white'
-                }`}
-                title="Toggle Road Networks"
-              >
-                <Route className="w-3.5 h-3.5 text-slate-300" />
-                <span>Roads</span>
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            {/* Middle: AI Heatmap Signatures */}
-            <div className="flex items-center gap-2 flex-wrap">
-              <div className="flex items-center gap-1.5 pl-2 border-l border-slate-800">
+            {/* Section 1: Vector Feature Overlays */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 font-mono flex items-center gap-1.5">
+                  <Layers className="w-3.5 h-3.5 text-cyan-400" /> Vector Feature Overlays
+                </span>
+                <span className="text-[10px] font-mono text-cyan-300 bg-cyan-950/60 px-2 py-0.5 rounded-full border border-cyan-500/30">
+                  {Object.values(currentLayerVisibility).filter(Boolean).length}/5 Active
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-1.5">
                 <button
-                  onClick={() => setShowHeatmap(!showHeatmap)}
-                  className={`px-3 py-1 rounded-xl text-[11px] font-extrabold flex items-center gap-1.5 transition border ${
-                    showHeatmap
-                      ? 'bg-gradient-to-r from-amber-500/25 to-orange-500/25 border-amber-500/60 text-amber-300 shadow-md shadow-amber-500/20'
-                      : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-slate-200'
+                  onClick={() => toggleLayer('vegetation')}
+                  className={`px-2.5 py-2 rounded-xl text-[11px] font-bold flex items-center justify-between transition border ${
+                    currentLayerVisibility.vegetation
+                      ? 'bg-emerald-950/50 border-emerald-500/50 text-emerald-300 shadow-sm shadow-emerald-500/20'
+                      : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-white'
                   }`}
                 >
-                  <Flame className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Heatmap: {showHeatmap ? 'ON' : 'OFF'}</span>
+                  <span className="flex items-center gap-1.5">
+                    <Trees className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Vegetation</span>
+                  </span>
+                  <span className={`w-2 h-2 rounded-full ${currentLayerVisibility.vegetation ? 'bg-emerald-400 shadow-sm shadow-emerald-400' : 'bg-slate-700'}`} />
                 </button>
 
-                {showHeatmap && (
-                  <div className="flex items-center gap-1 bg-slate-900/90 p-0.5 rounded-xl border border-slate-800 animate-fade-in">
+                <button
+                  onClick={() => toggleLayer('water')}
+                  className={`px-2.5 py-2 rounded-xl text-[11px] font-bold flex items-center justify-between transition border ${
+                    currentLayerVisibility.water
+                      ? 'bg-sky-950/50 border-sky-500/50 text-sky-300 shadow-sm shadow-sky-500/20'
+                      : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <span className="flex items-center gap-1.5">
+                    <Droplets className="w-3.5 h-3.5 text-sky-400" />
+                    <span>Water Bodies</span>
+                  </span>
+                  <span className={`w-2 h-2 rounded-full ${currentLayerVisibility.water ? 'bg-sky-400 shadow-sm shadow-sky-400' : 'bg-slate-700'}`} />
+                </button>
+
+                <button
+                  onClick={() => toggleLayer('urban')}
+                  className={`px-2.5 py-2 rounded-xl text-[11px] font-bold flex items-center justify-between transition border ${
+                    currentLayerVisibility.urban
+                      ? 'bg-orange-950/50 border-orange-500/50 text-orange-300 shadow-sm shadow-orange-500/20'
+                      : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <span className="flex items-center gap-1.5">
+                    <Building2 className="w-3.5 h-3.5 text-orange-400" />
+                    <span>Built-up / Urban</span>
+                  </span>
+                  <span className={`w-2 h-2 rounded-full ${currentLayerVisibility.urban ? 'bg-orange-400 shadow-sm shadow-orange-400' : 'bg-slate-700'}`} />
+                </button>
+
+                <button
+                  onClick={() => toggleLayer('diff_change')}
+                  className={`px-2.5 py-2 rounded-xl text-[11px] font-bold flex items-center justify-between transition border ${
+                    currentLayerVisibility.diff_change
+                      ? 'bg-amber-950/50 border-amber-500/50 text-amber-300 shadow-sm shadow-amber-500/20'
+                      : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <span className="flex items-center gap-1.5">
+                    <GitCompare className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Change Diffs</span>
+                  </span>
+                  <span className={`w-2 h-2 rounded-full ${currentLayerVisibility.diff_change ? 'bg-amber-400 shadow-sm shadow-amber-400' : 'bg-slate-700'}`} />
+                </button>
+
+                <button
+                  onClick={() => toggleLayer('roads')}
+                  className={`col-span-2 px-2.5 py-2 rounded-xl text-[11px] font-bold flex items-center justify-between transition border ${
+                    currentLayerVisibility.roads
+                      ? 'bg-slate-800/80 border-slate-500/60 text-slate-200 shadow-sm'
+                      : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <span className="flex items-center gap-1.5">
+                    <Route className="w-3.5 h-3.5 text-slate-300" />
+                    <span>Roads &amp; Arterial Transit Grid</span>
+                  </span>
+                  <span className={`w-2 h-2 rounded-full ${currentLayerVisibility.roads ? 'bg-slate-300 shadow-sm' : 'bg-slate-700'}`} />
+                </button>
+              </div>
+            </div>
+
+            {/* Section 2: AI Multi-Spectral Heatmap */}
+            <div className="space-y-2 pt-2 border-t border-slate-800">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 font-mono flex items-center gap-1.5">
+                  <Flame className="w-3.5 h-3.5 text-amber-400" /> AI Satellite Heatmap
+                </span>
+
+                <button
+                  onClick={() => setShowHeatmap(!showHeatmap)}
+                  className={`px-2.5 py-1 rounded-lg text-[10px] font-black transition border flex items-center gap-1.5 ${
+                    showHeatmap
+                      ? 'bg-amber-500/20 border-amber-500/60 text-amber-300'
+                      : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <span className={`w-1.5 h-1.5 rounded-full ${showHeatmap ? 'bg-amber-400 animate-ping' : 'bg-slate-600'}`} />
+                  <span>{showHeatmap ? 'HEATMAP ON' : 'HEATMAP OFF'}</span>
+                </button>
+              </div>
+
+              {showHeatmap && (
+                <div className="space-y-2 animate-fade-in">
+                  <div className="grid grid-cols-3 gap-1.5">
                     {[
-                      { type: 'vegetation', label: 'NDVI', icon: '🌿', activeClass: 'bg-emerald-600 text-white shadow-md' },
-                      { type: 'water', label: 'NDWI', icon: '💧', activeClass: 'bg-sky-600 text-white shadow-md' },
-                      { type: 'urban', label: 'Urban', icon: '🏙️', activeClass: 'bg-orange-600 text-white shadow-md' },
-                      { type: 'sar', label: 'SAR', icon: '📡', activeClass: 'bg-purple-600 text-white shadow-md' },
-                      { type: 'change', label: 'Delta', icon: '⚖️', activeClass: 'bg-amber-600 text-white shadow-md' },
-                      { type: 'hazard', label: 'Threat', icon: '🔥', activeClass: 'bg-rose-600 text-white shadow-md' },
+                      { type: 'vegetation', label: 'NDVI', sub: 'Canopy', icon: '🌿', activeClass: 'bg-emerald-600 text-white' },
+                      { type: 'water', label: 'NDWI', sub: 'Water', icon: '💧', activeClass: 'bg-sky-600 text-white' },
+                      { type: 'urban', label: 'Urban', sub: 'Heat Island', icon: '🏙️', activeClass: 'bg-orange-600 text-white' },
+                      { type: 'sar', label: 'SAR', sub: 'Backscatter', icon: '📡', activeClass: 'bg-purple-600 text-white' },
+                      { type: 'change', label: 'Delta', sub: 'Expansion', icon: '⚖️', activeClass: 'bg-amber-600 text-white' },
+                      { type: 'hazard', label: 'Threat', sub: 'Severity', icon: '🔥', activeClass: 'bg-rose-600 text-white' },
                     ].map((hm) => (
                       <button
                         key={hm.type}
                         onClick={() => setHeatmapType(hm.type as any)}
-                        className={`px-2 py-0.5 rounded-lg text-[10px] font-bold flex items-center gap-1 transition ${
+                        className={`p-2 rounded-xl text-center transition border ${
                           heatmapType === hm.type
-                            ? hm.activeClass
-                            : 'text-slate-400 hover:text-white'
+                            ? `${hm.activeClass} border-transparent shadow-md`
+                            : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-white hover:border-slate-700'
                         }`}
-                        title={`Switch to ${hm.label} AI Heatmap`}
                       >
-                        <span>{hm.icon}</span>
-                        <span>{hm.label}</span>
+                        <div className="text-base leading-none">{hm.icon}</div>
+                        <div className="text-[11px] font-black mt-1">{hm.label}</div>
+                        <div className="text-[9px] opacity-75 font-mono">{hm.sub}</div>
                       </button>
                     ))}
                   </div>
-                )}
-              </div>
 
-              {/* Right: Target Pin & Relocate */}
-              <div className="flex items-center gap-1.5 pl-2 border-l border-slate-800">
-                <button
-                  onClick={() => setShowLocationPin(!showLocationPin)}
-                  className={`px-2.5 py-1 rounded-xl text-[11px] font-bold flex items-center gap-1 transition border ${
-                    showLocationPin
-                      ? 'bg-cyan-500/20 border-cyan-500/50 text-cyan-300 shadow-sm'
-                      : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-slate-200'
-                  }`}
-                  title="Toggle Target Location Reticle Pin"
-                >
-                  <MapPin className="w-3.5 h-3.5" />
-                  <span>Pin: {showLocationPin ? 'ON' : 'OFF'}</span>
-                </button>
+                  {/* Heatmap Opacity Slider */}
+                  <div className="p-2 bg-slate-900/60 rounded-xl border border-slate-800 space-y-1">
+                    <div className="flex justify-between text-[10px] text-slate-400 font-mono">
+                      <span>Heatmap Density Opacity</span>
+                      <span className="text-cyan-300 font-bold">{heatmapOpacity}%</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="20"
+                      max="100"
+                      value={heatmapOpacity}
+                      onChange={(e) => setHeatmapOpacity(Number(e.target.value))}
+                      className="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-500"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
 
-                <button
-                  onClick={() => setShowRelocateBar(!showRelocateBar)}
-                  className="px-2.5 py-1 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 rounded-xl text-[11px] font-bold flex items-center gap-1 transition"
-                  title="Relocate Scene to Preset Hotspot"
-                >
-                  <Navigation className="w-3.5 h-3.5 text-cyan-400" />
-                  <span>Relocate</span>
-                </button>
+            {/* Section 3: Target Pin & Preset Hotspot Relocation */}
+            <div className="pt-2 border-t border-slate-800 flex items-center justify-between gap-2">
+              <button
+                onClick={() => setShowLocationPin(!showLocationPin)}
+                className={`flex-1 px-3 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition border ${
+                  showLocationPin
+                    ? 'bg-cyan-950/60 border-cyan-500/50 text-cyan-300 shadow-sm'
+                    : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-white'
+                }`}
+              >
+                <MapPin className="w-3.5 h-3.5" />
+                <span>Target Pin: {showLocationPin ? 'ON' : 'OFF'}</span>
+              </button>
 
-                <button
-                  onClick={() => setShowControlDeck(false)}
-                  className="p-1 rounded-lg text-slate-500 hover:text-white hover:bg-slate-800 transition ml-1"
-                  title="Minimize Features Deck"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              </div>
+              <button
+                onClick={() => setShowRelocateBar(!showRelocateBar)}
+                className="flex-1 px-3 py-2 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition"
+              >
+                <Navigation className="w-3.5 h-3.5 text-cyan-400" />
+                <span>Relocate Target</span>
+              </button>
             </div>
           </div>
         )}
