@@ -61,33 +61,33 @@ export default function Navbar() {
     : 'U';
 
   return (
-    <header className="h-15 bg-[#0B3558] border-b border-[#082842] px-6 flex items-center justify-between sticky top-0 z-50 shadow-md">
+    <header className="h-13 bg-[#006BB6] border-b border-[#005591] px-6 flex items-center justify-between sticky top-0 z-50 shadow-sm">
       {/* Left: Logo + Nav */}
-      <div className="flex items-center gap-7">
+      <div className="flex items-center gap-6">
         <Link href="/dashboard" className="flex items-center gap-2.5 group">
-          <div className="p-2 bg-amber-500/20 rounded-xl border border-amber-400/40 group-hover:bg-amber-500/30 transition shadow-xs">
-            <Eye className="w-5 h-5 text-amber-300" />
+          <div className="w-8 h-8 rounded-full bg-white/15 border border-white/30 flex items-center justify-center group-hover:bg-white/25 transition">
+            <Eye className="w-4 h-4 text-white" />
           </div>
           <div className="hidden sm:block">
-            <h1 className="text-base font-extrabold tracking-tight text-white leading-none">CORVUS</h1>
-            <p className="text-[10px] text-blue-200 font-medium">National Geospatial Portal</p>
+            <h1 className="text-sm font-black tracking-wider text-white leading-none">CORVUS</h1>
+            <p className="text-[10px] text-blue-100 font-medium">Bhuvan Geo-Platform</p>
           </div>
         </Link>
 
-        <nav className="hidden md:flex items-center gap-1">
+        <nav className="hidden md:flex items-center">
           {navLinks.map((link) => {
             const isActive = pathname === link.href || pathname?.startsWith(link.href + '/');
             return (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
+                className={`flex items-center gap-1.5 px-3 py-3 text-xs transition-all ${
                   isActive
-                    ? 'bg-[#12426d] text-white border-b-2 border-amber-400 font-bold shadow-xs'
-                    : 'text-blue-100 hover:text-white hover:bg-[#12426d]/60'
+                    ? 'bg-[#004E85] text-white font-bold border-b-2 border-amber-300'
+                    : 'text-white/90 hover:text-white hover:bg-[#005A9C]'
                 }`}
               >
-                <link.icon className="w-4 h-4 text-blue-200" />
+                <link.icon className="w-3.5 h-3.5 text-white/80" />
                 {link.label}
               </Link>
             );
@@ -97,24 +97,24 @@ export default function Navbar() {
 
       {/* Right: Status + User */}
       <div className="flex items-center gap-3">
-        <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 bg-emerald-950/40 border border-emerald-500/30 rounded-md text-[11px] text-emerald-300 font-semibold shadow-xs">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span>Portal Active</span>
+        <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 bg-white/10 border border-white/20 rounded text-[11px] text-white font-medium">
+          <span className="w-2 h-2 rounded-full bg-emerald-300 animate-pulse" />
+          <span>ISRO Feed Active</span>
         </div>
 
         {/* User Dropdown */}
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setShowDropdown(!showDropdown)}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#12426d] hover:bg-[#185387] border border-[#1b5080] transition text-white"
+            className="flex items-center gap-2 px-2.5 py-1 rounded bg-[#004E85] hover:bg-[#004373] border border-white/20 transition text-white"
           >
-            <div className="w-6 h-6 rounded-md bg-amber-500 text-slate-950 flex items-center justify-center text-xs font-black shadow-xs">
+            <div className="w-5 h-5 rounded-full bg-amber-400 text-blue-950 flex items-center justify-center text-[10px] font-black">
               {initials}
             </div>
             <div className="hidden sm:block text-left">
-              <div className="text-xs font-bold text-white leading-none">{mounted && user?.full_name ? user.full_name : 'Officer'}</div>
+              <div className="text-xs font-semibold text-white leading-none">{mounted && user?.full_name ? user.full_name : 'Officer'}</div>
             </div>
-            <ChevronDown className={`w-3.5 h-3.5 text-blue-200 transition-transform ${showDropdown ? 'rotate-180' : ''}`} />
+            <ChevronDown className={`w-3.5 h-3.5 text-white/80 transition-transform ${showDropdown ? 'rotate-180' : ''}`} />
           </button>
 
           {showDropdown && (
