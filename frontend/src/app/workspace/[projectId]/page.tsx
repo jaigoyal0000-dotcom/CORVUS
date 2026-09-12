@@ -10,7 +10,7 @@ import {
   Trees, Droplets, Building2, GitCompare, Route, Sliders,
   BarChart3, Globe, Sparkles, CheckCircle2, Eye, EyeOff,
   AlertTriangle, Flame, Waves, ShieldAlert, Compass, Navigation,
-  HelpCircle, RefreshCw, X
+  HelpCircle, RefreshCw, X, Upload
 } from 'lucide-react';
 import { isAuthenticated } from '@/lib/auth';
 import Navbar from '@/components/Navbar';
@@ -467,227 +467,11 @@ export default function WorkspacePage({ params }: { params: { projectId: string 
     <div className="min-h-screen bg-transparent flex flex-col">
       <Navbar />
 
-      <div className="flex-1 flex overflow-hidden">
-        {/* Left Control Sidebar */}
-        <aside className="w-84 bg-slate-950/70 border-r border-slate-800/60 flex flex-col overflow-hidden shrink-0">
-          <div className="p-4 border-b border-slate-800/60 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Globe className="w-4 h-4 text-cyan-400" />
-              <h2 className="text-xs font-bold uppercase tracking-wider text-slate-200">
-                Spatial Command
-              </h2>
-            </div>
-            <span className="text-[10px] font-mono bg-slate-800 text-cyan-300 px-2 py-0.5 rounded-md border border-slate-700">
-              {params.projectId}
-            </span>
-          </div>
-
-          <div className="flex-1 overflow-y-auto p-4 space-y-6 custom-scrollbar">
-            {/* Image Uploader */}
-            <ImageUploader
-              uploadedFiles={uploadedFiles}
-              projectCentroid={activeCentroid}
-              projectLocationName={activeLocationName}
-              projectId={params.projectId}
-              onFlyToLocation={(coords, name, zoom) => {
-                handlePointLocation(coords, name, zoom || 14);
-              }}
-              onFilesChange={(files) => {
-                setUploadedFiles(files);
-                setShowValidation(files.some(f => f.validated || f.validating));
-
-                // Anchor map to the latest updated/validated file
-                const latestFile = [...files].reverse().find(f => f.validated && f.metadata?.centroid);
-                if (latestFile?.metadata?.centroid) {
-                  const [lon, lat] = latestFile.metadata.centroid;
-                  const locName = latestFile.metadata.location_name || `Uploaded Image Location`;
-                  handlePointLocation([lon, lat], locName, 14);
-                }
-              }}
-            />
-
-            {/* 1. Multi-Spectral Classified Feature Layer Suite */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
-                  <Layers className="w-4 h-4 text-cyan-400" /> Land Cover Layers
-                </h3>
-                <span className="text-[10px] font-mono text-slate-400 bg-slate-900 px-1.5 py-0.5 rounded border border-slate-800">
-                  {Object.values(layerVisibility).filter(Boolean).length}/5 Active
-                </span>
-              </div>
-
-              <div className="space-y-2">
-                {/* 🌿 Vegetation Layer */}
-                <div
-                  onClick={() => toggleLayer('vegetation')}
-                  className={`p-3 rounded-xl border cursor-pointer transition flex items-center justify-between ${
-                    layerVisibility.vegetation
-                      ? 'bg-emerald-950/40 border-emerald-500/40 text-emerald-200'
-                      : 'bg-slate-900/40 border-slate-800/60 text-slate-500 hover:border-slate-700'
-                  }`}
-                >
-                  <div className="flex items-center gap-2.5">
-                    <div className={`p-1.5 rounded-lg ${layerVisibility.vegetation ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-800 text-slate-500'}`}>
-                      <Trees className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <div className="text-xs font-bold">Vegetation & Canopy</div>
-                      <div className="text-[10px] font-mono text-emerald-400/80">NDVI: +0.67 • 2.52 km² (36%)</div>
-                    </div>
-                  </div>
-                  {layerVisibility.vegetation ? (
-                    <Eye className="w-4 h-4 text-emerald-400 shrink-0" />
-                  ) : (
-                    <EyeOff className="w-4 h-4 text-slate-600 shrink-0" />
-                  )}
-                </div>
-
-                {/* 💧 Water Bodies Layer */}
-                <div
-                  onClick={() => toggleLayer('water')}
-                  className={`p-3 rounded-xl border cursor-pointer transition flex items-center justify-between ${
-                    layerVisibility.water
-                      ? 'bg-sky-950/40 border-sky-500/40 text-sky-200'
-                      : 'bg-slate-900/40 border-slate-800/60 text-slate-500 hover:border-slate-700'
-                  }`}
-                >
-                  <div className="flex items-center gap-2.5">
-                    <div className={`p-1.5 rounded-lg ${layerVisibility.water ? 'bg-sky-500/20 text-sky-400' : 'bg-slate-800 text-slate-500'}`}>
-                      <Droplets className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <div className="text-xs font-bold">Water Bodies & Rivers</div>
-                      <div className="text-[10px] font-mono text-sky-400/80">NDWI: +0.58 • 0.63 km² (12%)</div>
-                    </div>
-                  </div>
-                  {layerVisibility.water ? (
-                    <Eye className="w-4 h-4 text-sky-400 shrink-0" />
-                  ) : (
-                    <EyeOff className="w-4 h-4 text-slate-600 shrink-0" />
-                  )}
-                </div>
-
-                {/* 🏙️ Built-up & Urban Layer */}
-                <div
-                  onClick={() => toggleLayer('urban')}
-                  className={`p-3 rounded-xl border cursor-pointer transition flex items-center justify-between ${
-                    layerVisibility.urban
-                      ? 'bg-orange-950/40 border-orange-500/40 text-orange-200'
-                      : 'bg-slate-900/40 border-slate-800/60 text-slate-500 hover:border-slate-700'
-                  }`}
-                >
-                  <div className="flex items-center gap-2.5">
-                    <div className={`p-1.5 rounded-lg ${layerVisibility.urban ? 'bg-orange-500/20 text-orange-400' : 'bg-slate-800 text-slate-500'}`}>
-                      <Building2 className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <div className="text-xs font-bold">Built-Up & Urban</div>
-                      <div className="text-[10px] font-mono text-orange-400/80">NDBI: +0.46 • 1.85 km² (52%)</div>
-                    </div>
-                  </div>
-                  {layerVisibility.urban ? (
-                    <Eye className="w-4 h-4 text-orange-400 shrink-0" />
-                  ) : (
-                    <EyeOff className="w-4 h-4 text-slate-600 shrink-0" />
-                  )}
-                </div>
-
-                {/* 🔄 Change Differences (Diffs) */}
-                <div
-                  onClick={() => toggleLayer('diff_change')}
-                  className={`p-3 rounded-xl border cursor-pointer transition flex items-center justify-between ${
-                    layerVisibility.diff_change
-                      ? 'bg-amber-950/40 border-amber-500/40 text-amber-200'
-                      : 'bg-slate-900/40 border-slate-800/60 text-slate-500 hover:border-slate-700'
-                  }`}
-                >
-                  <div className="flex items-center gap-2.5">
-                    <div className={`p-1.5 rounded-lg ${layerVisibility.diff_change ? 'bg-amber-500/20 text-amber-400' : 'bg-slate-800 text-slate-500'}`}>
-                      <GitCompare className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <div className="text-xs font-bold">Change Detections (Diffs)</div>
-                      <div className="text-[10px] font-mono text-amber-400/80">Growth: +26.5% • Delta: +49 ha</div>
-                    </div>
-                  </div>
-                  {layerVisibility.diff_change ? (
-                    <Eye className="w-4 h-4 text-amber-400 shrink-0" />
-                  ) : (
-                    <EyeOff className="w-4 h-4 text-slate-600 shrink-0" />
-                  )}
-                </div>
-
-                {/* 🛣️ Road Networks */}
-                <div
-                  onClick={() => toggleLayer('roads')}
-                  className={`p-3 rounded-xl border cursor-pointer transition flex items-center justify-between ${
-                    layerVisibility.roads
-                      ? 'bg-slate-800/60 border-slate-600/50 text-slate-200'
-                      : 'bg-slate-900/40 border-slate-800/60 text-slate-500 hover:border-slate-700'
-                  }`}
-                >
-                  <div className="flex items-center gap-2.5">
-                    <div className={`p-1.5 rounded-lg ${layerVisibility.roads ? 'bg-slate-700 text-slate-200' : 'bg-slate-800 text-slate-500'}`}>
-                      <Route className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <div className="text-xs font-bold">Roads & Arterial Grid</div>
-                      <div className="text-[10px] font-mono text-slate-400">16.0 km Vectorized Transit</div>
-                    </div>
-                  </div>
-                  {layerVisibility.roads ? (
-                    <Eye className="w-4 h-4 text-slate-200 shrink-0" />
-                  ) : (
-                    <EyeOff className="w-4 h-4 text-slate-600 shrink-0" />
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* 2. Basemap Style Selection */}
-            <div className="space-y-2">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
-                <Globe className="w-4 h-4 text-blue-400" /> Satellite Basemap
-              </h3>
-              <select
-                value={activeBasemap}
-                onChange={(e) => setActiveBasemap(e.target.value as BasemapStyle)}
-                className="w-full bg-slate-900 border border-slate-700 text-xs text-slate-200 font-medium rounded-xl p-2.5 focus:outline-none focus:border-cyan-500 cursor-pointer"
-              >
-                {(Object.keys(BASEMAP_PROVIDERS) as BasemapStyle[]).map((key) => (
-                  <option key={key} value={key}>
-                    {BASEMAP_PROVIDERS[key].icon} {BASEMAP_PROVIDERS[key].name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* 3. Sensor Spectral Filter Simulation */}
-            <div className="space-y-2">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-purple-400" /> Spectral Visualizer
-              </h3>
-              <select
-                value={activeSpectralFilter}
-                onChange={(e) => setActiveSpectralFilter(e.target.value as SpectralFilter)}
-                className="w-full bg-slate-900 border border-slate-700 text-xs text-slate-200 font-mono rounded-xl p-2.5 focus:outline-none focus:border-cyan-500 cursor-pointer"
-              >
-                <option value="normal">🌈 True Color RGB</option>
-                <option value="cir_infrared">🌿 False Color NIR (Vegetation Stress)</option>
-                <option value="sar_radar">📡 SAR Radar Mock (VV/VH Backscatter)</option>
-                <option value="night_vision">🟢 Night Vision Green Phosphor</option>
-                <option value="panchromatic">⚪ Panchromatic HD Sharpening</option>
-                <option value="thermal_lut">🔥 Thermal Invert Spectrum</option>
-              </select>
-            </div>
-          </div>
-        </aside>
-
-        {/* Main Content Area */}
-        <main className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-y-auto">
+        {/* Main Content Area — Spanning Full Width From Left Edge */}
+        <main className="flex-1 flex flex-col">
           {/* Workspace Map Header & Telemetry Bar */}
-          <div className="px-5 py-2.5 bg-slate-900/95 border-b border-slate-800 flex items-center justify-between flex-wrap gap-2">
+          <div className="px-5 py-2.5 bg-slate-900/95 border-b border-slate-800 flex items-center justify-between flex-wrap gap-2 w-full">
             <div className="flex items-center gap-2.5 flex-wrap">
               <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${isFreshProject ? 'bg-amber-400 animate-ping' : 'bg-cyan-400 animate-pulse'}`} />
               
@@ -733,8 +517,8 @@ export default function WorkspacePage({ params }: { params: { projectId: string 
             </div>
           </div>
 
-          {/* Map Canvas */}
-          <div className="h-[640px] xl:h-[700px] min-h-[540px] border-b border-slate-800 relative shrink-0">
+          {/* Map Canvas — Extended full-width to left side with optimized height */}
+          <div className="h-[460px] xl:h-[500px] min-h-[420px] w-full border-b border-slate-800 relative shrink-0">
             {projectData ? (
               <OpenLayersMap
                 centerLonLat={activeCentroid}
@@ -758,8 +542,204 @@ export default function WorkspacePage({ params }: { params: { projectId: string 
             )}
           </div>
 
-          {/* Content & Mission Intelligence Copilot Area */}
-          <div className="flex-1 overflow-y-auto p-5 space-y-5">
+          {/* Content & Mission Operations Deck Area (Directly Below Map) */}
+          <div className="p-5 space-y-5">
+            {/* 🚀 Mission Command Deck: Multi-Temporal Ingestion & Multi-Spectral Intelligence */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+              {/* Left Column: Satellite Imagery Ingestion (lg:col-span-6) */}
+              <div className="lg:col-span-6 bg-slate-900/60 border border-slate-800/80 rounded-2xl p-5 shadow-xl space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-800/70 pb-3">
+                  <div className="flex items-center gap-2">
+                    <div className="p-2 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+                      <Upload className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h3 className="text-xs font-bold uppercase tracking-wider text-white">
+                        Satellite Imagery Ingestion
+                      </h3>
+                      <p className="text-[10px] text-slate-400 font-mono">
+                        Multi-temporal optical (T1, T2) &amp; SAR Radar feeds
+                      </p>
+                    </div>
+                  </div>
+                  <span className="text-[10px] font-mono bg-cyan-950/60 text-cyan-300 px-2 py-0.5 rounded-full border border-cyan-500/30 font-bold">
+                    {uploadedFiles.length} Ingested
+                  </span>
+                </div>
+
+                <ImageUploader
+                  uploadedFiles={uploadedFiles}
+                  projectCentroid={activeCentroid}
+                  projectLocationName={activeLocationName}
+                  projectId={params.projectId}
+                  onFlyToLocation={(coords, name, zoom) => {
+                    handlePointLocation(coords, name, zoom || 14);
+                  }}
+                  onFilesChange={(files) => {
+                    setUploadedFiles(files);
+                    setShowValidation(files.some(f => f.validated || f.validating));
+
+                    const latestFile = [...files].reverse().find(f => f.validated && f.metadata?.centroid);
+                    if (latestFile?.metadata?.centroid) {
+                      const [lon, lat] = latestFile.metadata.centroid;
+                      const locName = latestFile.metadata.location_name || `Uploaded Image Location`;
+                      handlePointLocation([lon, lat], locName, 14);
+                    }
+                  }}
+                />
+              </div>
+
+              {/* Right Column: Classified Land Cover Layers (lg:col-span-6) */}
+              <div className="lg:col-span-6 bg-slate-900/60 border border-slate-800/80 rounded-2xl p-5 shadow-xl space-y-4 flex flex-col justify-between">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between border-b border-slate-800/70 pb-3">
+                    <div className="flex items-center gap-2">
+                      <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                        <Layers className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <h3 className="text-xs font-bold uppercase tracking-wider text-white">
+                          Land Cover Multi-Spectral Layers
+                        </h3>
+                        <p className="text-[10px] text-slate-400 font-mono">
+                          Click to toggle vector overlays across the satellite canvas
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-[10px] font-mono bg-slate-800 text-cyan-300 px-2.5 py-0.5 rounded-full border border-slate-700 font-bold">
+                      {Object.values(layerVisibility).filter(Boolean).length}/5 Active
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    {/* 🌿 Vegetation Layer */}
+                    <div
+                      onClick={() => toggleLayer('vegetation')}
+                      className={`p-3 rounded-xl border cursor-pointer transition flex items-center justify-between ${
+                        layerVisibility.vegetation
+                          ? 'bg-emerald-950/40 border-emerald-500/40 text-emerald-200 shadow-sm shadow-emerald-500/10'
+                          : 'bg-slate-900/40 border-slate-800/60 text-slate-500 hover:border-slate-700'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <div className={`p-1.5 rounded-lg ${layerVisibility.vegetation ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-800 text-slate-500'}`}>
+                          <Trees className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <div className="text-xs font-bold">Vegetation &amp; Canopy</div>
+                          <div className="text-[10px] font-mono text-emerald-400/80">NDVI: +0.67 • 2.52 km²</div>
+                        </div>
+                      </div>
+                      {layerVisibility.vegetation ? (
+                        <Eye className="w-4 h-4 text-emerald-400 shrink-0" />
+                      ) : (
+                        <EyeOff className="w-4 h-4 text-slate-600 shrink-0" />
+                      )}
+                    </div>
+
+                    {/* 💧 Water Bodies Layer */}
+                    <div
+                      onClick={() => toggleLayer('water')}
+                      className={`p-3 rounded-xl border cursor-pointer transition flex items-center justify-between ${
+                        layerVisibility.water
+                          ? 'bg-sky-950/40 border-sky-500/40 text-sky-200 shadow-sm shadow-sky-500/10'
+                          : 'bg-slate-900/40 border-slate-800/60 text-slate-500 hover:border-slate-700'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <div className={`p-1.5 rounded-lg ${layerVisibility.water ? 'bg-sky-500/20 text-sky-400' : 'bg-slate-800 text-slate-500'}`}>
+                          <Droplets className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <div className="text-xs font-bold">Water Bodies &amp; Rivers</div>
+                          <div className="text-[10px] font-mono text-sky-400/80">NDWI: +0.58 • 0.63 km²</div>
+                        </div>
+                      </div>
+                      {layerVisibility.water ? (
+                        <Eye className="w-4 h-4 text-sky-400 shrink-0" />
+                      ) : (
+                        <EyeOff className="w-4 h-4 text-slate-600 shrink-0" />
+                      )}
+                    </div>
+
+                    {/* 🏙️ Built-up & Urban Layer */}
+                    <div
+                      onClick={() => toggleLayer('urban')}
+                      className={`p-3 rounded-xl border cursor-pointer transition flex items-center justify-between ${
+                        layerVisibility.urban
+                          ? 'bg-orange-950/40 border-orange-500/40 text-orange-200 shadow-sm shadow-orange-500/10'
+                          : 'bg-slate-900/40 border-slate-800/60 text-slate-500 hover:border-slate-700'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <div className={`p-1.5 rounded-lg ${layerVisibility.urban ? 'bg-orange-500/20 text-orange-400' : 'bg-slate-800 text-slate-500'}`}>
+                          <Building2 className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <div className="text-xs font-bold">Built-Up &amp; Urban</div>
+                          <div className="text-[10px] font-mono text-orange-400/80">NDBI: +0.46 • 1.85 km²</div>
+                        </div>
+                      </div>
+                      {layerVisibility.urban ? (
+                        <Eye className="w-4 h-4 text-orange-400 shrink-0" />
+                      ) : (
+                        <EyeOff className="w-4 h-4 text-slate-600 shrink-0" />
+                      )}
+                    </div>
+
+                    {/* 🔄 Change Differences (Diffs) */}
+                    <div
+                      onClick={() => toggleLayer('diff_change')}
+                      className={`p-3 rounded-xl border cursor-pointer transition flex items-center justify-between ${
+                        layerVisibility.diff_change
+                          ? 'bg-amber-950/40 border-amber-500/40 text-amber-200 shadow-sm shadow-amber-500/10'
+                          : 'bg-slate-900/40 border-slate-800/60 text-slate-500 hover:border-slate-700'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <div className={`p-1.5 rounded-lg ${layerVisibility.diff_change ? 'bg-amber-500/20 text-amber-400' : 'bg-slate-800 text-slate-500'}`}>
+                          <GitCompare className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <div className="text-xs font-bold">Change Detections (Diffs)</div>
+                          <div className="text-[10px] font-mono text-amber-400/80">Delta: +26.5% (+49 ha)</div>
+                        </div>
+                      </div>
+                      {layerVisibility.diff_change ? (
+                        <Eye className="w-4 h-4 text-amber-400 shrink-0" />
+                      ) : (
+                        <EyeOff className="w-4 h-4 text-slate-600 shrink-0" />
+                      )}
+                    </div>
+
+                    {/* 🛣️ Road Networks */}
+                    <div
+                      onClick={() => toggleLayer('roads')}
+                      className={`sm:col-span-2 p-3 rounded-xl border cursor-pointer transition flex items-center justify-between ${
+                        layerVisibility.roads
+                          ? 'bg-slate-800/60 border-slate-600/50 text-slate-200'
+                          : 'bg-slate-900/40 border-slate-800/60 text-slate-500 hover:border-slate-700'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <div className={`p-1.5 rounded-lg ${layerVisibility.roads ? 'bg-slate-700 text-slate-200' : 'bg-slate-800 text-slate-500'}`}>
+                          <Route className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <div className="text-xs font-bold">Roads &amp; Arterial Grid</div>
+                          <div className="text-[10px] font-mono text-slate-400">16.0 km Vectorized Transit System</div>
+                        </div>
+                      </div>
+                      {layerVisibility.roads ? (
+                        <Eye className="w-4 h-4 text-slate-200 shrink-0" />
+                      ) : (
+                        <EyeOff className="w-4 h-4 text-slate-600 shrink-0" />
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
             {/* Active AOI Geospatial Mission Status Banner */}
             <div className="bg-slate-900/60 border border-slate-800/80 rounded-2xl px-5 py-3 flex items-center justify-between flex-wrap gap-3 shadow-inner">
               <div className="flex items-center gap-3">
