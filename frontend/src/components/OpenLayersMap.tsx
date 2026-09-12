@@ -933,60 +933,7 @@ export default function OpenLayersMap({
 
     // If an image overlay is active, the image already has its calibrated hairline frame.
     // Suppress duplicate overlapping AOI polygon and corner dots to prevent map burst/visual clash!
-    const hasActiveImageOverlay = uploadedFiles.length > 0 && showImageOverlay;
-    if (!hasActiveImageOverlay) {
-      // 1. AOI Bounding Box Polygon with tactical glow style
-      const polyCoords = [
-        [
-          fromLonLat([minLon, minLat]),
-          fromLonLat([maxLon, minLat]),
-          fromLonLat([maxLon, maxLat]),
-          fromLonLat([minLon, maxLat]),
-          fromLonLat([minLon, minLat]),
-        ],
-      ];
-
-      const aoiFeature = new Feature({
-        geometry: new Polygon(polyCoords),
-      });
-
-      aoiFeature.setStyle(
-        new Style({
-          stroke: new Stroke({
-            color: '#06B6D4',
-            width: 2.5,
-            lineDash: [10, 6],
-          }),
-          fill: new Fill({
-            color: 'rgba(6, 182, 212, 0.08)',
-          }),
-        })
-      );
-      source.addFeature(aoiFeature);
-
-      // 2. Corner Target Brackets for AOI
-      const cornerOffsets = [
-        [minLon, minLat],
-        [maxLon, minLat],
-        [maxLon, maxLat],
-        [minLon, maxLat],
-      ];
-      cornerOffsets.forEach(([cLon, cLat]) => {
-        const cornerPoint = new Feature({
-          geometry: new Point(fromLonLat([cLon, cLat])),
-        });
-        cornerPoint.setStyle(
-          new Style({
-            image: new CircleStyle({
-              radius: 4,
-              fill: new Fill({ color: '#06B6D4' }),
-              stroke: new Stroke({ color: '#FFFFFF', width: 2 }),
-            }),
-          })
-        );
-        source.addFeature(cornerPoint);
-      });
-    }
+    // 3. Location Radar Pin Marker & Tactical Reticle (Locates the place on the map)
 
     // 3. Location Radar Pin Marker & Tactical Reticle (Locates the place on the map)
     if (showLocationPin) {
@@ -1845,317 +1792,297 @@ export default function OpenLayersMap({
         </div>
       )}
 
-      {/* 🔥 Floating AI Satellite Heatmap & Target Location Bar */}
-      {viewMode === 'map' && (
-        <div className="absolute top-16 left-3 z-20 pointer-events-auto bg-slate-950/95 backdrop-blur-md border border-cyan-500/50 p-2.5 rounded-2xl shadow-2xl shadow-black/80 flex items-center gap-2.5 flex-wrap max-w-3xl animate-fade-in text-xs">
-          {/* Target Location Badge */}
-          <div className="flex items-center gap-1.5 pr-2 border-r border-slate-800">
-            <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping shrink-0" />
-            <span className="text-[11px] font-extrabold text-cyan-200 flex items-center gap-1">
-              <MapPin className="w-3.5 h-3.5 text-cyan-400" />
-              <span>{recognizedLocation.name}</span>
-            </span>
-          </div>
-
-          {/* Quick Fly-To Button */}
-          <button
-            onClick={() => flyToLocation(recognizedLocation.centroid, 14)}
-            className="px-2.5 py-1 bg-cyan-950/60 hover:bg-cyan-900/80 text-cyan-300 rounded-lg text-[10px] font-bold border border-cyan-500/40 flex items-center gap-1 transition shadow-sm"
-            title="Focus camera on target place"
-          >
-            <Navigation className="w-3 h-3 text-cyan-400" />
-            <span>Center Target</span>
-          </button>
-
-          {/* Heatmap Signature Selector Pills */}
-          <div className="flex items-center gap-1 pl-1 border-l border-slate-800">
-            <span className="text-[10px] text-slate-400 font-semibold">Heatmap:</span>
-            {[
-              { type: 'change', label: 'Change', icon: '🔄' },
-              { type: 'vegetation', label: 'NDVI', icon: '🌿' },
-              { type: 'water', label: 'Flood', icon: '💧' },
-              { type: 'urban', label: 'Urban', icon: '🏙️' },
-              { type: 'sar', label: 'SAR', icon: '📡' },
-            ].map((hm) => (
+      {/* 🚀 Consolidated Aerospace Master HUD Deck */}
+      <div className="absolute top-3 left-3 right-3 z-20 pointer-events-auto flex flex-col gap-2">
+        {/* Row 1: Master Navigation, Basemap, Filter & Search */}
+        <div className="flex items-center justify-between gap-2.5 flex-wrap bg-slate-950/85 backdrop-blur-xl border border-slate-800/90 px-3 py-2 rounded-2xl shadow-2xl">
+          {/* Left: View Mode Toggle & Satellite Basemap & Sensor Filter */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex items-center bg-slate-900/90 p-1 rounded-xl border border-slate-800">
               <button
-                key={hm.type}
-                onClick={() => {
-                  setHeatmapType(hm.type as any);
-                  setShowHeatmap(true);
-                }}
-                className={`px-2 py-0.5 rounded-lg text-[10px] font-bold flex items-center gap-1 transition ${
-                  heatmapType === hm.type && showHeatmap
-                    ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-extrabold shadow-md shadow-amber-500/30'
-                    : 'bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800'
+                onClick={() => setViewMode('map')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition ${
+                  viewMode === 'map'
+                    ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-md shadow-cyan-600/20'
+                    : 'text-slate-400 hover:text-white'
                 }`}
-                title={`Switch to ${hm.label} AI Heatmap`}
               >
-                <span>{hm.icon}</span>
-                <span>{hm.label}</span>
+                <Globe className="w-3.5 h-3.5" />
+                <span>Satellite Map</span>
               </button>
-            ))}
-          </div>
-
-          {/* Heatmap Glow Opacity Slider */}
-          <div className="flex items-center gap-1.5 pl-1 border-l border-slate-800">
-            <span className="text-[10px] text-slate-400 font-medium">Glow:</span>
-            <input
-              type="range"
-              min="15"
-              max="100"
-              value={heatmapOpacity}
-              onChange={(e) => setHeatmapOpacity(Number(e.target.value))}
-              className="w-16 h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-400"
-              title="Adjust heatmap glow opacity"
-            />
-            <span className="text-[10px] font-mono text-amber-300 w-6">{heatmapOpacity}%</span>
-          </div>
-
-          {/* Heatmap Radius / Spread Slider */}
-          <div className="flex items-center gap-1.5 pl-1 border-l border-slate-800">
-            <span className="text-[10px] text-slate-400 font-medium">Spread:</span>
-            <input
-              type="range"
-              min="10"
-              max="36"
-              value={heatmapRadius}
-              onChange={(e) => setHeatmapRadius(Number(e.target.value))}
-              className="w-14 h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-400"
-              title="Adjust heatmap blur radius"
-            />
-          </div>
-
-          {/* Heatmap Toggle Button */}
-          <button
-            onClick={() => setShowHeatmap(!showHeatmap)}
-            className={`px-2 py-1 rounded-lg text-[10px] font-bold border transition flex items-center gap-1 ${
-              showHeatmap
-                ? 'bg-amber-500/20 border-amber-500/50 text-amber-300 shadow-sm'
-                : 'bg-slate-900 border-slate-800 text-slate-500 hover:text-slate-300'
-            }`}
-            title={showHeatmap ? 'Turn Heatmap OFF' : 'Turn AI Heatmap ON'}
-          >
-            <Flame className="w-3.5 h-3.5 text-amber-400" />
-            <span>{showHeatmap ? 'Heatmap ON' : 'Heatmap OFF'}</span>
-          </button>
-
-          {/* Location Pin Toggle */}
-          <button
-            onClick={() => setShowLocationPin(!showLocationPin)}
-            className={`p-1.5 rounded-lg text-[10px] border transition ${
-              showLocationPin
-                ? 'bg-cyan-500/20 border-cyan-500/50 text-cyan-300 shadow-sm'
-                : 'bg-slate-900 border-slate-800 text-slate-500 hover:text-slate-300'
-            }`}
-            title={showLocationPin ? 'Hide Location Target Pin' : 'Show Location Target Pin'}
-          >
-            <Target className="w-3.5 h-3.5" />
-          </button>
-        </div>
-      )}
-
-      {/* Top Floating Master Deck */}
-      <div className="absolute top-3 left-3 right-3 flex items-center justify-between z-20 pointer-events-auto flex-wrap gap-2">
-        {/* Left: View Mode & Basemap Selector */}
-        <div className="flex items-center gap-1.5 bg-slate-900/95 backdrop-blur-md border border-slate-800 p-1.5 rounded-2xl shadow-2xl">
-          <button
-            onClick={() => setViewMode('map')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition ${
-              viewMode === 'map'
-                ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-md shadow-blue-600/30'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            <Globe className="w-3.5 h-3.5" />
-            Global Satellite Map
-          </button>
-          <button
-            onClick={() => setViewMode('uploaded')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition ${
-              viewMode === 'uploaded'
-                ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-md shadow-blue-600/30'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            <ImageIcon className="w-3.5 h-3.5" />
-            Uploaded Raster
-            {uploadedFiles.length > 0 && (
-              <span className="ml-1 bg-cyan-400/20 text-cyan-300 text-[10px] px-1.5 py-0.2 rounded-full font-mono font-bold">
-                {uploadedFiles.length}
-              </span>
-            )}
-          </button>
-
-          {/* Basemap Dropdown Selector */}
-          {viewMode === 'map' && (
-            <div className="flex items-center gap-1 pl-1 border-l border-slate-800">
-              <select
-                value={basemap}
-                onChange={(e) => setBasemap(e.target.value as BasemapStyle)}
-                className="bg-slate-800 text-xs text-slate-200 font-medium rounded-xl px-2.5 py-1.5 border border-slate-700 focus:outline-none focus:border-cyan-500 cursor-pointer"
+              <button
+                onClick={() => setViewMode('uploaded')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition ${
+                  viewMode === 'uploaded'
+                    ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-md shadow-cyan-600/20'
+                    : 'text-slate-400 hover:text-white'
+                }`}
               >
-                {(Object.keys(BASEMAP_PROVIDERS) as BasemapStyle[]).map((key) => (
-                  <option key={key} value={key}>
-                    {BASEMAP_PROVIDERS[key].icon} {BASEMAP_PROVIDERS[key].name}
-                  </option>
-                ))}
-              </select>
+                <ImageIcon className="w-3.5 h-3.5" />
+                <span>Uploaded Raster</span>
+                {uploadedFiles.length > 0 && (
+                  <span className="ml-1 bg-cyan-400/20 text-cyan-300 text-[10px] px-1.5 py-0.5 rounded-full font-mono font-bold">
+                    {uploadedFiles.length}
+                  </span>
+                )}
+              </button>
+            </div>
+
+            {viewMode === 'map' && (
+              <>
+                {/* Basemap Dropdown */}
+                <select
+                  value={basemap}
+                  onChange={(e) => setBasemap(e.target.value as BasemapStyle)}
+                  className="bg-slate-900/90 text-xs text-slate-200 font-medium rounded-xl px-2.5 py-1.5 border border-slate-800 focus:outline-none focus:border-cyan-500/60 cursor-pointer shadow-inner"
+                >
+                  {(Object.keys(BASEMAP_PROVIDERS) as BasemapStyle[]).map((key) => (
+                    <option key={key} value={key}>
+                      {BASEMAP_PROVIDERS[key].icon} {BASEMAP_PROVIDERS[key].name}
+                    </option>
+                  ))}
+                </select>
+
+                {/* Spectral Sensor Filter */}
+                <select
+                  value={spectralFilter}
+                  onChange={(e) => setSpectralFilter(e.target.value as SpectralFilter)}
+                  className="bg-slate-900/90 text-xs text-slate-200 font-medium rounded-xl px-2.5 py-1.5 border border-slate-800 focus:outline-none focus:border-cyan-500/60 cursor-pointer shadow-inner"
+                >
+                  <option value="normal">🌈 True Color RGB</option>
+                  <option value="cir_infrared">🌿 False Color NIR</option>
+                  <option value="sar_radar">📡 SAR Radar Mock</option>
+                  <option value="night_vision">🟢 Night Vision</option>
+                  <option value="panchromatic">⚪ Panchromatic HD</option>
+                  <option value="thermal_lut">🔥 Thermal Invert</option>
+                </select>
+              </>
+            )}
+          </div>
+
+          {/* Right: Search & Tactical Action Buttons */}
+          {viewMode === 'map' && (
+            <div className="flex items-center gap-2 flex-wrap ml-auto">
+              {/* Geocoding Search */}
+              <form onSubmit={handleGlobalSearch} className="relative flex items-center">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search city, coordinates..."
+                  className="bg-slate-900/90 border border-slate-800 rounded-xl pl-8 pr-18 py-1.5 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-cyan-500/60 w-48 sm:w-60 font-medium transition"
+                />
+                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 pointer-events-none" />
+                <button
+                  type="submit"
+                  disabled={isSearching}
+                  className="absolute right-1 px-2.5 py-1 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white rounded-lg text-[10px] font-bold transition disabled:opacity-50"
+                >
+                  {isSearching ? <span className="w-2.5 h-2.5 border-2 border-white border-t-transparent rounded-full animate-spin" /> : 'LOCATE'}
+                </button>
+              </form>
+
+              {/* Quick Action Buttons Group */}
+              <div className="flex items-center gap-1 bg-slate-900/90 p-1 rounded-xl border border-slate-800">
+                <button
+                  onClick={() => flyToLocation(recognizedLocation.centroid, 14)}
+                  title="Center on Target AOI"
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-cyan-300 hover:bg-slate-800 transition"
+                >
+                  <Navigation className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setShowReticle(!showReticle)}
+                  title="Toggle Tactical Crosshair"
+                  className={`p-1.5 rounded-lg transition ${showReticle ? 'bg-cyan-500/20 text-cyan-300' : 'text-slate-400 hover:text-white hover:bg-slate-800'}`}
+                >
+                  <Crosshair className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setShowTunePanel(!showTunePanel)}
+                  title="Sensor Radiometry Tuning"
+                  className={`p-1.5 rounded-lg transition ${showTunePanel ? 'bg-indigo-500/20 text-indigo-300' : 'text-slate-400 hover:text-white hover:bg-slate-800'}`}
+                >
+                  <Sliders className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setShowStatsDrawer(!showStatsDrawer)}
+                  title="GIS Metrics Drawer"
+                  className={`p-1.5 rounded-lg transition ${showStatsDrawer ? 'bg-emerald-500/20 text-emerald-300' : 'text-slate-400 hover:text-white hover:bg-slate-800'}`}
+                >
+                  <BarChart3 className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={handleBrowserGeolocation}
+                  title="My GPS Location"
+                  disabled={geoLocating}
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-blue-300 hover:bg-slate-800 transition disabled:opacity-50"
+                >
+                  <LocateFixed className={`w-4 h-4 ${geoLocating ? 'animate-spin text-blue-400' : ''}`} />
+                </button>
+                <button
+                  onClick={handleExportSnapshot}
+                  title="Export Satellite Snapshot"
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+                >
+                  <Camera className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setIsFullScreen(!isFullScreen)}
+                  title={isFullScreen ? "Exit Fullscreen" : "Fullscreen Map"}
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+                >
+                  {isFullScreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+                </button>
+              </div>
             </div>
           )}
         </div>
 
-        {/* Global Geocoding Search Bar */}
+        {/* Row 2: Secondary Tactical Strip — Unified Overlays & AI Heatmap (Single clean row, zero clipping) */}
         {viewMode === 'map' && (
-          <form
-            onSubmit={handleGlobalSearch}
-            className="flex items-center gap-1.5 bg-slate-900/95 backdrop-blur-md border border-slate-800 p-1.5 rounded-2xl shadow-2xl"
-          >
-            <Search className="w-3.5 h-3.5 text-slate-400 ml-2" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search city, coordinates, or target..."
-              className="bg-transparent text-xs text-slate-200 placeholder:text-slate-500 focus:outline-none w-40 sm:w-52 px-2 font-medium"
-            />
-            <button
-              type="submit"
-              disabled={isSearching}
-              className="px-3 py-1 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white rounded-xl text-xs font-bold flex items-center gap-1 transition"
-            >
-              {isSearching ? (
-                <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              ) : (
-                'LOCATE'
-              )}
-            </button>
-          </form>
-        )}
+          <div className="flex items-center justify-between gap-3 flex-wrap bg-slate-950/85 backdrop-blur-xl border border-slate-800/90 px-3.5 py-2 rounded-2xl shadow-xl text-xs">
+            {/* Left: Vector Feature Overlays */}
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="text-[10px] uppercase font-bold text-slate-400 font-mono flex items-center gap-1 pr-2 border-r border-slate-800">
+                <Layers className="w-3.5 h-3.5 text-cyan-400" /> Overlays
+              </span>
 
-        {/* Right: Tactical Tools Deck */}
-        {viewMode === 'map' && (
-          <div className="flex items-center gap-1.5 bg-slate-900/95 backdrop-blur-md border border-slate-800 p-1.5 rounded-2xl shadow-2xl">
-            {/* Spectral Filter Selector */}
-            <select
-              value={spectralFilter}
-              onChange={(e) => setSpectralFilter(e.target.value as SpectralFilter)}
-              title="Spectral Sensor Simulation"
-              className="bg-slate-800 text-[11px] text-slate-200 font-mono rounded-xl px-2 py-1.5 border border-slate-700 focus:outline-none focus:border-cyan-500 cursor-pointer"
-            >
-              <option value="normal">🌈 True Color RGB</option>
-              <option value="cir_infrared">🌿 False Color NIR</option>
-              <option value="sar_radar">📡 SAR Radar Mock</option>
-              <option value="night_vision">🟢 Night Vision</option>
-              <option value="panchromatic">⚪ Panchromatic HD</option>
-              <option value="thermal_lut">🔥 Thermal Invert</option>
-            </select>
-
-            {/* Land Cover Summary Stats Drawer Toggle */}
-            <button
-              onClick={() => setShowStatsDrawer(!showStatsDrawer)}
-              title="View Land Cover & Spectral GIS Metrics"
-              className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition ${
-                showStatsDrawer
-                  ? 'bg-emerald-500/20 border border-emerald-500/40 text-emerald-300'
-                  : 'bg-slate-800/40 border border-slate-700/40 text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              <BarChart3 className="w-3.5 h-3.5 text-emerald-400" />
-              <span className="hidden md:inline">GIS Stats</span>
-            </button>
-
-            {/* Heatmap Toggle */}
-            <button
-              onClick={() => setShowHeatmap(!showHeatmap)}
-              className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition ${
-                showHeatmap
-                  ? 'bg-amber-500/20 border border-amber-500/40 text-amber-300'
-                  : 'bg-slate-800/40 border border-slate-700/40 text-slate-400'
-              }`}
-            >
-              <Flame className="w-3.5 h-3.5 text-amber-400" />
-              <span className="hidden sm:inline">Heatmap</span>
-            </button>
-
-            {/* Tactical Crosshair Toggle */}
-            <button
-              onClick={() => setShowReticle(!showReticle)}
-              title="Toggle Tactical Crosshair HUD"
-              className={`p-1.5 rounded-xl border transition ${
-                showReticle
-                  ? 'bg-cyan-500/20 border-cyan-500/40 text-cyan-300'
-                  : 'bg-slate-800/40 border-slate-700/40 text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              <Crosshair className="w-4 h-4" />
-            </button>
-
-            {/* Radiometric Tuning Toggle */}
-            <button
-              onClick={() => setShowTunePanel(!showTunePanel)}
-              title="Adjust Brightness, Contrast, Opacity"
-              className={`p-1.5 rounded-xl border transition ${
-                showTunePanel
-                  ? 'bg-indigo-500/20 border-indigo-500/40 text-indigo-300'
-                  : 'bg-slate-800/40 border-slate-700/40 text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              <Sliders className="w-4 h-4" />
-            </button>
-
-            {/* 📸 Image Overlay Toggle (visible when files uploaded) */}
-            {uploadedFiles.length > 0 && (
               <button
-                onClick={() => setShowImageOverlay(!showImageOverlay)}
-                title={showImageOverlay ? 'Hide Image Overlay on Map' : 'Show Image Overlay on Map'}
-                className={`p-1.5 rounded-xl border transition ${
-                  showImageOverlay
-                    ? 'bg-teal-500/20 border-teal-500/40 text-teal-300'
-                    : 'bg-slate-800/40 border-slate-700/40 text-slate-400 hover:text-slate-200'
+                onClick={() => toggleLayer('vegetation')}
+                className={`px-2.5 py-1 rounded-xl text-[11px] font-bold flex items-center gap-1.5 transition border ${
+                  currentLayerVisibility.vegetation
+                    ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300 shadow-sm'
+                    : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-white'
                 }`}
               >
-                <ImageDown className="w-4 h-4" />
+                <Trees className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Vegetation</span>
               </button>
-            )}
 
-            {/* 🌍 Browser Geolocation Button */}
-            <button
-              onClick={handleBrowserGeolocation}
-              title="Fly to Your GPS Location"
-              disabled={geoLocating}
-              className={`p-1.5 rounded-xl border transition ${
-                geoLocating
-                  ? 'bg-blue-500/20 border-blue-500/40 text-blue-300 animate-pulse'
-                  : 'bg-slate-800/40 border-slate-700/40 text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              <LocateFixed className={`w-4 h-4 ${geoLocating ? 'animate-spin' : ''}`} />
-            </button>
+              <button
+                onClick={() => toggleLayer('water')}
+                className={`px-2.5 py-1 rounded-xl text-[11px] font-bold flex items-center gap-1.5 transition border ${
+                  currentLayerVisibility.water
+                    ? 'bg-sky-500/20 border-sky-500/40 text-sky-300 shadow-sm'
+                    : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-white'
+                }`}
+              >
+                <Droplets className="w-3.5 h-3.5 text-sky-400" />
+                <span>Water Bodies</span>
+              </button>
 
-            {/* Snapshot Button */}
-            <button
-              onClick={handleExportSnapshot}
-              title="Export High-Res Recon Snapshot (PNG)"
-              className="p-1.5 bg-slate-800/50 hover:bg-slate-800 text-slate-300 rounded-xl border border-slate-700/50 transition"
-            >
-              <Camera className="w-4 h-4" />
-            </button>
+              <button
+                onClick={() => toggleLayer('urban')}
+                className={`px-2.5 py-1 rounded-xl text-[11px] font-bold flex items-center gap-1.5 transition border ${
+                  currentLayerVisibility.urban
+                    ? 'bg-orange-500/20 border-orange-500/40 text-orange-300 shadow-sm'
+                    : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-white'
+                }`}
+              >
+                <Building2 className="w-3.5 h-3.5 text-orange-400" />
+                <span>Built-up</span>
+              </button>
 
-            {/* Fullscreen Toggle */}
-            <button
-              onClick={() => setIsFullScreen(!isFullScreen)}
-              title={isFullScreen ? 'Exit Fullscreen' : 'Expand Fullscreen Map'}
-              className="p-1.5 text-slate-400 hover:text-slate-200 bg-slate-800/50 hover:bg-slate-800 rounded-xl transition"
-            >
-              {isFullScreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
-            </button>
+              <button
+                onClick={() => toggleLayer('diff_change')}
+                className={`px-2.5 py-1 rounded-xl text-[11px] font-bold flex items-center gap-1.5 transition border ${
+                  currentLayerVisibility.diff_change
+                    ? 'bg-amber-500/20 border-amber-500/40 text-amber-300 shadow-sm'
+                    : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-white'
+                }`}
+              >
+                <GitCompare className="w-3.5 h-3.5 text-amber-400" />
+                <span>Change Diffs</span>
+              </button>
+
+              <button
+                onClick={() => toggleLayer('roads')}
+                className={`px-2.5 py-1 rounded-xl text-[11px] font-bold flex items-center gap-1.5 transition border ${
+                  currentLayerVisibility.roads
+                    ? 'bg-slate-700/60 border-slate-500/50 text-slate-200 shadow-sm'
+                    : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-white'
+                }`}
+              >
+                <Route className="w-3.5 h-3.5 text-slate-300" />
+                <span>Roads</span>
+              </button>
+            </div>
+
+            {/* Right: AI Heatmap Spectral Signatures & Pin Controls */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <div className="flex items-center gap-1.5 pl-2 border-l border-slate-800">
+                <button
+                  onClick={() => setShowHeatmap(!showHeatmap)}
+                  className={`px-3 py-1 rounded-xl text-[11px] font-extrabold flex items-center gap-1.5 transition border ${
+                    showHeatmap
+                      ? 'bg-gradient-to-r from-amber-500/25 to-orange-500/25 border-amber-500/60 text-amber-300 shadow-md shadow-amber-500/10'
+                      : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  <Flame className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Heatmap: {showHeatmap ? 'ON' : 'OFF'}</span>
+                </button>
+
+                {showHeatmap && (
+                  <div className="flex items-center gap-1 bg-slate-900/90 p-0.5 rounded-xl border border-slate-800 animate-fade-in">
+                    {[
+                      { type: 'vegetation', label: 'NDVI', icon: '🌿', activeClass: 'bg-emerald-600 text-white shadow-md' },
+                      { type: 'water', label: 'NDWI', icon: '💧', activeClass: 'bg-sky-600 text-white shadow-md' },
+                      { type: 'urban', label: 'Urban', icon: '🏙️', activeClass: 'bg-orange-600 text-white shadow-md' },
+                      { type: 'sar', label: 'SAR', icon: '📡', activeClass: 'bg-purple-600 text-white shadow-md' },
+                      { type: 'change', label: 'Delta', icon: '⚖️', activeClass: 'bg-amber-600 text-white shadow-md' },
+                      { type: 'hazard', label: 'Threat', icon: '🔥', activeClass: 'bg-rose-600 text-white shadow-md' },
+                    ].map((hm) => (
+                      <button
+                        key={hm.type}
+                        onClick={() => setHeatmapType(hm.type as any)}
+                        className={`px-2 py-0.5 rounded-lg text-[10px] font-bold flex items-center gap-1 transition ${
+                          heatmapType === hm.type
+                            ? hm.activeClass
+                            : 'text-slate-400 hover:text-white'
+                        }`}
+                        title={`Switch to ${hm.label} AI Heatmap`}
+                      >
+                        <span>{hm.icon}</span>
+                        <span>{hm.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="flex items-center gap-1.5 pl-2 border-l border-slate-800">
+                <button
+                  onClick={() => setShowLocationPin(!showLocationPin)}
+                  className={`px-2.5 py-1 rounded-xl text-[11px] font-bold flex items-center gap-1 transition border ${
+                    showLocationPin
+                      ? 'bg-cyan-500/20 border-cyan-500/50 text-cyan-300 shadow-sm'
+                      : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-slate-200'
+                  }`}
+                  title="Toggle Target Location Reticle Pin"
+                >
+                  <MapPin className="w-3.5 h-3.5" />
+                  <span>Pin: {showLocationPin ? 'ON' : 'OFF'}</span>
+                </button>
+
+                <button
+                  onClick={() => setShowRelocateBar(!showRelocateBar)}
+                  className="px-2.5 py-1 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 rounded-xl text-[11px] font-bold flex items-center gap-1 transition"
+                  title="Relocate Scene to Preset Hotspot"
+                >
+                  <Navigation className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>Relocate</span>
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </div>
 
-      {/* 📍 Location Recognition Toast — shows when location is detected from upload/search/GPS */}
+      {/* 📍 Location Recognition Toast */}
       {locationToast.visible && viewMode === 'map' && (
-        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-40 pointer-events-auto animate-fade-up">
+        <div className="absolute top-28 left-1/2 -translate-x-1/2 z-40 pointer-events-auto animate-fade-up">
           <div className="bg-slate-900/95 border border-emerald-500/70 text-emerald-200 px-5 py-3 rounded-2xl shadow-2xl shadow-emerald-500/20 backdrop-blur-md flex items-center gap-3 max-w-xl">
             <div className="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-400/50 flex items-center justify-center shrink-0 animate-bounce">
               <MapPin className="w-5 h-5 text-emerald-400" />
@@ -2184,7 +2111,7 @@ export default function OpenLayersMap({
 
       {/* Floating Fresh Map Alert Badge */}
       {isFreshMap && viewMode === 'map' && !locationToast.visible && (
-        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-30 pointer-events-auto bg-slate-900/95 border border-amber-400/80 text-amber-200 px-4 py-2.5 rounded-2xl shadow-2xl backdrop-blur-md flex items-center gap-3 max-w-lg">
+        <div className="absolute top-28 left-1/2 -translate-x-1/2 z-30 pointer-events-auto bg-slate-900/95 border border-amber-400/80 text-amber-200 px-4 py-2.5 rounded-2xl shadow-2xl backdrop-blur-md flex items-center gap-3 max-w-lg">
           <div className="w-7 h-7 rounded-xl bg-amber-500/20 border border-amber-400/50 flex items-center justify-center shrink-0">
             <Crosshair className="w-4 h-4 text-amber-400 animate-pulse" />
           </div>
@@ -2196,191 +2123,6 @@ export default function OpenLayersMap({
             <div className="text-[11px] text-slate-300 mt-0.5">
               Click <strong>anywhere on the map</strong> or search a city to anchor this project&apos;s target location.
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* Secondary Multi-Spectral Land Cover Layer Bar */}
-      {viewMode === 'map' && (
-        <div className="absolute top-16 left-3 z-20 pointer-events-auto flex items-center gap-1.5 bg-slate-900/95 backdrop-blur-md border border-slate-800 p-1.5 rounded-2xl shadow-2xl flex-wrap">
-          <span className="text-[10px] uppercase font-bold text-slate-400 px-2 flex items-center gap-1 font-mono">
-            <Layers className="w-3 h-3 text-cyan-400" /> Overlays:
-          </span>
-
-          {/* 🌿 Vegetation Toggle */}
-          <button
-            onClick={() => toggleLayer('vegetation')}
-            className={`px-2.5 py-1 rounded-xl text-[11px] font-bold flex items-center gap-1.5 transition border ${
-              currentLayerVisibility.vegetation
-                ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-300'
-                : 'bg-slate-800/40 border-slate-800 text-slate-500 hover:text-slate-300'
-            }`}
-          >
-            <Trees className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Vegetation (NDVI)</span>
-          </button>
-
-          {/* 💧 Water Bodies Toggle */}
-          <button
-            onClick={() => toggleLayer('water')}
-            className={`px-2.5 py-1 rounded-xl text-[11px] font-bold flex items-center gap-1.5 transition border ${
-              currentLayerVisibility.water
-                ? 'bg-sky-500/20 border-sky-500/50 text-sky-300'
-                : 'bg-slate-800/40 border-slate-800 text-slate-500 hover:text-slate-300'
-            }`}
-          >
-            <Droplets className="w-3.5 h-3.5 text-sky-400" />
-            <span>Water Bodies (NDWI)</span>
-          </button>
-
-          {/* 🏙️ Built-up Toggle */}
-          <button
-            onClick={() => toggleLayer('urban')}
-            className={`px-2.5 py-1 rounded-xl text-[11px] font-bold flex items-center gap-1.5 transition border ${
-              currentLayerVisibility.urban
-                ? 'bg-orange-500/20 border-orange-500/50 text-orange-300'
-                : 'bg-slate-800/40 border-slate-800 text-slate-500 hover:text-slate-300'
-            }`}
-          >
-            <Building2 className="w-3.5 h-3.5 text-orange-400" />
-            <span>Built-up / Urban</span>
-          </button>
-
-          {/* 🔄 Bi-temporal Changes (Diffs) Toggle */}
-          <button
-            onClick={() => toggleLayer('diff_change')}
-            className={`px-2.5 py-1 rounded-xl text-[11px] font-bold flex items-center gap-1.5 transition border ${
-              currentLayerVisibility.diff_change
-                ? 'bg-amber-500/20 border-amber-500/50 text-amber-300'
-                : 'bg-slate-800/40 border-slate-800 text-slate-500 hover:text-slate-300'
-            }`}
-          >
-            <GitCompare className="w-3.5 h-3.5 text-amber-400" />
-            <span>Change Diffs</span>
-          </button>
-
-          {/* 🛣️ Roads Toggle */}
-          <button
-            onClick={() => toggleLayer('roads')}
-            className={`px-2.5 py-1 rounded-xl text-[11px] font-bold flex items-center gap-1.5 transition border ${
-              currentLayerVisibility.roads
-                ? 'bg-slate-700/60 border-slate-500/50 text-slate-200'
-                : 'bg-slate-800/40 border-slate-800 text-slate-500 hover:text-slate-300'
-            }`}
-          >
-            <Route className="w-3.5 h-3.5 text-slate-300" />
-            <span>Roads</span>
-          </button>
-
-          {/* 🔥 Real Multi-Spectral Heatmap Engine */}
-          <div className="flex items-center gap-1 pl-2 border-l border-slate-700/80">
-            <button
-              onClick={() => setShowHeatmap(!showHeatmap)}
-              className={`px-3 py-1 rounded-xl text-[11px] font-bold flex items-center gap-1.5 transition border ${
-                showHeatmap
-                  ? 'bg-gradient-to-r from-amber-500/30 to-red-500/30 border-amber-500/60 text-amber-200 shadow-lg shadow-amber-500/20'
-                  : 'bg-slate-800/40 border-slate-800 text-slate-400 hover:text-slate-200'
-              }`}
-              title="Toggle Real Multi-Spectral Heatmap on/off"
-            >
-              <Flame className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
-              <span>Heatmap: {showHeatmap ? 'ON' : 'OFF'}</span>
-            </button>
-
-            {showHeatmap && (
-              <div className="flex items-center gap-1 bg-slate-950/80 p-0.5 rounded-xl border border-slate-800">
-                <button
-                  onClick={() => setHeatmapType('vegetation')}
-                  className={`px-2 py-0.5 rounded-lg text-[10px] font-bold transition ${
-                    heatmapType === 'vegetation'
-                      ? 'bg-emerald-600 text-white shadow-md'
-                      : 'text-slate-400 hover:text-slate-200'
-                  }`}
-                  title="Normalized Difference Vegetation Index (Chlorophyll Canopy Health)"
-                >
-                  🌿 NDVI
-                </button>
-                <button
-                  onClick={() => setHeatmapType('water')}
-                  className={`px-2 py-0.5 rounded-lg text-[10px] font-bold transition ${
-                    heatmapType === 'water'
-                      ? 'bg-sky-600 text-white shadow-md'
-                      : 'text-slate-400 hover:text-slate-200'
-                  }`}
-                  title="Normalized Difference Water Index (Flood Inundation & Hydrology)"
-                >
-                  💧 NDWI
-                </button>
-                <button
-                  onClick={() => setHeatmapType('urban')}
-                  className={`px-2 py-0.5 rounded-lg text-[10px] font-bold transition ${
-                    heatmapType === 'urban'
-                      ? 'bg-orange-600 text-white shadow-md'
-                      : 'text-slate-400 hover:text-slate-200'
-                  }`}
-                  title="NDBI Urban Heat Island / Concrete Core Density"
-                >
-                  🏙️ Urban
-                </button>
-                <button
-                  onClick={() => setHeatmapType('sar')}
-                  className={`px-2 py-0.5 rounded-lg text-[10px] font-bold transition ${
-                    heatmapType === 'sar'
-                      ? 'bg-purple-600 text-white shadow-md'
-                      : 'text-slate-400 hover:text-slate-200'
-                  }`}
-                  title="Synthetic Aperture Radar Backscatter & Interferometric Fringes"
-                >
-                  📡 SAR
-                </button>
-                <button
-                  onClick={() => setHeatmapType('change')}
-                  className={`px-2 py-0.5 rounded-lg text-[10px] font-bold transition ${
-                    heatmapType === 'change'
-                      ? 'bg-amber-600 text-white shadow-md'
-                      : 'text-slate-400 hover:text-slate-200'
-                  }`}
-                  title="Bi-Temporal Change Delta Spectrum"
-                >
-                  ⚖️ Delta
-                </button>
-                <button
-                  onClick={() => setHeatmapType('hazard')}
-                  className={`px-2 py-0.5 rounded-lg text-[10px] font-bold transition ${
-                    heatmapType === 'hazard'
-                      ? 'bg-rose-600 text-white shadow-md'
-                      : 'text-slate-400 hover:text-slate-200'
-                  }`}
-                  title="Multi-Hazard Threat Severity Index"
-                >
-                  🔥 Threat
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* 🎯 AI Geolocation & Relocate Target & Map Pin Toggle */}
-          <div className="flex items-center gap-1.5 pl-2 border-l border-slate-700/80">
-            <button
-              onClick={() => setShowLocationPin(!showLocationPin)}
-              className={`px-2.5 py-1 rounded-xl text-[11px] font-bold flex items-center gap-1.5 transition border ${
-                showLocationPin
-                  ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-300 shadow-md shadow-emerald-950/20'
-                  : 'bg-slate-800/60 border-slate-700/60 text-slate-400 hover:text-slate-200'
-              }`}
-              title="Toggle AOI Location Pin/Label on map (Default OFF for clean satellite raster inspection)"
-            >
-              <MapPin className="w-3.5 h-3.5" />
-              <span>Pin: {showLocationPin ? 'ON' : 'OFF'}</span>
-            </button>
-            <button
-              onClick={() => setShowRelocateBar(!showRelocateBar)}
-              className="px-2.5 py-1 bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/40 text-cyan-300 rounded-xl text-[11px] font-bold flex items-center gap-1.5 transition"
-              title="AI Location Detected — Click to Relocate Scene"
-            >
-              <Navigation className="w-3.5 h-3.5 text-cyan-400" />
-              <span>🎯 Relocate</span>
-            </button>
           </div>
         </div>
       )}
@@ -2420,7 +2162,7 @@ export default function OpenLayersMap({
 
       {/* Floating Measurement Toolbar */}
       {viewMode === 'map' && (
-        <div className="absolute left-3 top-28 flex flex-col gap-1.5 z-20 pointer-events-auto bg-slate-900/90 backdrop-blur-md border border-slate-800 p-1.5 rounded-2xl shadow-2xl">
+        <div className="absolute left-3 top-1/2 -translate-y-1/2 flex flex-col gap-1.5 z-20 pointer-events-auto bg-slate-900/90 backdrop-blur-md border border-slate-800 p-1.5 rounded-2xl shadow-2xl">
           <button
             onClick={() => setActiveTool(activeTool === 'measure_distance' ? 'none' : 'measure_distance')}
             title="Measure Line Distance (Click on map to measure)"
@@ -2459,7 +2201,7 @@ export default function OpenLayersMap({
 
       {/* Floating Measurement Status Banner */}
       {measureResult && viewMode === 'map' && (
-        <div className="absolute top-28 left-16 z-20 pointer-events-auto bg-rose-950/90 border border-rose-600/50 text-rose-200 px-3.5 py-1.5 rounded-xl text-xs font-mono font-bold shadow-2xl flex items-center gap-2 animate-fade-in">
+        <div className="absolute left-16 top-1/2 -translate-y-1/2 z-20 pointer-events-auto bg-rose-950/90 border border-rose-600/50 text-rose-200 px-3.5 py-1.5 rounded-xl text-xs font-mono font-bold shadow-2xl flex items-center gap-2 animate-fade-in">
           <Activity className="w-3.5 h-3.5 text-rose-400 animate-pulse" />
           <span>{measureResult}</span>
           <button
